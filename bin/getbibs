@@ -1,0 +1,13 @@
+#!/bin/sh
+
+> $HOME/Box\ Sync/Bib/notes.bib
+
+# Find all the notes whose name is a string followed by four digits,
+# then send that file through the getbibs.py pandoc filter.
+
+PAGES=$(basename -s .page -a /Users/jared/Box\ Sync/Documents/Notes/*.md | grep '^[a-z]\+[0-9]\{4\}')
+
+echo "$PAGES" | while read -r page
+do
+	pandoc --filter=$HOME/.pandoc/filters/getbibs.py -t markdown /Users/jared/Box\ Sync/Documents/Notes/"$page".md >> $HOME/Box\ Sync/Bib/notes.bib 
+done
