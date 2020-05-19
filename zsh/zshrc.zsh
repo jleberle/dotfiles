@@ -75,6 +75,7 @@ pathdirs=(
   $HOME/go/bin
   $HOME/.rbenv/shims
   $HOME/.pyenv/bin
+  /usr/local/sbin
 )
 
 for dir in $pathdirs; do
