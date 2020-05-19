@@ -7,6 +7,7 @@ set directory=$HOME/.backups/vim/swap/
 
 " General 
 " -------------------------------------------------------------------
+colorscheme NeoSolarized
 set encoding=utf-8
 set showmode
 set showcmd
