@@ -27,7 +27,8 @@ Plug 'tomtom/tlib_vim' " Required by Snipmate
 
 call plug#end()
 
-let g:mapleader = ','       
+let mapleader = ","
+colorscheme neoSolarized 
 
 runtime! partials/plugins.vim
 runtime! partials/settings.vim

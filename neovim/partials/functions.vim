@@ -108,3 +108,25 @@ function! AbbreviateMonths()
   :%s/November/Nov./g
   :%s/December/Dec./g
 endfunction
+
+" Functions to pass file through pandoc
+
+function! PanPdf()
+   exec ":! pandoc -o ~/Desktop/" . fnameescape(expand('%:t:r')) . ".pdf " . fnameescape(expand('%:p'))
+endfunction
+
+function! PanRtf()
+   exec ":! pandoc -s -S -t rtf -o ~/Desktop/" . fnameescape(expand('%:t:r')) . ".rtf " . fnameescape(expand('%:p'))
+endfunction
+
+function! PanSyllabus()
+   exec ":! pandoc -s -S --template=syllabus.tex -o ~/Desktop/" . fnameescape(expand('%:t:r')) . ".pdf " . fnameescape(expand('%:p'))
+endfunction
+
+function! PanDocx()
+   exec ":! makebib;pandoc -s -S -t docx --reference-docx=/Users/wcm1/.pandoc/reference.docx --bibliography=/Users/wcm1/all.bib -o ~/Desktop/" . fnameescape(expand('%:t:r')) . ".docx " . fnameescape(expand('%:p'))
+endfunction
+
+function! PanBib()
+   exec ":! makebib;pandoc -s -S -t markdown --bibliography=/Users/wcm1/all.bib . fnameescape(expand('%:p'))"
+endfunction
