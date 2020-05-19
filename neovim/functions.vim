@@ -31,3 +31,5 @@ function! ToggleBackground()
   endif
 endfunction
 
+" Find text markers
+nnoremap <leader>{ :vimgrep /{\w\+}/ %<CR>:copen<CR>
