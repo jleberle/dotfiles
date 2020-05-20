@@ -12,7 +12,6 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-vinegar'
 
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
@@ -28,6 +27,8 @@ Plug 'tomtom/tlib_vim' " Required by Snipmate
 call plug#end()
 
 let mapleader = ","
+let maplocalleader = ","
+
 colorscheme neoSolarized 
 
 runtime! partials/plugins.vim

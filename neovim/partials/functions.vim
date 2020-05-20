@@ -109,6 +109,10 @@ function! AbbreviateMonths()
   :%s/December/Dec./g
 endfunction
 
+" Command to call Pandoc and process working file, using functions below
+command! -nargs=* Pan execute ":call Pan<args>()"
+nmap <leader>p :Pan 
+
 " Functions to pass file through pandoc
 
 function! PanPdf()

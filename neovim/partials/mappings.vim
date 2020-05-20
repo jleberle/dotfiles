@@ -34,6 +34,14 @@ nnoremap <silent> <leader>= mpgg/\v^(\w\|\#)<CR>=G`p :let @/ = ""<CR> " Clean up
 set dictionary=$HOME/Documents/Bib/citekeys.txt
  set complete+=k
 
+ " Expand directory of current file at command line
+" http://vimcasts.org/episodes/the-edit-command/
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+map <leader>ew :e %%
+map <leader>es :sp %%
+map <leader>ev :vsp %%
+map <leader>et :tabe %%
+
 " Update/Reload Vimrc and Functions
 " -------------------------------------------------------------------
 command! -nargs=0 Evimrc e $MYVIMRC
