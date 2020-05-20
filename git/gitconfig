@@ -13,7 +13,6 @@
     co = checkout
     count = !git shortlog -sn
     praise = blame
-    gp = git push
 
 [color]
     diff = auto
