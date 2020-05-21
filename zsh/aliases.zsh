@@ -12,17 +12,13 @@ alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
 alias ip="curl icanhazip.com"       # get current public IP
 alias more='more -R'                # give more colors
-alias process="ps aux | grep -i"
-alias scanlocal='nmap -sP 192.168.1.0/24'
-alias dfd='df -h -x squashfs -x tmpfs -x devtmpfs'
+alias files='du -hd 1 . | sort -hr' # https://leancrew.com/all-this/2020/05/sort-of-handy/
 
 # Editing zshrc/vim profiles
 alias vim='nvim'
 
 alias eprofile="$EDITOR ~/.dotfiles/zsh/zshrc.zsh"
 alias rprofile="source ~/.zshrc"
-
-alias ve='vim ~/.vim/vimrc'
 
 # Git 
 # -------------------------------------------------------------------
@@ -34,7 +30,8 @@ alias gcm='git commit -m'
 alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
 alias gs='git status -sb'
 alias gl='git pull --ff-only'
-alias gp='git push -u origin master'
+alias gp='git push'
+
 # Program Aliases
 # -------------------------------------------------------------------
 alias mp3='cd ~/Music && youtube-dl -x --audio-format mp3'
