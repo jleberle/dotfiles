@@ -17,8 +17,6 @@ Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-markdownfootnotes'
 
-Plug 'itchyny/lightline.vim'
-
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets' " Defaults
 Plug 'marcweber/vim-addon-mw-utils' " Required by Snipmate
@@ -29,10 +27,8 @@ call plug#end()
 let mapleader = ","
 let maplocalleader = ","
 
-colorscheme neoSolarized 
-
-runtime! partials/plugins.vim
 runtime! partials/settings.vim
+runtime! partials/plugins.vim
 runtime! partials/mappings.vim
 runtime! partials/filetype/*.vim
 runtime! partials/functions.vim

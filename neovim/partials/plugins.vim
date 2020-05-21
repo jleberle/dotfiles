@@ -1,25 +1,6 @@
 " PLUGINS
 " -------------------------------------------------------------------
 
-"" Lightline
-"" -------------------------------------------------------------------
-set laststatus=2                            " always show a status line
-
-if !has('gui_running')
-  set t_Co=256
-endif
-
-let g:lightline = {
-      \ 'colorscheme': 'solarized',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'fugitive#head'
-      \ },
-      \ }
-
 "" Commentary.vim 
 "" -------------------------------------------------------------------
 autocmd FileType apache set commentstring=#\ %s   "comments for Apache
@@ -27,6 +8,7 @@ autocmd FileType make set commentstring=#\ %s   "comments for Makefile
 autocmd FileType r set commentstring=#\ %s        "comments for R
 autocmd FileType pandoc set commentstring=<!--\ %s\ -->   "comments for pandoc
 nmap <C-c> gcc
+vmap <C-c> gcc
 
 "" Ctrl-P 
 "" -------------------------------------------------------------------
