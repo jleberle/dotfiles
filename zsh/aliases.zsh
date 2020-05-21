@@ -31,7 +31,7 @@ alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C
 alias gs='git status -sb'
 alias gl='git pull --ff-only'
 alias gp='git push'
-alias gsa='find . -maxdepth 1 -mindepth 1 -type d -exec sh -c '(echo {} && cd {} && git status -s && echo)' \;' # Git status for all repos in a folder
+alias gsa="find . -maxdepth 1 -mindepth 1 -type d -exec sh -c '(echo {} && cd {} && git status -s && echo)' \;" # Git status for all repos in a folder
 
 # Program Aliases
 # -------------------------------------------------------------------
