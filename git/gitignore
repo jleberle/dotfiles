@@ -16,7 +16,6 @@
 *.log
 *.odt
 *.out
-*.pdf
 *.pdfsync
 *.rbc
 *.run.xml
@@ -26,7 +25,6 @@
 *.synctex.gz
 *.tif
 *.toc
-*.zip
 *.~*
 *~
 .DS_Store
