@@ -1,3 +1,4 @@
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -26,11 +27,15 @@ export HOMEBREW_CASK_OPTS=--require-sha
 export HOMEBREW_NO_ANALYTICS=1
 
 #Homebrew autocompletion directories
-fpath=(/usr/local/share/zsh-completions $fpath)
-fpath=(/usr/local/share/zsh/site-functions $fpath)
+fpath=(
+ /usr/local/share/zsh-completions
+ /usr/local/share/zsh/site-functions
+ $fpath
+)
 
-# Aliases
+# Sourcing Aliases and Functions
 source $ZSH/zsh/aliases.zsh
+source $ZSH/zsh/functions.zsh
 
 # Functions
 autoload -U $ZSH/zsh/functions/*(:t)
@@ -76,6 +81,8 @@ pathdirs=(
   $HOME/.rbenv/shims
   $HOME/.pyenv/bin
   /usr/local/sbin
+  /usr/local/opt/coreutils/libexec/gnubin
+  /usr/local/opt/findutils/libexec/gnubin
 )
 
 for dir in $pathdirs; do
