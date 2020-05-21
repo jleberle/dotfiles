@@ -41,31 +41,6 @@ set number
 " Resize the splits if the vim windows is resized
 autocmd VimResized * :wincmd =
 
-" Status line
-" -------------------------------------------------------------------
-set laststatus=2                            " always show a status line
-set statusline=""
-set statusline+=%t                          " tail/filename
-set statusline+=%m%r%h                      " modified/read only/help
-set statusline+=\ [%Y]                      " line endings/type of file
-set statusline+=%=                          " left/right separator
-"display a warning if &paste is set
-set statusline+=%#error#
-set statusline+=%{&paste?'[paste]':''}
-set statusline+=%*
-" display a warning if the line endings aren't unix
-set statusline+=%#warningmsg#
-set statusline+=%{&ff!='unix'?'['.&ff.']':''}
-set statusline+=%*
-" display a warning if file encoding isnt utf-8
-set statusline+=%#warningmsg#
-set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}
-set statusline+=%*
-" progress through file
-set statusline+=C:%02c,                       " cursor column
-set statusline+=L:%03l/%03L                   " cursor line/total lines
-set statusline+=\ %P                        " percent through file
-
 " Folding
 " -------------------------------------------------------------------
 set nofoldenable

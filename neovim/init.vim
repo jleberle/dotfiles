@@ -17,6 +17,8 @@ Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-markdownfootnotes'
 
+Plug 'itchyny/lightline.vim'
+
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets' " Defaults
 Plug 'marcweber/vim-addon-mw-utils' " Required by Snipmate

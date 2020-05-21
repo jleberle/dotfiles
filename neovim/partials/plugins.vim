@@ -1,6 +1,27 @@
 " PLUGINS
 " -------------------------------------------------------------------
 
+
+"" Lightline
+"" -------------------------------------------------------------------
+set laststatus=2                            " always show a status line
+
+if !has('gui_running')
+  set t_Co=256
+endif
+
+let g:lightline = {
+      \ 'colorscheme': 'solarized',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'fugitive#head'
+      \ },
+      \ }
+
+
 "" Commentary.vim 
 "" -------------------------------------------------------------------
 autocmd FileType apache set commentstring=#\ %s   "comments for Apache
