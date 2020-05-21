@@ -8,6 +8,7 @@ fi
 
 # ZSH configuration
 # -------------------------------------------------------------------
+source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 
 # Environment variables
 if [[ -a "$HOME/.env.zsh" ]]; then
@@ -35,7 +36,6 @@ fpath=(
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/aliases.zsh
-source $ZSH/zsh/functions.zsh
 
 # Functions
 autoload -U $ZSH/zsh/functions/*(:t)
@@ -101,9 +101,5 @@ fi
 
 # Sourcing 
 # -------------------------------------------------------------------
-source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-eval "$(pyenv init -)"
