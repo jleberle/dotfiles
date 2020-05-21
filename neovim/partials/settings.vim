@@ -1,17 +1,18 @@
 " Vim File Locations 
 " -------------------------------------------------------------------
-set backup                                  " backups and swaps
-set swapfile
+set nobackup                                  " backups and swaps
+set noswapfile
 set backupdir=$HOME/.backups/vim/backup/
 set directory=$HOME/.backups/vim/swap/
 
 " General 
 " -------------------------------------------------------------------
+filetype plugin indent on
 set encoding=utf-8
+set showmatch
 set showmode
 set showcmd
 set hidden
-set showmatch
 set ruler
 set backspace=indent,eol,start              " allow backspacing in insert mode
 set smarttab
@@ -28,6 +29,10 @@ au FocusLost * :wa                          " save when losing focus (gVim)
 
 " General Display
 " -------------------------------------------------------------------
+syntax enable
+set notermguicolors
+colorscheme neoSolarized 
+set background=dark
 set display+=lastline                       " show partial last lines
 set nolist                                  " don't display space chars
 set listchars=tab:▸\ ,eol:¬,trail:·,nbsp:·  " TextMate style space chars
@@ -56,6 +61,12 @@ vnoremap Q gq
 nnoremap Q gwap
 set formatoptions=tqcwn                     " see :help fo-table
 
+" Pandoc 
+" -------------------------------------------------------------------
+au BufNewFile,BufFilePRe,BufRead *.markdown,*.md,*.mkd,*.pd,*.pdc,*.pdk,*.pandoc,*.text,*.txt,*.Rmd   set filetype=markdown.pandoc
+" Find the space before Pandoc footnotes
+nnoremap <leader><space> /\v^$\n[\^1\]:<CR>:let @/ = ""<CR>
+
 " Search 
 " -------------------------------------------------------------------
 set incsearch
@@ -66,17 +77,6 @@ set smartcase
 
 "" Spell check 
 "" -------------------------------------------------------------------
+set spelllang=en_us                         " US English
+set spell                                   " spell check on
 set spellsuggest=10                         " only suggest a few words
-
-
-"" Netrw
-"" -------------------------------------------------------------------
-" let g:netrw_banner = 0
-" let g:netrw_liststyle = 3
-" let g:netrw_browse_split = 4
-" let g:netrw_altv = 1
-" let g:netrw_winsize = 25
-" augroup ProjectDrawer
-"   autocmd!
-"   autocmd VimEnter * :Vexplore
-" augroup END

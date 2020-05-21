@@ -29,10 +29,8 @@ call plug#end()
 let mapleader = ","
 let maplocalleader = ","
 
-colorscheme neoSolarized 
-
-runtime! partials/plugins.vim
 runtime! partials/settings.vim
+runtime! partials/plugins.vim
 runtime! partials/mappings.vim
 runtime! partials/filetype/*.vim
 runtime! partials/functions.vim

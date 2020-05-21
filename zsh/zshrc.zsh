@@ -71,7 +71,7 @@ autoload colors zsh/terminfo && colors
 # Path
 # -------------------------------------------------------------------
 pathdirs=(
-  $HOME/dotfiles/bin
+  $HOME/Git/dotfiles/bin
   $HOME/go/bin
   $HOME/.rbenv/shims
   $HOME/.pyenv/bin
