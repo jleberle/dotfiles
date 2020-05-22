@@ -17,7 +17,7 @@ alias files='du -hd 1 . | sort -hr' # https://leancrew.com/all-this/2020/05/sort
 # Editing zshrc/vim profiles
 alias vim='nvim'
 
-alias eprofile="$EDITOR ~/.dotfiles/zsh/zshrc.zsh"
+alias eprofile="$EDITOR ~/Git/dotfiles/zsh/zshrc.zsh"
 alias rprofile="source ~/.zshrc"
 
 # Git 
@@ -107,22 +107,6 @@ function pman() { man -t "$@" | open -f -a "Preview" ;}
 # usage: fn foo 
 # to find all files containing 'foo' in the name
 function fn() { ls **/*$1* }
-
-function wordfrequency() {
-  awk '
-     BEGIN { FS="[^a-zA-Z]+" } {
-         for (i=1; i<=NF; i++) {
-             word = tolower($i)
-             words[word]++
-         }
-     }
-     END {
-         for (w in words)
-              printf("%3d %s\n", words[w], w)
-     } ' | sort -rn
-}
-
-function pman() { man -t "$@" | open -f -a "Preview" ;}
 
 # `o` with no arguments opens the current directory, otherwise opens the given
 # location
