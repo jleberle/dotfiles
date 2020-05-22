@@ -67,8 +67,11 @@ au BufNewFile,BufFilePRe,BufRead *.markdown,*.md,*.mkd,*.pd,*.pdc,*.pdk,*.pandoc
 " Find the space before Pandoc footnotes
 nnoremap <leader><space> /\v^$\n[\^1\]:<CR>:let @/ = ""<CR>
 
+" 
 " Search 
 " -------------------------------------------------------------------
+set path+=**
+set wildmenu
 set incsearch
 set ignorecase
 set smartcase
