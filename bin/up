@@ -29,7 +29,7 @@ fi
 
 # macOS
 echo "\nChecking macOS updates..."
-softwareupdate -l | tail +5
+softwareupdate -l | tail -n 5
 
 echo "\nInstall macOS updates? (y/n)" 
 read answer
