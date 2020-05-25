@@ -32,7 +32,7 @@ au FocusLost * :wa                          " save when losing focus (gVim)
 syntax enable
 set notermguicolors
 colorscheme neoSolarized 
-set background=dark
+set background=light
 set display+=lastline                       " show partial last lines
 set nolist                                  " don't display space chars
 set listchars=tab:▸\ ,eol:¬,trail:·,nbsp:·  " TextMate style space chars

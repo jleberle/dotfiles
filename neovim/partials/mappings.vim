@@ -47,7 +47,7 @@ map <leader>et :tabe %%
 command! -nargs=0 Evimrc e $MYVIMRC
 command! -nargs=0 Svimrc source $MYVIMRC
 command! -nargs=0 Efunctions e $HOME/.vim/functions.vim
-
+nnoremap <silent> <leader>sz :call ToggleBackground()<cr>
 " Tab completion
 " -------------------------------------------------------------------
 if has('wildmenu')
