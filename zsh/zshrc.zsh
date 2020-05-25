@@ -40,6 +40,9 @@ source $ZSH/zsh/aliases.zsh
 # Functions
 autoload -U $ZSH/zsh/functions/*(:t)
 
+# Colors
+eval $(gdircolors "$ZSH/zsh/solarized-colors")
+
 # Options
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -49,7 +52,8 @@ setopt INC_APPEND_HISTORY SHARE_HISTORY  # adds history incrementally and share 
 setopt HIST_IGNORE_ALL_DUPS  # don't record dupes in history
 setopt HIST_REDUCE_BLANKS
 export CLICOLOR=true
-export TERM="xterm-256color"
+export TERM="xterm-256color"        # for common 256 color terminals (e.g. gnome-terminal)
+export TERM="screen-256color"       # for a tmux -2 session (also for screen)
 setopt NO_BG_NICE # don't nice background tasks
 setopt NO_LIST_BEEP
 setopt PROMPT_SUBST
@@ -81,8 +85,6 @@ pathdirs=(
   $HOME/.rbenv/shims
   $HOME/.pyenv/bin
   /usr/local/sbin
-  /usr/local/opt/coreutils/libexec/gnubin
-  /usr/local/opt/findutils/libexec/gnubin
 )
 
 for dir in $pathdirs; do
