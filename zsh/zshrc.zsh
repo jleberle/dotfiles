@@ -24,6 +24,7 @@ else
   export MAKEFLAGS="-j 4"
 fi
 
+# export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
 export HOMEBREW_CASK_OPTS=--require-sha
 export HOMEBREW_NO_ANALYTICS=1
 
@@ -81,9 +82,6 @@ autoload colors zsh/terminfo && colors
 # -------------------------------------------------------------------
 pathdirs=(
   $HOME/Git/dotfiles/bin
-  $HOME/go/bin
-  $HOME/.rbenv/shims
-  $HOME/.pyenv/bin
   /usr/local/sbin
 )
 
@@ -106,5 +104,10 @@ fi
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+eval "$(rbenv init -)"
+
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi

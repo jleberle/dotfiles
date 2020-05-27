@@ -1,6 +1,6 @@
 # Directories
 # -------------------------------------------------------------------
-alias projects='cd ~/Git/Current\ Projects'
+alias projects='cd ~/Git/Projects'
 alias wiki='cd ~/Git/notebook'
 alias cv='cd ~/Git/CV'
 alias bib='cd ~/Git/Bib'
@@ -40,7 +40,6 @@ alias gsa="find . -maxdepth 1 -mindepth 1 -type d -exec sh -c '(echo {} && cd {}
 # -------------------------------------------------------------------
 alias mp3='cd ~/Music && youtube-dl -x --audio-format mp3'
 alias video='cd ~/Movies && youtube-dl -f bestvideo+bestaudio'
-alias tmux='tmux attach-session -t default'
 alias hosts='sudo python3 ~/.hosts/updateHostsFile.py -a -r -f'
 
 # Zippin
