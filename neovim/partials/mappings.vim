@@ -18,9 +18,8 @@ nnoremap ]<space> o<ESC>k
 nnoremap ]N /\V[^\d\+]<CR>
 nnoremap [N ?\V[^\d\+]<CR>
 " Copying and pasting
-imap <C-v> <C-r><C-o>+
-imap <C-c> <CR><Esc>O
-
+nnoremap <leader>0 "+p
+vnoremap <leader>x "+y
 "" Key mappings
 "" -------------------------------------------------------------------
 " Find the space before Pandoc footnotes
