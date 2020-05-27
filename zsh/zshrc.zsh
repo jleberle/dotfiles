@@ -82,9 +82,6 @@ autoload colors zsh/terminfo && colors
 # -------------------------------------------------------------------
 pathdirs=(
   $HOME/Git/dotfiles/bin
-  $HOME/go/bin
-  $HOME/.rbenv/shims
-  $HOME/.pyenv/bin
   /usr/local/sbin
 )
 
@@ -109,3 +106,8 @@ fi
 
 # test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+eval "$(rbenv init -)"
+
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
