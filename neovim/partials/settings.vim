@@ -15,7 +15,7 @@ au FocusLost * :wa                          " save when losing focus (gVim)
 
 " General Display
 " -------------------------------------------------------------------
-set notermguicolors
+set termguicolors
 colorscheme neoSolarized 
 set nolist                                  " don't display space chars
 set listchars=tab:▸\ ,eol:¬,trail:·,nbsp:·  " TextMate style space chars
