@@ -10,7 +10,7 @@ from datetime import date, datetime, time
 
 # add as many taskpaper files as you want here
 filelist = [ 
-                '/Users/jaredeberle/Documents/notes/td-tasks.wiki' 
+                '/Users/jaredeberle/Documents/td-tasks.taskpaper
             ]
 
 # this is where your today perspective will be stored
