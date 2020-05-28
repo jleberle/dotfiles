@@ -10,11 +10,11 @@ from datetime import date, datetime, time
 
 # add as many taskpaper files as you want here
 filelist = [ 
-                '/Users/jaredeberle/Documents/notes/td-tasks.taskpaper' 
+                '/Users/jaredeberle/Documents/notes/td-tasks.wiki' 
             ]
 
 # this is where your today perspective will be stored
-targetfile = '/Users/jaredeberle/Documents/notes/td-today.taskpaper'
+targetfile = '/Users/jaredeberle/Documents/td-today.taskpaper'
 d = date.today()
 today = d.strftime('%Y-%m-%d')
 dt = datetime.now()
