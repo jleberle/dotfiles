@@ -27,6 +27,7 @@ autocmd VimResized * :wincmd =
 " Folding
 " -------------------------------------------------------------------
 set nofoldenable
+set foldmethod=syntax
 set foldcolumn=1
 nnoremap <space> za
 
