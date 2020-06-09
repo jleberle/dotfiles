@@ -14,7 +14,7 @@ source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
 if [[ -a "$HOME/.env.zsh" ]]; then
   source "$HOME/.env.zsh"
 fi
-export EDITOR='vim'
+export EDITOR='nvim'
 export PROJECTS=$HOME/Git # c + <tab> for autocomplete
 export ZSH=$HOME/Git/dotfiles
 export GOPATH=$HOME/go
