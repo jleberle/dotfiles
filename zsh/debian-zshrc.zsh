@@ -1,48 +1,17 @@
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # ZSH configuration
 # -------------------------------------------------------------------
-source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
-
-# Environment variables
-if [[ -a "$HOME/.env.zsh" ]]; then
-  source "$HOME/.env.zsh"
-fi
-export EDITOR='nvim'
-export PROJECTS=$HOME/Git # c + <tab> for autocomplete
-export ZSH=$HOME/Git/dotfiles
-export GOPATH=$HOME/go
-if [[ -v NUMCORES ]]; then
-  export MAKEFLAGS="-j $NUMCORES"
-else
-  export MAKEFLAGS="-j 4"
-fi
-
-# export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
-export HOMEBREW_CASK_OPTS=--require-sha
-export HOMEBREW_NO_ANALYTICS=1
-
-#Homebrew autocompletion directories
-fpath=(
- /usr/local/share/zsh-completions
- /usr/local/share/zsh/site-functions
- $fpath
-)
+export EDITOR='vim'
+export PROJECTS=$HOME/git # c + <tab> for autocomplete
+export ZSH=$HOME/git/dotfiles
 
 # Sourcing Aliases and Functions
-source $ZSH/zsh/aliases.zsh
+source $ZSH/zsh/debian-aliases.zsh
 
 # Functions
 autoload -U $ZSH/zsh/functions/*(:t)
 
 # Colors
-eval $(gdircolors "$ZSH/zsh/solarized-colors")
+eval $(dircolors "$ZSH/zsh/solarized-colors")
 
 # Options
 HISTFILE=~/.zsh_history
@@ -82,7 +51,6 @@ autoload colors zsh/terminfo && colors
 # -------------------------------------------------------------------
 pathdirs=(
   $HOME/Git/dotfiles/bin
-  /usr/local/sbin
 )
 
 for dir in $pathdirs; do
@@ -91,23 +59,11 @@ for dir in $pathdirs; do
   fi
 done
 
-# initialize autocomplete here, otherwise functions won't be loaded
-if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
-
-  autoload -Uz compinit
-  compinit
-fi
+autoload -Uz compinit
+compinit
 
 # Sourcing 
 # -------------------------------------------------------------------
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-eval "$(rbenv init -)"
-
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
+source ~/.powerlevel10k/powerlevel10k.zsh-theme
