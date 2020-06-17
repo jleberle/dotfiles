@@ -1,0 +1,31 @@
+Host *
+  AddressFamily inet
+  HashKnownHosts yes
+  VisualHostKey yes
+  PasswordAuthentication no
+  ChallengeResponseAuthentication no
+  StrictHostKeyChecking ask
+  VerifyHostKeyDNS yes
+  ForwardAgent no
+  ForwardX11 no
+  ForwardX11Trusted no
+  ServerAliveInterval 300
+  ServerAliveCountMax 2
+  Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+  MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+  KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+  HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa
+
+Host blog
+  HostName ssh.phx.nearlyfreespeech.net
+  User eberlel_wiki
+  RemoteForward 52698 localhost:52698
+
+Host github
+  Hostname github.com
+  User git
+  ControlMaster no
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/github_ed25519
+  MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
