@@ -2,7 +2,7 @@
 autotag:
   whitelist: []
   synonyms: {}
-doing_file: "~/td-tasks.md"
+doing_file: "~/Documents/td-tasks.md"
 current_section: Currently
 editor_app:
 html_template:
