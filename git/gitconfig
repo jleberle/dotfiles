@@ -4,7 +4,7 @@
 [user]
      name = Jared Eberle
      email = me@jaredeberle.org
-     signingkey = 0x74A0A6336FCAB505
+     signingkey = 0xF8D2388B3B5C0C84
 
 [github]
     user = jleberle
@@ -59,3 +59,5 @@
 
 [commit]
 	gpgsign = true
+[gpg]
+	program = gpg
