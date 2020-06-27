@@ -40,7 +40,7 @@ alias gsa="find . -maxdepth 1 -mindepth 1 -type d -exec sh -c '(echo {} && cd {}
 # -------------------------------------------------------------------
 alias mp3='cd ~/Music && youtube-dl -x --audio-format mp3'
 alias video='cd ~/Movies && youtube-dl -f bestvideo+bestaudio'
-alias hosts='sudo python3 ~/.hosts/updateHostsFile.py -a -r -f'
+alias hosts='sudo python3 ~/.hosts/updateHostsFile.py -e fakenews porn -m -a -r -f'
 
 # Zippin
 alias gz='tar -zcvf'
