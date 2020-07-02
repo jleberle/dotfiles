@@ -29,10 +29,4 @@ fi
 
 # macOS
 echo "\nChecking macOS updates..."
-softwareupdate -l | tail -n 5
-
-echo "\nInstall macOS updates? (y/n)" 
-read answer
-	if echo "$answer" | grep -iq "^y" ; then
-	sudo softwareupdate -i -a && echo "\nmacOS updates done! You may need to reboot..."
-fi
+softwareupdate -i -a
