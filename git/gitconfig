@@ -50,7 +50,6 @@
 [mergetool]
     keepBackup = false
 
-
 [help]
     autocorrect = 1
 
