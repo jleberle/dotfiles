@@ -20,8 +20,11 @@ Host *
 
 Host blog
   HostName ssh.phx.nearlyfreespeech.net
-  User eberlel_wiki
-  RemoteForward 52698 localhost:52698
+  User eberlel_jaredeberle
+
+Host wp
+  HostName ssh.phx.nearlyfreespeech.net
+  User eberlel_clippings
 
 Host github
   Hostname github.com
