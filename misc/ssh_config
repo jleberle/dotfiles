@@ -18,10 +18,15 @@ Host *
   KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
   HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa
 
-Host blog
+Host website
   HostName ssh.phx.nearlyfreespeech.net
   User eberlel_jaredeberle
-
+Host blog
+  HostName ssh.phx.nearlyfreespeech.net
+  User eberlel_jleberleblog
+Host covid
+  HostName ssh.phx.nearlyfreespeech.net
+  User eberlel_wiki
 Host wp
   HostName ssh.phx.nearlyfreespeech.net
   User eberlel_clippings
