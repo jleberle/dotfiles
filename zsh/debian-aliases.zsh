@@ -59,7 +59,7 @@ alias jazz='mplayer -playlist http://somafm.com/sonicuniverse130.pls'
 alias scanner='mpv https://www.broadcastify.com/scripts/playlists/1/31184/-6349349068.m3u'
 
 # Use zmv, which is amazing
-autoload -U zmv
+# autoload -U zmv
 alias zmv="noglob zmv -W"
 
 # Functions

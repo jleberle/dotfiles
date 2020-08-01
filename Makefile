@@ -19,7 +19,18 @@ firstrun :
 	ln -s $(HOME)/Git/Dotfiles/misc/gpg.conf $(HOME)/.gnupg/gpg.conf
 	ln -s $(HOME)/Git/Dotfiles/misc/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
 	ln -s $(HOME)/Git/Dotfiles/misc/gemrc $(HOME)/.gemrc
-	ln -s $(HOME)/Git/Dotfiles/misc/.tmux.conf $(HOME)/.tmux.conf
+	ln -s $(HOME)/Git/Dotfiles/misc/tmux.conf $(HOME)/.tmux.conf
+
+linux :
+	@echo "Symlinking dotfiles"
+	ln -s $(HOME)/Documents/dotfiles/misc/gpg.conf $(HOME)/.gnupg/gpg.conf
+	ln -s $(HOME)/Documents/dotfiles/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
+	ln -s $(HOME)/Documents/dotfiles/misc/gemrc $(HOME)/.gemrc
+	ln -s $(HOME)/Documents/dotfiles/tmux.conf $(HOME)/.tmux.conf
+	ln -s $(HOME)/Documents/dotfiles/neovim $(HOME)/.config/nvim
+	ln -s $(HOME)/Documents/dotfiles/git/gitconfig $(HOME)/.gitconfig 
+	ln -s $(HOME)/Documents/dotfiles/git/gitignore $(HOME)/.gitignore
+	ln -s $(HOME)/Documents/dotfiles/zsh/debian-zshrc.zsh $(HOME)/.zshrc
 
 all : git zsh neovim 
 

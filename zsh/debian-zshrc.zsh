@@ -1,8 +1,15 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # ZSH configuration
 # -------------------------------------------------------------------
-export EDITOR='vim'
-export PROJECTS=$HOME/git # c + <tab> for autocomplete
-export ZSH=$HOME/git/dotfiles
+export EDITOR='nvim'
+export PROJECTS=$HOME/Documents # c + <tab> for autocomplete
+export ZSH=$HOME/Documents/dotfiles
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
@@ -50,7 +57,7 @@ autoload colors zsh/terminfo && colors
 # Path
 # -------------------------------------------------------------------
 pathdirs=(
-  $HOME/Git/dotfiles/bin
+  $HOME/Documents/dotfiles/bin
 )
 
 for dir in $pathdirs; do
@@ -66,4 +73,4 @@ compinit
 # -------------------------------------------------------------------
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-source ~/.powerlevel10k/powerlevel10k.zsh-theme
+source ~/.config/powerlevel10k/powerlevel10k.zsh-theme
