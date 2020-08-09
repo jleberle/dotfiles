@@ -1,9 +1,9 @@
 # Directories
 # -------------------------------------------------------------------
-alias projects='cd ~/git/projects'
-alias wiki='cd ~/git/wiki'
-alias bib='cd ~/git/bib'
-alias book='cd ~/git/book'
+alias projects='cd ~/Documents/projects'
+alias wiki='cd ~/Documents/wiki'
+alias bib='cd ~/Documents/bib'
+alias book='cd ~/Documents/book'
 
 # System management
 # -------------------------------------------------------------------
@@ -19,7 +19,7 @@ alias ll='ls -al --color=auto'
 # Editing zshrc/vim profiles
 alias vim='nvim'
 
-alias eprofile="$EDITOR ~/git/dotfiles/zsh/zshrc.zsh"
+alias eprofile="$EDITOR ~/Documents/dotfiles/zsh/zshrc.zsh"
 alias rprofile="source ~/.zshrc"
 
 # Git 
