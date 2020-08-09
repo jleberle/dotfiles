@@ -59,6 +59,7 @@ autoload colors zsh/terminfo && colors
 pathdirs=(
   $HOME/Documents/dotfiles/bin
   $HOME/.gem/ruby/2.5.0/bin
+  $HOME/.local/bin
 )
 
 for dir in $pathdirs; do

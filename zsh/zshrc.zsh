@@ -83,6 +83,7 @@ autoload colors zsh/terminfo && colors
 pathdirs=(
   $HOME/Git/dotfiles/bin
   /usr/local/sbin
+  $HOME/go/bin
 )
 
 for dir in $pathdirs; do
