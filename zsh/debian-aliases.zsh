@@ -13,8 +13,7 @@ alias ip="curl icanhazip.com"       # get current public IP
 alias more='more -R'                # give more colors
 alias files='du -hd 1 . | sort -hr' # https://leancrew.com/all-this/2020/05/sort-of-handy/
 
-alias ls='ls --color=auto'  
-alias ll='ls -al --color=auto'
+alias ls='ls -lAhog --color=auto'  
 
 # Editing zshrc/vim profiles
 alias vim='nvim'
