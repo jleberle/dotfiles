@@ -39,7 +39,6 @@ alias gsa="find . -maxdepth 1 -mindepth 1 -type d -exec sh -c '(echo {} && cd {}
 # -------------------------------------------------------------------
 alias mp3='cd ~/Music && youtube-dl -x --audio-format mp3'
 alias video='cd ~/Movies && youtube-dl -f bestvideo+bestaudio'
-alias hosts='sudo python3 ~/.hosts/updateHostsFile.py -a -r -f'
 
 # Zippin
 alias gz='tar -zcvf'
@@ -61,6 +60,8 @@ alias scanner='mpv https://www.broadcastify.com/scripts/playlists/1/31184/-63493
 # Use zmv, which is amazing
 autoload -U zmv
 alias zmv="noglob zmv -W"
+
+alias gollum='gollum --config=config.rb --css --critic-markup'
 
 # Functions
 # -------------------------------------------------------------------
