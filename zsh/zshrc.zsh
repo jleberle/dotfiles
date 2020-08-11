@@ -25,7 +25,8 @@ else
 fi
 
 export GPG_TTY=$(tty)
-# export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
+
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
 export HOMEBREW_CASK_OPTS=--require-sha
 export HOMEBREW_NO_ANALYTICS=1
 #Homebrew autocompletion directories
