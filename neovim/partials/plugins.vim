@@ -4,8 +4,19 @@
 "" VimWiki
 ""------------------------------------------------------------------
 let g:vimwiki_global_ext = 0
-let g:vimwiki_list = [{'path': '~/git/wiki/', 'syntax': 'markdown', 'ext': '.wiki'}]
-
+let g:vimwiki_list = [
+      \ {
+      \         'path': '/Users/jaredeberle/Git/wiki/wiki',
+      \         'path_html': '/Users/jaredeberle/Git/wiki/html',
+      \         'template_path': '~/.config/vimwiki/',
+      \         'template_default': 'default',
+      \         'syntax': 'markdown',
+      \         'ext': '.wiki',
+      \         'template_ext': '.tpl',
+      \         'custom_wiki2html': 'vimwiki_markdown',
+      \         'html_filename_parameterization': 1,
+      \         'auto_toc': 1},
+      \ ]
 
 "" Lightline
 "" -------------------------------------------------------------------
