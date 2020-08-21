@@ -60,3 +60,5 @@
 	gpgsign = true
 [gpg]
 	program = gpg
+[pull]
+	rebase = false
