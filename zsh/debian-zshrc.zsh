@@ -10,6 +10,7 @@ fi
 export EDITOR='nvim'
 export PROJECTS=$HOME/Documents # c + <tab> for autocomplete
 export ZSH=$HOME/Documents/dotfiles
+export GPG_TTY=$(tty)
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
