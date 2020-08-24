@@ -2,6 +2,8 @@
 # Most optional fields are not included.
 extends markdown
 
+# Based on http://pts.szit.bme.hu/bibtex-cheat-sheet.txt
+# Most optional fields are not included.
 snippet article
 	~~~~~{.bib}
 	@Article{ `Filename('', 'id')`,
@@ -70,29 +72,4 @@ snippet phd
 	}
 	~~~~~
 	{$4}
-snippet fmatter
-	----
-	from: markdown
-	to: latex
-	template: /Users/jaredeberle/Git/dotfiles/pandoc-templates/default.latex
-	title: '${1:title}'
-	toc: false
-	titlepage: false
-	indent: true
-	geometry: margin=1in
-	header-includes:
-		- \usepackage{multicol}
-		- \usepackage{indentfirst}
-		- \setlength{\parindent}{4em}
-		- \setlength{\parskip}{6pt}
-		- \pagenumbering{gobble}
-		- \newcommand{\hideFromPandoc}[1]{#1}
-		- \hideFromPandoc{
-			\let\Begin\begin
-			\let\End\end
-		}
-	---
-	$2
 
-snippet lobjs
-	Upon completion of this lesson you should be able to:
