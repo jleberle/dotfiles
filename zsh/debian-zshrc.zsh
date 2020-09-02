@@ -8,8 +8,8 @@ fi
 # ZSH configuration
 # -------------------------------------------------------------------
 export EDITOR='nvim'
-export PROJECTS=$HOME/Documents # c + <tab> for autocomplete
-export ZSH=$HOME/Documents/dotfiles
+export PROJECTS=$HOME/Git # c + <tab> for autocomplete
+export ZSH=$HOME/Git/dotfiles
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
