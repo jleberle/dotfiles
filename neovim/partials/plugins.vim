@@ -9,6 +9,7 @@ let g:vimwiki_list = [
       \         'path': '~/Git/wiki',
       \         'syntax': 'markdown',
       \         'ext': '.md',
+      \         'template_ext': '.tpl',
       \         'html_filename_parameterization': 1,
       \         'auto_toc': 1},
       \ ]
