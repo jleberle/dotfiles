@@ -8,9 +8,8 @@ fi
 # ZSH configuration
 # -------------------------------------------------------------------
 export EDITOR='nvim'
-export PROJECTS=$HOME/Documents # c + <tab> for autocomplete
-export ZSH=$HOME/Documents/dotfiles
-export GPG_TTY=$(tty)
+export PROJECTS=$HOME/Git # c + <tab> for autocomplete
+export ZSH=$HOME/Git/dotfiles
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
@@ -77,3 +76,6 @@ compinit
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 source ~/.config/powerlevel10k/powerlevel10k.zsh-theme
+export GPG_TTY=$(tty)
+
+
