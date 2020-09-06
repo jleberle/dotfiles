@@ -20,6 +20,7 @@ Plug 'vim-pandoc/vim-markdownfootnotes'
 Plug 'itchyny/lightline.vim'
 
 Plug 'vimwiki/vimwiki'
+Plug 'mattn/calendar-vim'
 
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets' " Defaults
