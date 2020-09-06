@@ -57,7 +57,7 @@ autoload colors zsh/terminfo && colors
 # Path
 # -------------------------------------------------------------------
 pathdirs=(
-  $HOME/Documents/dotfiles/bin
+  $HOME/Git/dotfiles/bin
   $HOME/.gem/ruby/2.5.0/bin
   $HOME/.local/bin
 )
@@ -76,6 +76,5 @@ compinit
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 source ~/.config/powerlevel10k/powerlevel10k.zsh-theme
-export GPG_TTY=$(tty)
-
-
+GPG_TTY=$(tty)
+export GPG_TTY

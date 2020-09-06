@@ -50,3 +50,4 @@ env/
 .cache/
 TODO.txt
 *.scriv
+public/

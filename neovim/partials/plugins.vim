@@ -6,7 +6,7 @@
 let g:vimwiki_global_ext = 0
 let g:vimwiki_list = [
       \ {
-      \         'path': '/Users/jaredeberle/Git/wiki',
+      \         'path': '~/Git/wiki',
       \         'syntax': 'markdown',
       \         'ext': '.md',
       \         'template_ext': '.tpl',
