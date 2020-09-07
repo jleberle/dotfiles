@@ -10,6 +10,10 @@ zsh :
 	@echo "Symlinking ZSH dotfiles"
 	ln -s $(HOME)/Git/dotfiles/zsh/zshrc.zsh $(HOME)/.zshrc 
 
+linux-zsh :
+	@echo "Symlinking ZSH dotfiles"
+	ln -s $(HOME)/Git/dotfiles/zsh/debian-zshrc.zsh $(HOME)/.zshrc
+
 neovim :
 	@echo "Symlinking Neovim dotfiles"
 	ln -s $(HOME)/Git/dotfiles/neovim $(HOME)/.config/nvim
