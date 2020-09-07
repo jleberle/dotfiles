@@ -78,5 +78,3 @@ compinit
 source ~/.config/powerlevel10k/powerlevel10k.zsh-theme
 GPG_TTY=$(tty)
 export GPG_TTY
-
-
