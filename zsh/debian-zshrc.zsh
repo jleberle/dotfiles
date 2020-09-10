@@ -10,6 +10,7 @@ fi
 export EDITOR='nvim'
 export PROJECTS=$HOME/Git # c + <tab> for autocomplete
 export ZSH=$HOME/Git/dotfiles
+export TROPY_PATH=/opt/tropy
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
@@ -60,6 +61,7 @@ pathdirs=(
   $HOME/Git/dotfiles/bin
   $HOME/.gem/ruby/2.5.0/bin
   $HOME/.local/bin
+  $TROPY_PATH
 )
 
 for dir in $pathdirs; do
