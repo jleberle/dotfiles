@@ -6,9 +6,11 @@ nnoremap ~ K
 nnoremap K ~
 nmap E ge
 imap jj <Esc>
+
 " reselect visual after indent
 vnoremap < <gv
 vnoremap > >gv
+
 " move between splits
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -17,11 +19,15 @@ nnoremap <C-l> <C-w>l
 nnoremap ]<space> o<ESC>k
 nnoremap ]N /\V[^\d\+]<CR>
 nnoremap [N ?\V[^\d\+]<CR>
-" Copying and pasting
-nnoremap <leader>0 "+p
-vnoremap <leader>x "+y
+
+" Copying and pasting (Stopped working, see main settings for yank to system 
+" clipboard setup. Leaving for reference
+" nnoremap <leader>0 "+p
+" vnoremap <leader>x "+y
+
 "" Key mappings
 "" -------------------------------------------------------------------
+
 " Find the space before Pandoc footnotes
 nnoremap <leader><space> /\v^$\n[\^1\]:<CR>:let @/ = ""<CR>
 

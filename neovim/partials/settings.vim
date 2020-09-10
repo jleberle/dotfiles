@@ -40,18 +40,21 @@ set shiftwidth=2                            " # of spaces for autoindenting
 set expandtab                               " insert spaces not tabs
 set copyindent                              " copy prev indentation
 set shiftround                              " use shiftwidth when indenting
+
 " Use Q to format paragraph
 vnoremap Q gq
 nnoremap Q gwap
 set formatoptions=tqcwn                     " see :help fo-table
 
+" Yank to system
+set clipboard+=unnamed
 " Pandoc 
 " -------------------------------------------------------------------
 au BufNewFile,BufFilePRe,BufRead *.markdown,*.md,*.mkd,*.pd,*.pdc,*.pdk,*.pandoc,*.text,*.txt,*.Rmd   set filetype=markdown.pandoc
+
 " Find the space before Pandoc footnotes
 nnoremap <leader><space> /\v^$\n[\^1\]:<CR>:let @/ = ""<CR>
 
-" 
 " Search 
 " -------------------------------------------------------------------
 set path+=**
