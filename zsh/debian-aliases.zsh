@@ -14,9 +14,15 @@ alias more='more -R'                # give more colors
 alias files='du -hd 1 . | sort -hr' # https://leancrew.com/all-this/2020/05/sort-of-handy/
 
 alias ls='ls -lAhog --color=auto'  
+alias grep='grep --color' 
+alias rgrep='rgrep -n --color' 
+alias diff='colordiff' 
+alias tail='colortail' 
+alias make='colormake'
 
 # Editing zshrc/vim profiles
 alias vim='nvim'
+alias vi='nvim'
 
 alias eprofile="$EDITOR ~/Documents/dotfiles/zsh/zshrc.zsh"
 alias rprofile="source ~/.zshrc"

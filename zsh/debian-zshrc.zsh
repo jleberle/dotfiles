@@ -14,12 +14,14 @@ export TROPY_PATH=/opt/tropy
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Functions
 autoload -U $ZSH/zsh/functions/*(:t)
 
 # Colors
 eval $(dircolors "$ZSH/zsh/solarized-colors")
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Options
 HISTFILE=~/.zsh_history
