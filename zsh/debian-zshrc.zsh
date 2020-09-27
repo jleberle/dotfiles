@@ -14,7 +14,6 @@ export TROPY_PATH=/opt/tropy
 
 # Sourcing Aliases and Functions
 source $ZSH/zsh/debian-aliases.zsh
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Functions
 autoload -U $ZSH/zsh/functions/*(:t)
@@ -82,3 +81,5 @@ compinit
 source ~/.config/powerlevel10k/powerlevel10k.zsh-theme
 GPG_TTY=$(tty)
 export GPG_TTY
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
