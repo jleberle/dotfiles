@@ -8,8 +8,6 @@ fi
 
 # ZSH configuration
 # -------------------------------------------------------------------
-source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
-
 # Environment variables
 if [[ -a "$HOME/.env.zsh" ]]; then
   source "$HOME/.env.zsh"
@@ -23,8 +21,6 @@ if [[ -v NUMCORES ]]; then
 else
   export MAKEFLAGS="-j 4"
 fi
-
-export GPG_TTY=$(tty)
 
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
 export HOMEBREW_CASK_OPTS=--require-sha
@@ -113,3 +109,9 @@ eval "$(rbenv init -)"
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
+
+export GPG_TTY=$TTY
+
+source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh

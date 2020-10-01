@@ -1,7 +1,7 @@
 # Directories
 # -------------------------------------------------------------------
 alias projects='cd ~/Git/Projects'
-alias wiki='cd ~/Git/notebook'
+alias wiki='cd ~/Git/wiki'
 alias cv='cd ~/Git/CV'
 alias bib='cd ~/Git/Bib'
 alias diss='cd ~/Documents/Dissertation'
