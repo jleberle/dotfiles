@@ -6,6 +6,9 @@ export TERM='rxvt-256color'
 export DOTFILES="$HOME/Git/dotfiles"
 export CLICOLOR=YES
 export GPG_TTY=$TTY
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
+export HOMEBREW_CASK_OPTS=--require-sha
+export HOMEBREW_NO_ANALYTICS=1
 
 # editor
 export EDITOR="nvim"
