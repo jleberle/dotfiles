@@ -1,0 +1,17 @@
+#!/bin/zsh
+###############################
+# EXPORT ENVIRONMENT VARIABLE #
+###############################
+export TERM='rxvt-256color'
+export DOTFILES="$HOME/Git/dotfiles"
+export CLICOLOR=YES
+export GPG_TTY=$TTY
+
+# editor
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+# Paths
+export ZSH="${HOME}/.oh-my-zsh"
+export PATH="${HOME}/.local/bin:${HOME}/.cabal/bin:${DOTFILES}/bin:$PATH"
+
