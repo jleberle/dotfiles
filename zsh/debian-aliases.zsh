@@ -1,9 +1,9 @@
 # Directories
 # -------------------------------------------------------------------
-alias projects='cd ~/Documents/projects'
-alias wiki='cd ~/Documents/wiki'
-alias bib='cd ~/Documents/bib'
-alias book='cd ~/Documents/book'
+alias projects='cd $GITSTORE/projects'
+alias wiki='cd $GITSTORE/wiki'
+alias bib='cd $GITSTORE/bib'
+alias book='cd $GITSTORE/book'
 
 # System management
 # -------------------------------------------------------------------
