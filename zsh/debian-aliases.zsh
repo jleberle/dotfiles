@@ -1,5 +1,6 @@
 # Directories
 # -------------------------------------------------------------------
+<<<<<<< HEAD
 alias projects='cd $GITDIR/projects'
 alias wiki='cd $GITDIR/wiki'
 alias bib='cd $GITDIR/bib'
