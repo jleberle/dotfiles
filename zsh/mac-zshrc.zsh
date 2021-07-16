@@ -8,13 +8,13 @@ fi
 # ZSH configuration
 
 # Aliases
-source $ZSH/zsh/aliases.zsh
+source $ZSH/aliases.zsh
 
 autoload -U compinit
 compinit
 
 # Functions
-autoload -U $ZSH/zsh/functions/*(:t)
+autoload -U $ZSH/functions/*(:t)
 
 # Options
 HISTFILE=~/.zsh_history
@@ -128,7 +128,7 @@ setopt promptsubst
 pathdirs=(
   /opt/homebrew/bin
   /usr/local/opt/ruby/bin
-  $HOME/Dropbox/Dotfiles/bin
+  $DOTFILES/bin
 )
 
 for dir in $pathdirs; do

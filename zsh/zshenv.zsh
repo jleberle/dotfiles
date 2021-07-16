@@ -6,7 +6,7 @@ export CLICOLOR=true
 export TERM="xterm-256color"        # for common 256 color terminals (e.g. gnome-terminal)
 
 export DOTFILES="$HOME/Dropbox/Dotfiles"
-export ZSH=$HOME/Dropbox/Dotfiles/Mac/
+export ZSH=$DOTFILES/zsh
 
 export GPG_TTY=$TTY
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
