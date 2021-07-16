@@ -6,8 +6,7 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'icymind/NeoSolarized'
-
+Plug 'arcticicestudio/nord-vim'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-unimpaired'
@@ -19,9 +18,6 @@ Plug 'vim-pandoc/vim-markdownfootnotes'
 
 Plug 'itchyny/lightline.vim'
 
-Plug 'vimwiki/vimwiki'
-Plug 'mattn/calendar-vim'
-
 Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets' " Defaults
 Plug 'marcweber/vim-addon-mw-utils' " Required by Snipmate
@@ -31,8 +27,6 @@ call plug#end()
 
 let mapleader = ","
 let maplocalleader = ","
-
-set termguicolors
 
 runtime! partials/settings.vim
 runtime! partials/plugins.vim
