@@ -1,3 +1,13 @@
+" Display
+" -------------------------------------------------------------------
+colorscheme nord
+set nolist                                  " don't display space chars
+set listchars=tab:▸\ ,eol:¬,trail:·,nbsp:·  " TextMate style space chars
+set scrolloff=0
+set number
+" Resize the splits if the vim windows is resized
+autocmd VimResized * :wincmd =
+
 " General 
 " -------------------------------------------------------------------
 set showmatch
@@ -12,17 +22,6 @@ set shiftround
 set timeoutlen=1000
 set ttimeoutlen=0
 au FocusLost * :wa                          " save when losing focus (gVim)
-
-" General Display
-" -------------------------------------------------------------------
-colorscheme NeoSolarized
-set background=light
-set nolist                                  " don't display space chars
-set listchars=tab:▸\ ,eol:¬,trail:·,nbsp:·  " TextMate style space chars
-set scrolloff=0
-set number
-" Resize the splits if the vim windows is resized
-autocmd VimResized * :wincmd =
 
 " Folding
 " -------------------------------------------------------------------
