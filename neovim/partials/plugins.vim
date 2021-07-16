@@ -1,19 +1,6 @@
 " PLUGINS
 " -------------------------------------------------------------------
 
-"" VimWiki
-""------------------------------------------------------------------
-let g:vimwiki_global_ext = 0
-let g:vimwiki_list = [
-      \ {
-      \         'path': '~/Git/wiki',
-      \         'syntax': 'markdown',
-      \         'ext': '.md',
-      \         'template_ext': '.tpl',
-      \         'html_filename_parameterization': 1,
-      \         'auto_toc': 1},
-      \ ]
-
 "" Lightline
 "" -------------------------------------------------------------------
 set laststatus=2                            " always show a status line
@@ -23,7 +10,7 @@ if !has('gui_running')
 endif
 
 let g:lightline = {
-      \ 'colorscheme': 'solarized',
+      \ 'colorscheme': 'nord',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
