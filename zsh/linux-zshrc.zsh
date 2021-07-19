@@ -8,13 +8,13 @@ fi
 # ZSH configuration
 
 # Aliases
-source $ZSH/Linux/aliases.zsh
+source $ZSH/aliases.zsh
 
 autoload -U compinit
 compinit
 
 # Functions
-autoload -U $ZSH/Linux/functions/*(:t)
+autoload -U $ZSH/functions/*(:t)
 
 # Options
 HISTFILE=~/.zsh_history
@@ -134,6 +134,12 @@ for dir in $pathdirs; do
     PATH=$dir:$PATH
   fi
 done
+
+if [[ `uname` == "Darwin" ]]; then
+  eval $(gdircolors $ZSH/dir_colors)
+else
+  eval $(dircolors $ZSH/dir_colors)
+fi
 
 source ~/.powerlevel10k/powerlevel10k.zsh-theme
 

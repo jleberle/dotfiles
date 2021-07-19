@@ -12,7 +12,7 @@ alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
 alias ip="curl icanhazip.com"       # get current public IP
 alias more='more -R'                # give more colors
-alias ls='ls -lAFh'   #long list,show almost all,show type,human readable
+alias ls='ls -lAFh --color'   #long list,show almost all,show type,human readable
 
 # Git 
 # -------------------------------------------------------------------
