@@ -5,7 +5,7 @@
 export CLICOLOR=true
 export TERM="xterm-256color"        # for common 256 color terminals (e.g. gnome-terminal)
 
-export DOTFILES="$HOME/Dropbox/Dotfiles"
+export DOTFILES="$HOME/.dotfiles"
 export ZSH=$DOTFILES/zsh
 
 export GPG_TTY=$TTY

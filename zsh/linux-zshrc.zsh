@@ -8,13 +8,13 @@ fi
 # ZSH configuration
 
 # Aliases
-source $ZSH/Linux/aliases.zsh
+source $ZSH/aliases.zsh
 
 autoload -U compinit
 compinit
 
 # Functions
-autoload -U $ZSH/Linux/functions/*(:t)
+autoload -U $ZSH/functions/*(:t)
 
 # Options
 HISTFILE=~/.zsh_history
@@ -46,83 +46,6 @@ bindkey '^S' history-incremental-search-forward
 unsetopt nomatch
 autoload colors zsh/terminfo && colors
 
-# Prompt
-# -------------------------------------------------------------------
-git_branch() {
-  echo $(/usr/bin/git symbolic-ref HEAD 2>/dev/null | awk -F/ {'print $NF'})
-}
-
-git_dirty() {
-  st=$(/usr/bin/git status 2>/dev/null | tail -n 1)
-  if [[ $st == "" ]]
-  then
-    echo ""
-  else
-    if [[ $st == "nothing to commit, working directory clean" ]]
-    then
-      echo ":%{$fg[green]%}$(git_prompt_info)%{$reset_color%}"
-    else
-      echo ":%{$fg[red]%}$(git_prompt_info)%{$reset_color%}"
-    fi
-  fi
-}
-
-git_prompt_info() {
-  ref=$(/usr/bin/git symbolic-ref HEAD 2>/dev/null) || return
-  # echo "(%{\e[0;33m%}${ref#refs/heads/}%{\e[0m%})"
-  echo ":%{$fg[magenta]%}${ref#refs/heads/}${reset_color%}"
-}
-
-unpushed() {
-  /usr/bin/git cherry -v @{upstream} 2>/dev/null
-}
-
-need_push() {
-  if [[ $(unpushed) == "" ]]
-  then
-    echo ""
-  else
-    echo ":%{$fg[magenta]%}unpushed%{$reset_color%}"
-  fi
-}
-
-has_stash() {
-  if [[ -n "$(git stash list 2>/dev/null)" ]]; then
-    echo ":%{$fg[magenta]%}stash%{$reset_color%}"
-  fi
-}
-
-directory_name(){
-  echo "%{$fg[blue]%}%~%{$reset_color%}"
-}
-
-user_machine(){
-  echo "%{$fg[yellow]%}%n@%m%{$reset_color%}"
-}
-
-python_venv() {
-   if [[ -z $VIRTUAL_ENV ]] then
-     echo ""
-   else
-     echo ":%{$fg[green]%}venv$reset_color%}"
-   fi
-}
-
-set_prompt() {
-  export PROMPT=$'\n$(user_machine):$(directory_name)$(git_prompt_info)\n%{$fg[red]%}›%{$reset_color%} '
-  RPROMPT='%(?.. %?)'
-}
-
-# Set the correct prompt
-# precmd() {
-#  set_prompt
-#  print -Pn "\e]0;%~\a"
-#}
-
-# Change the PROMPT style to something like | (base) hades in ~ >
-export PROMPT='%F{8}[%f%F{37}%n%f%F{8}]%f %F{8}%~ %f$(git_branch) %F{13}$%f '
-setopt promptsubst
-
 # Path
 # -------------------------------------------------------------------
 pathdirs=(
@@ -134,6 +57,12 @@ for dir in $pathdirs; do
     PATH=$dir:$PATH
   fi
 done
+
+if [[ `uname` == "Darwin" ]]; then
+  eval $(gdircolors $ZSH/dir_colors)
+else
+  eval $(dircolors $ZSH/dir_colors)
+fi
 
 source ~/.powerlevel10k/powerlevel10k.zsh-theme
 
