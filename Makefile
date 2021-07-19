@@ -8,8 +8,6 @@ linux :
 	@echo "Symlinking ZSH Files"
 	ln -s $(HOME)/.dotfiles/zsh/linux-zshrc.zsh $(HOME)/.zshrc
 	ln -s $(HOME)/.dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
-	@echo "Symlinking Neovim Files"
-	ln -s $(HOME)/.dotfiles/neovim ~/.config/nvim
 	@echo "Symlinking GPG Files"
 	ln -s $(HOME)/.dotfiles/Linux/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
 	ln -s $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
