@@ -6,8 +6,8 @@ linux :
 	ln -s $(HOME)/Dropbox/Dotfiles/Linux/gitconfig $(HOME)/.gitconfig
 	ln -s $(HOME)/Dropbox/Dotfiles/General/gitignore $(HOME)/.gitignore
 	@echo "Symlinking ZSH Files"
-	ln -s $(HOME)/Dropbox/Dotfiles/Linux/zshrc.zsh $(HOME)/.zshrc
-	ln -s $(HOME)/Dropbox/Dotfiles/General/zshenv.zsh $(HOME)/.zshenv
+	ln -s $(HOME)/Dropbox/Dotfiles/zsh/linux-zshrc.zsh $(HOME)/.zshrc
+	ln -s $(HOME)/Dropbox/Dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
 	@echo "Symlinking GPG Files"
 	ln -s $(HOME)/Dropbox/Dotfiles/Linux/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
 	ln -s $(HOME)/Dropbox/Dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
