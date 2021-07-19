@@ -49,7 +49,9 @@ autoload colors zsh/terminfo && colors
 # Path
 # -------------------------------------------------------------------
 pathdirs=(
-  $HOME/Dropbox/Dotfiles/bin
+  /opt/homebrew/bin
+  /usr/local/opt/ruby/bin
+  $DOTFILES/bin
 )
 
 for dir in $pathdirs; do
@@ -60,11 +62,11 @@ done
 
 if [[ `uname` == "Darwin" ]]; then
   eval $(gdircolors $ZSH/dir_colors)
+  source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
 else
   eval $(dircolors $ZSH/dir_colors)
+  source ~/.powerlevel10k/powerlevel10k.zsh-theme
 fi
-
-source ~/.powerlevel10k/powerlevel10k.zsh-theme
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
