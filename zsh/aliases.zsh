@@ -11,9 +11,14 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
-alias ip="curl icanhazip.com"       # get current public IP
 alias more='more -R'                # give more colors
 alias c='clear'
+
+alias ip="curl icanhazip.com"       # get current public IP
+alias checkup="ping -c3 google.com"
+alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
+alias brewup='brew update && brew upgrade && brew cleanup'
+alias brewcheck='brew outdated && brew autoremove && brew cleanup && brew doctor'
 
 if $(gls &>/dev/null)
 then
