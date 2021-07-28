@@ -6,17 +6,28 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # ZSH configuration
+# -------------------------------------------------------------------
 
 # Aliases
 source $ZSH/aliases.zsh
 
-autoload -U compinit
-compinit
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 
-# Functions
-autoload -U $ZSH/functions/*(:t)
+  autoload -Uz compinit
+  compinit
+fi
+
+if [[ `uname` == "Darwin" ]]; then
+  eval $(gdircolors $ZSH/dir_colors)
+  source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+else
+  eval $(dircolors $ZSH/dir_colors)
+  source ~/.powerlevel10k/powerlevel10k.zsh-theme
+fi
 
 # Options
+# -------------------------------------------------------------------
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
@@ -32,10 +43,12 @@ setopt COMPLETE_IN_WORD
 setopt AUTOPUSHD        # keep history of directories
 setopt AUTO_LIST        # list ambiguous completions automatically
 setopt complete_aliases
+
 # matches case insensitive for lowercase
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # pasting with tabs doesn't perform completion
 zstyle ':completion:*' insert-tab pending
+
 # Vim key bindings and Vim-like line editor
 bindkey -v
 autoload -U   edit-command-line
@@ -46,10 +59,14 @@ bindkey '^S' history-incremental-search-forward
 unsetopt nomatch
 autoload colors zsh/terminfo && colors
 
+
+
 # Path
 # -------------------------------------------------------------------
 pathdirs=(
-  $HOME/Dropbox/Dotfiles/bin
+  /opt/homebrew/bin
+  /usr/local/opt/ruby/bin
+  $DOTFILES/bin
 )
 
 for dir in $pathdirs; do
@@ -58,13 +75,8 @@ for dir in $pathdirs; do
   fi
 done
 
-if [[ `uname` == "Darwin" ]]; then
-  eval $(gdircolors $ZSH/dir_colors)
-else
-  eval $(dircolors $ZSH/dir_colors)
-fi
-
-source ~/.powerlevel10k/powerlevel10k.zsh-theme
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

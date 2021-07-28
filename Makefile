@@ -6,7 +6,7 @@ linux :
 	ln -s $(HOME)/.dotfiles/Linux/gitconfig $(HOME)/.gitconfig
 	ln -s $(HOME)/.dotfiles/General/gitignore $(HOME)/.gitignore
 	@echo "Symlinking ZSH Files"
-	ln -s $(HOME)/.dotfiles/zsh/linux-zshrc.zsh $(HOME)/.zshrc
+	ln -s $(HOME)/.dotfiles/zsh/zshrc.zsh $(HOME)/.zshrc
 	ln -s $(HOME)/.dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
 	@echo "Symlinking GPG Files"
 	ln -s $(HOME)/.dotfiles/Linux/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
@@ -20,8 +20,8 @@ osx :
 	ln -s $(HOME)/.dotfiles/Mac/gitconfig $(HOME)/.gitconfig
 	ln -s $(HOME)/.dotfiles/General/gitignore $(HOME)/.gitignore
 	@echo "Symlinking ZSH Files"
-	ln -s $(HOME)/.dotfiles/Mac/zsh/zshrc.zsh $(HOME)/.zshrc
-	ln -s $(HOME)/.dotfiles/General/zshenv.zsh $(HOME)/.zshenv
+	ln -s $(HOME)/.dotfiles/zsh/zshrc.zsh $(HOME)/.zshrc
+	ln -s $(HOME)/.dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
 	@echo "Symlinking GPG Files"
 	ln -s $(HOME)/.dotfiles/Mac/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
 	ln -s $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
@@ -35,6 +35,6 @@ neovim :
 
 alllinux : linux neovim 
 
-allmac: mac neovim
+allmac: osx neovim
 
 .PHONY : all default git zsh neovim install

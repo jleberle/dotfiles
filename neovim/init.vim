@@ -15,6 +15,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-markdownfootnotes'
+Plug 'robertbasic/vim-hugo-helper'
 
 Plug 'itchyny/lightline.vim'
 
