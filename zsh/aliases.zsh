@@ -17,8 +17,15 @@ alias c='clear'
 alias ip="curl icanhazip.com"       # get current public IP
 alias checkup="ping -c3 google.com"
 alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
+
 alias brewup='brew update && brew upgrade && brew cleanup'
 alias brewcheck='brew outdated && brew autoremove && brew cleanup && brew doctor'
+alias adg="sudo apt update && sudo apt upgrade"
+alias adc="sudo apt autoremove && sudo apt purge"
+
+alias rprofile="source ~/.zshrc"
+alias eprofile="nvim ~/.zshrc"
+alias ealias="vim ~/.dotfiles/zsh/aliases.zsh"
 
 if $(gls &>/dev/null)
 then
