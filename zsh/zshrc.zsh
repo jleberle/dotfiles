@@ -66,6 +66,7 @@ autoload colors zsh/terminfo && colors
 pathdirs=(
   /opt/homebrew/bin
   /usr/local/opt/ruby/bin
+  ~/.local/bin
   $DOTFILES/bin
 )
 
