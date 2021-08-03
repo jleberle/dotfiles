@@ -7,9 +7,33 @@ fi
 
 # ZSH configuration
 # -------------------------------------------------------------------
+export CLICOLOR=true
+export TERM="xterm-256color"        # for common 256 color terminals (e.g. gnome-terminal)
 
-# Aliases
-source $ZSH/aliases.zsh
+export DOTFILES="$HOME/.dotfiles"
+export ZSH=$DOTFILES/zsh
+export PROJECTS=$HOME/github
+
+export GPG_TTY=$TTY
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=YES
+export HOMEBREW_CASK_OPTS=--require-sha
+export HOMEBREW_NO_ANALYTICS=1
+export GOPATH=$HOME/go
+
+pathdirs=(
+  /opt/homebrew/bin
+  /opt/homebrew/sbin
+  ~/go/bin
+  /usr/local/opt/ruby/bin
+  ~/.local/bin
+  $DOTFILES/bin
+)
+
+for dir in $pathdirs; do
+  if [ -d $dir ]; then
+    PATH=$dir:$PATH
+  fi
+done
 
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
@@ -19,11 +43,9 @@ if type brew &>/dev/null; then
 fi
 
 if [[ `uname` == "Darwin" ]]; then
-  eval $(gdircolors $ZSH/dir_colors)
-  source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+  test -r ~/.dir_colors && eval $(gdircolors ~/.dir_colors)
 else
-  eval $(dircolors $ZSH/dir_colors)
-  source ~/.powerlevel10k/powerlevel10k.zsh-theme
+  test -r ~/.dir_colors && eval $(dircolors ~/.dir_colors)
 fi
 
 # Options
@@ -59,30 +81,11 @@ bindkey '^S' history-incremental-search-forward
 unsetopt nomatch
 autoload colors zsh/terminfo && colors
 
-
-
-# Path
-# -------------------------------------------------------------------
-pathdirs=(
-  /opt/homebrew/bin
-  /usr/local/opt/ruby/bin
-  ~/.local/bin
-  $DOTFILES/bin
-)
-
-for dir in $pathdirs; do
-  if [ -d $dir ]; then
-    PATH=$dir:$PATH
-  fi
-done
-
-if [[ `uname` == "Darwin" ]]; then
- source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
- source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-else
- source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
- source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
+# Source Aliases and submodules
+source $ZSH/aliases.zsh
+source $ZSH/submodules/powerlevel10k/powerlevel10k.zsh-theme
+source $ZSH/submodules/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $ZSH/submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

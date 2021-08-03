@@ -1,0 +1,12 @@
+[submodule "zsh/submodules/nord-dircolors"]
+	path = zsh/submodules/nord-dircolors
+	url = git@github.com:arcticicestudio/nord-dircolors.git
+[submodule "zsh/submodules/zsh-syntax-highlighting"]
+	path = zsh/submodules/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "zsh/submodules/zsh-autosuggestions"]
+	path = zsh/submodules/zsh-autosuggestions
+	url = git@github.com:zsh-users/zsh-autosuggestions.git
+[submodule "zsh/submodules/powerlevel10k"]
+	path = zsh/submodules/powerlevel10k
+	url = https://github.com/romkatv/powerlevel10k.git
