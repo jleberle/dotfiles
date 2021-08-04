@@ -2,6 +2,7 @@
 # -------------------------------------------------------------------
 alias vim='nvim'
 alias pubkey="more ~/.ssh/id_ed25519.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
+alias cb='xclip -i -selection clipboard'
 
 # System management
 # -------------------------------------------------------------------
@@ -10,13 +11,15 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
-alias more='more -R'                # give more colors
 alias c='clear'
+alias fuck='sudo $(fc -ln -1)' # Redo last command with sudo
 
-alias ls="ls -F --color"
-alias l="ls -lAh --color"
-alias ll="la -l --color"
-alias la="ls -A --color"
+alias ls='exa -l --color=always --group-directories-first'
+alias la='exa -la --color=always --group-directories-first'
+
+alias rmi='rm -riv' # Prompt for removal, recursive and print results
+alias mvi='mv -iv' # Prompt for move and print result
+alias mkdir='mkdir -vp' # Make dir and subdirs and print results
 
 alias ip="curl icanhazip.com"       # get current public IP
 alias checkup="ping -c3 google.com"
@@ -43,6 +46,14 @@ alias adc="sudo apt autoremove && sudo apt purge"
 alias reload="exec zsh"
 alias eprofile="nvim ~/.zshrc"
 alias ealias="vim ~/.dotfiles/zsh/aliases.zsh"
+
+# Fun Stuff
+# -----------------------------------------------------------------------
+
+alias wttr='curl wttr.in/74075'
+alias ctwttr='curl wttr.in/06082'
+
+alias ytd='noglob youtube-dl --ignore-errors --continue --no-overwrites --format 'bestvideo+bestaudio' --output "~/Videos/%(title)s.%(ext)s" "$@"'
 
 # Functions
 # -----------------------------------------------------------------------
