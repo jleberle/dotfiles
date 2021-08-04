@@ -53,9 +53,6 @@
 [help]
     autocorrect = 1
 
-[credential]
-	helper = /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret
-
 [commit]
 	gpgsign = true
 [gpg]
