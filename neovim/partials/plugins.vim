@@ -1,6 +1,6 @@
 " PLUGINS
 " -------------------------------------------------------------------
-
+set rtp+=~/.dotfiles/zsh/submodules/fzf
 "" Lightline
 "" -------------------------------------------------------------------
 set laststatus=2                            " always show a status line
