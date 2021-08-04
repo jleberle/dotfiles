@@ -22,8 +22,8 @@ nnoremap [N ?\V[^\d\+]<CR>
 
 " Copying and pasting (Stopped working, see main settings for yank to system 
 " clipboard setup. Leaving for reference
-" nnoremap <leader>0 "+p
-" vnoremap <leader>x "+y
+nnoremap <leader>0 "+p
+vnoremap <leader>x "+y
 
 "" Key mappings
 "" -------------------------------------------------------------------
