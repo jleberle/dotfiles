@@ -12,6 +12,7 @@ alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
 alias more='more -R'                # give more colors
 alias c='clear'
+alias fuck="sudo !!"
 
 alias ls="ls -F --color"
 alias l="ls -lAh --color"
