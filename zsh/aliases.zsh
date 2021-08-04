@@ -1,7 +1,6 @@
 # Editors and languages
 # -------------------------------------------------------------------
 alias vim='nvim'
-alias R="R --no-save --no-restore-data --quiet"
 alias pubkey="more ~/.ssh/id_ed25519.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
 
 # System management
@@ -14,32 +13,39 @@ alias findf="find . -type f -iname" # find a file
 alias more='more -R'                # give more colors
 alias c='clear'
 
+alias ls="ls -F --color"
+alias l="ls -lAh --color"
+alias ll="la -l --color"
+alias la="ls -A --color"
+
 alias ip="curl icanhazip.com"       # get current public IP
 alias checkup="ping -c3 google.com"
 alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
 
+# Git
+# ------------------------------------------------------------------
+alias ga='git add'
+alias gc='git commit'
+alias gca='git commit -a'
+alias gcam='git commit -a -m'
+alias gcm='git commit -m'
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
+alias gs='git status -sb'
+alias gl='git pull --ff-only'
+
+# Updates
+# ------------------------------------------------------------------
 alias brewup='brew update && brew upgrade && brew cleanup'
 alias brewcheck='brew outdated && brew autoremove && brew cleanup && brew doctor'
 alias adg="sudo apt update && sudo apt upgrade"
 alias adc="sudo apt autoremove && sudo apt purge"
 
-alias rprofile="source ~/.zshrc"
+alias reload="exec zsh"
 alias eprofile="nvim ~/.zshrc"
 alias ealias="vim ~/.dotfiles/zsh/aliases.zsh"
 
-if $(gls &>/dev/null)
-then
-  alias ls="gls -F --color"
-  alias l="gls -lAh --color"
-  alias ll="gls -l --color"
-  alias la='gls -A --color'
-else
-  alias ls="ls -F --color"
-  alias l="ls -lAh --color"
-  alias ll="la -l --color"
-  alias la="ls -A --color"
-fi
-
+# Functions
+# -----------------------------------------------------------------------
 function wordfrequency() {
   awk '
      BEGIN { FS="[^a-zA-Z]+" } {
