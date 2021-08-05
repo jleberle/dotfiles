@@ -14,8 +14,8 @@ alias findf="find . -type f -iname" # find a file
 alias c='clear'
 alias fuck='sudo $(fc -ln -1)' # Redo last command with sudo
 
-alias ls='exa -l --color=always --group-directories-first'
-alias la='exa -la --color=always --group-directories-first'
+alias ls='exa -l --color=auto --group-directories-first'
+alias la='exa -la --color=auto --group-directories-first'
 
 alias rmi='rm -riv' # Prompt for removal, recursive and print results
 alias mvi='mv -iv' # Prompt for move and print result
