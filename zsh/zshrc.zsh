@@ -57,7 +57,7 @@ path=(~/.dotfiles/bin $path)
 export GPG_TTY=$TTY
 
 # Source additional local files if they exist.
-z4h source ~/.aliases ~/.functions.zsh
+z4h source ~/.dotfiles/zsh/aliases.zsh ~/.dotfiles/zsh/functions.zsh
 
 # Use additional Git repositories pulled in with `z4h install`.
 #
