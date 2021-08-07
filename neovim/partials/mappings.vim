@@ -25,6 +25,10 @@ nnoremap [N ?\V[^\d\+]<CR>
 nnoremap <leader>0 "+p
 vnoremap <leader>x "+y
 
+" Bring search results to midscreen
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
 "" Key mappings
 "" -------------------------------------------------------------------
 
