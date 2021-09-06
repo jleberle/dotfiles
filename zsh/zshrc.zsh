@@ -18,7 +18,7 @@ zstyle ':z4h:' start-tmux       'system'
 zstyle ':z4h:' prompt-at-bottom 'yes'
 
 # Keyboard type: 'mac' or 'pc'.
-zstyle ':z4h:bindkey' keyboard  'pc'
+zstyle ':z4h:bindkey' keyboard  'mac'
 
 # Right-arrow key accepts one character ('partial-accept') from
 # command autosuggestions or the whole thing ('accept')?
