@@ -8,10 +8,8 @@ misc :
 	@echo "Symlinking ZSH Files"
 	ln -s $(HOME)/.dotfiles/zsh/zshrc.zsh $(HOME)/.zshrc
 	ln -s $(HOME)/.dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
-	ln -s $(HOME)/.dotfiles/zsh/aliases.zsh $(HOME)/.aliases
-	ln -s $(HOME)/.dotfiles/zsh/functions.zsh $(HOME)/.functions.zsh
 	@echo "Symlinking GPG Files"
-	ln -s $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
+	# ln -s $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
 	@echo "Symlinking Misc Files"
 	ln -s $(HOME)/.dotfiles/General/gemrc $(HOME)/.gemrc
 	ln -s $(HOME)/.dotfiles/General/tmux.conf $(HOME)/.tmux.conf
