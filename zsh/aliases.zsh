@@ -26,7 +26,7 @@ alias mkdir='mkdir -vp' # Make dir and subdirs and print results
 alias ip="curl icanhazip.com"       # get current public IP
 alias checkup="ping -c3 google.com"
 alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
-
+alias network='networkQuality'
 # Git
 # ------------------------------------------------------------------
 alias ga='git add'
