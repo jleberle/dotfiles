@@ -28,5 +28,9 @@ else
 fi
 
 # macOS
+# echo "\nChecking for App Store updates…"
+# mas outdated
+# mas upgrade
+
 echo "\nChecking macOS updates..."
 softwareupdate -i -a
