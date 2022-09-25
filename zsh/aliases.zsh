@@ -50,7 +50,7 @@ alias ealias="vim ~/.dotfiles/zsh/aliases.zsh"
 # Fun Stuff
 # -----------------------------------------------------------------------
 
-alias wttr='curl wttr.in/74075'
+alias wttr='curl wttr.in/74074'
 alias ctwttr='curl wttr.in/06082'
 
 alias ytd='noglob youtube-dl --ignore-errors --continue --no-overwrites --format 'bestvideo+bestaudio' --output "~/Videos/%(title)s.%(ext)s" "$@"'
