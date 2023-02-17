@@ -13,7 +13,7 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
-alias c='clear'
+alias c='clear=z4h-clear-screen-soft-bottom'
 alias fuck='sudo $(fc -ln -1)' # Redo last command with sudo
 
 alias ls='exa -l --color=auto --group-directories-first'
