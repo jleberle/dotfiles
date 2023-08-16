@@ -4,6 +4,7 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'ctrlpvim/ctrlp.vim' " Find Files
+Plug 'altercation/vim-colors-solarized' "Vim Theme
 Plug 'arcticicestudio/nord-vim' " Theme
 Plug 'tpope/vim-commentary' " Comment out lines 
 Plug 'tpope/vim-eunuch' " UNIX Shell Commands
