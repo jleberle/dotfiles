@@ -3,8 +3,8 @@
 
 [user]
      name = Jared Eberle
-     email = 3945368+jleberle@users.noreply.github.com
-	signingkey = /Users/jaredeberle/.ssh/id_ed25519.pub
+     email = jared@jaredeberle.org
+	   signingkey = F8D2388B3B5C0C84
 
 [github]
     user = jleberle
@@ -59,4 +59,4 @@
 [pull]
 	rebase = false
 [gpg]
-	format = ssh
+	program = /usr/bin/gpg
