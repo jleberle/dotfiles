@@ -3,16 +3,18 @@ default :
 
 misc :
 	@echo "Symlinking Git Files"
-	ln -s $(HOME)/.dotfiles/General/gitconfig $(HOME)/.gitconfig
-	ln -s $(HOME)/.dotfiles/General/gitignore $(HOME)/.gitignore
+	ln -s $(HOME)/.dotfiles/general/gitconfig $(HOME)/.gitconfig
+	ln -s $(HOME)/.dotfiles/general/gitignore $(HOME)/.gitignore
 	@echo "Symlinking ZSH Files"
 	ln -s $(HOME)/.dotfiles/zsh/zshrc.zsh $(HOME)/.zshrc
 	ln -s $(HOME)/.dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
+	@echo "Symlinking SSH Configurations"
+	ln -s $(HOME)/.dotfiles/general/ssh-config $(HOME)/.ssh/config
 	@echo "Symlinking GPG Files"
-	# ln -s $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
+  ln -s $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
 	@echo "Symlinking Misc Files"
-	ln -s $(HOME)/.dotfiles/General/gemrc $(HOME)/.gemrc
-	ln -s $(HOME)/.dotfiles/General/tmux.conf $(HOME)/.tmux.conf
+	ln -s $(HOME)/.dotfiles/general/gemrc $(HOME)/.gemrc
+	ln -s $(HOME)/.dotfiles/general/tmux.conf $(HOME)/.tmux.conf
 
 neovim :
 	@echo "Symlinking Neovim dotfiles"
