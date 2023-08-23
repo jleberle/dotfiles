@@ -27,6 +27,8 @@ alias ip="curl icanhazip.com"       # get current public IP
 alias checkup="ping -c3 google.com"
 alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
 alias network='networkQuality'
+
+alias oggconvert="find ./ -name "*.mp3" -exec ~/.dotfiles/bin/to-opus.sh "{}" \;"
 # Git
 # ------------------------------------------------------------------
 alias ga='git add'
