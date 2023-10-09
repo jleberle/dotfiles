@@ -8,11 +8,11 @@ Host github
 
 Host nfsn
   User eberlel_jlewebsite
-  HostName ssh.phx.nearlyfreespeech.net
+  HostName ssh.nyc1.nearlyfreespeech.net
 
 Host blog
   User eberlel_jleblog
-  HostName ssh.phx.nearlyfreespeech.net
+  HostName ssh.nyc1.nearlyfreespeech.net
 
 Host *
   IgnoreUnknown UseKeychain

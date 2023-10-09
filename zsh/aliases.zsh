@@ -16,8 +16,8 @@ alias findf="find . -type f -iname" # find a file
 alias c='z4h-clear-screen-soft-bottom'
 alias fuck='sudo $(fc -ln -1)' # Redo last command with sudo
 
-alias ls='exa -l --color=auto --group-directories-first'
-alias la='exa -la --color=auto --group-directories-first'
+alias ls='eza -l --color=auto --group-directories-first'
+alias la='eza -la --color=auto --group-directories-first'
 
 alias rmi='rm -riv' # Prompt for removal, recursive and print results
 alias mvi='mv -iv' # Prompt for move and print result
@@ -28,7 +28,7 @@ alias checkup="ping -c3 google.com"
 alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
 alias network='networkQuality'
 
-alias oggconvert="find ./ -name "*.mp3" -exec ~/.dotfiles/bin/to-opus.sh "{}" \;"
+alias oggconvert='find ./ -name "*.m4a" -exec ~/.dotfiles/bin/to-opus.sh "{}" \;'
 # Git
 # ------------------------------------------------------------------
 alias ga='git add'
