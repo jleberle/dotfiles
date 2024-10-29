@@ -1,7 +1,5 @@
 " Display
 " -------------------------------------------------------------------
-set background=light
-colorscheme solarized
 set nolist                                  " don't display space chars
 set listchars=tab:▸\ ,eol:¬,trail:·,nbsp:·  " TextMate style space chars
 set scrolloff=0

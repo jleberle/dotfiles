@@ -4,7 +4,7 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'ctrlpvim/ctrlp.vim' " Find Files
-Plug 'altercation/vim-colors-solarized' "Vim Theme
+" Plug 'altercation/vim-colors-solarized' "Vim Theme
 Plug 'arcticicestudio/nord-vim' " Theme
 Plug 'tpope/vim-commentary' " Comment out lines 
 Plug 'tpope/vim-eunuch' " UNIX Shell Commands
@@ -24,6 +24,10 @@ Plug 'marcweber/vim-addon-mw-utils' " Required by Snipmate
 Plug 'tomtom/tlib_vim' " Required by Snipmate
 
 call plug#end()
+
+syntax enable
+set background=dark
+colorscheme nord
 
 let mapleader = "," " Use , instead of :
 let maplocalleader = "," " Use , instead of :
