@@ -42,8 +42,7 @@ alias gl='git pull --ff-only'
 
 # Updates
 # ------------------------------------------------------------------
-alias brewup='brew update && brew upgrade && brew cleanup'
-alias brewcheck='brew outdated && brew autoremove && brew cleanup && brew doctor'
+alias autobrew='brew update && brew upgrade && brew cleanup && brew outdated && brew autoremove && brew doctor'
 
 alias reload="exec zsh"
 alias eprofile="nvim ~/.zshrc"
