@@ -1,23 +1,8 @@
-Host gitlab
+Host codeberg
   User git
-  HostName gitlab.com
-
-Host github
-  User git
-  HostName github.com
-
-Host nfsn
-  User eberlel_jlewebsite
-  HostName ssh.nyc1.nearlyfreespeech.net
-
-Host blog
-  User eberlel_jleblog
-  HostName ssh.nyc1.nearlyfreespeech.net
-
-Host *
-  IgnoreUnknown UseKeychain
-  UseKeychain yes
+  HostName codeberg.org
   AddKeysToAgent yes
+  UseKeychain yes
   ControlMaster no
   IdentitiesOnly yes
   IdentityFile ~/.ssh/id_ed25519
