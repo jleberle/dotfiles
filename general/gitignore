@@ -51,3 +51,5 @@ env/
 TODO.txt
 *.scriv
 public/
+
+**/.claude/settings.local.json
