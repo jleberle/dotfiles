@@ -105,3 +105,4 @@ fi
 source ${ZIM_HOME}/init.zsh
 # }}} End configuration added by Zim Framework install
 source ~/.dotfiles/zsh/aliases.zsh
+source ~/.dotfiles/zsh/functions.zsh
