@@ -12,9 +12,6 @@ misc :
 	ln -s $(HOME)/.dotfiles/general/ssh-config $(HOME)/.ssh/config
 	@echo "Symlinking GPG Files"
   ln -s $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
-	@echo "Symlinking Misc Files"
-	ln -s $(HOME)/.dotfiles/general/gemrc $(HOME)/.gemrc
-	ln -s $(HOME)/.dotfiles/general/tmux.conf $(HOME)/.tmux.conf
 
 neovim :
 	@echo "Symlinking Neovim dotfiles"
