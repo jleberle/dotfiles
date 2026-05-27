@@ -3,8 +3,8 @@
 
 [user]
      name = Jared Eberle
-	email = " jleberle@noreply.codeberg.org"
 	signingkey = /Users/jaredeberle/.ssh/id_ed25519
+	email = jared@jaredeberle.org
 
 [github]
     user = jleberle
@@ -60,3 +60,9 @@
 	rebase = false
 [gpg]
 	format = ssh
+[init]
+	defaultBranch = main
+[tag]
+	gpgsign = true
+[gpg "ssh"]
+	allowedSignersFile = ~/.ssh/allowed_signers
