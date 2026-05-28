@@ -21,7 +21,7 @@
     user = jleberle
 
 [alias]
-   st = status -sb
+	st = status -sb
     co = checkout
     cb = checkout -b
     br = branch
@@ -36,7 +36,7 @@
 
 [color]
     ui = auto
-  
+ 
 [core]
     editor = nvim
     autocrlf = input
@@ -59,7 +59,7 @@
 [push]
     autoSetupRemote = true
     default = current
-   
+  
 [diff]
     colorMoved = default
     algorithm = histogram
@@ -76,7 +76,7 @@
 
 [help]
     autocorrect = prompt
-	
+
 [init]
 	defaultBranch = main
 
