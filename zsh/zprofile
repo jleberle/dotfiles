@@ -1,2 +1,10 @@
 #Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+typeset -U path PATH
+path=(
+  "$HOME/.dotfiles/bin"
+  $HOME/.local/bin
+  $path
+)
+export PATH
