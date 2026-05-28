@@ -1,31 +1,131 @@
+# ------------------------------------------------------------------------------
 # History
+# ------------------------------------------------------------------------------
+
+HISTFILE="$HOME/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=100000
-HISTFILE=~/.zsh_history
 
-setopt autocd
-setopt sharehistory
-setopt histignoredups
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
+setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY
 
-# Completion
+# Expire duplicate entries first when trimming history
+setopt HIST_EXPIRE_DUPS_FIRST
+
+# ------------------------------------------------------------------------------
+# Shell Behavior
+# ------------------------------------------------------------------------------
+
+setopt AUTO_CD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt PUSHD_MINUS
+setopt INTERACTIVE_COMMENTS
+
+# Prevent accidental file overwrite with >
+setopt NO_CLOBBER
+
+# Better globbing behavior
+setopt EXTENDED_GLOB
+
+# ------------------------------------------------------------------------------
+# Environment
+# ------------------------------------------------------------------------------
+
+# XDG-style cache location
+export ZSH_CACHE_DIR="$HOME/.cache/zsh"
+
+mkdir -p "$ZSH_CACHE_DIR"
+
+# ------------------------------------------------------------------------------
+# Completion System
+# ------------------------------------------------------------------------------
+fpath=(
+  "$HOME/.dotfiles/zsh/functions"
+  $fpath
+)
+
 autoload -Uz compinit
-compinit
 
+# Faster startup with cached completion dump
+compinit -d "$ZSH_CACHE_DIR/.zcompdump"
+
+# Completion styling
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# Completion caching
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR"
+
+# Better completion grouping
+zstyle ':completion:*' group-name ''
+
+# Enable descriptions in completion menu
+zstyle ':completion:*:descriptions' format '[%d]'
+
+# Rehash Completions
+zstyle ':completion:*' rehash true
+
+# ------------------------------------------------------------------------------
+# Keybindings
+# ------------------------------------------------------------------------------
+
+bindkey -e
+
+# Ctrl + Left/Right Arrow = move by word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+
+# History search with arrows
+autoload -Uz up-line-or-beginning-search
+autoload -Uz down-line-or-beginning-search
+
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+
+# ------------------------------------------------------------------------------
 # FZF
+# ------------------------------------------------------------------------------
+
 source <(fzf --zsh)
 
+# Use fd for faster searching
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# Better previews
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --color=always --style=numbers --line-range=:500 {}'
+"
+
+# ------------------------------------------------------------------------------
 # Plugins
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# ------------------------------------------------------------------------------
 
-# Custom Functions
-source ~/.dotfiles/zsh/functions.zsh
+source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
+# Syntax highlighting should stay near bottom
+source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# ------------------------------------------------------------------------------
 # Aliases
-source ~/.dotfiles/zsh/aliases.zsh
+# ------------------------------------------------------------------------------
 
+source "$HOME/.dotfiles/zsh/aliases.zsh"
+
+# ------------------------------------------------------------------------------
 # Prompt
+# ------------------------------------------------------------------------------
+
 eval "$(starship init zsh)"
-
-# Highlighting
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-

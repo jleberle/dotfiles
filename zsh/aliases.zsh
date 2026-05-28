@@ -1,8 +1,12 @@
 # Aliases
 # --------------------------------------------------------------------
 alias v='nvim'
-alias ls="eza"
+alias vim='nvim'
 alias cat="bat"
+
+alias ls='eza --icons'
+alias ll='eza -lah --icons'
+alias grep='rg'
 
 # Editors and languages
 # -------------------------------------------------------------------
