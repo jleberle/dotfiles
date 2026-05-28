@@ -14,7 +14,7 @@ alias lt='eza --tree --level=2 --icons'
 alias lta='eza --tree --level=3 --all --icons'
 
 # git-aware listings
-alias llg='eza -lah --git --icons'
+alias lgt='eza -lah --git --icons'
 
 # sort helpers
 alias lm='eza -lah --sort=modified --reverse'
