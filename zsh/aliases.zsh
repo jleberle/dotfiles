@@ -10,6 +10,23 @@ alias lt='eza --tree --level=2 --icons'
 alias tree='eza --tree --icons'
 alias grep='rg'
 
+alias cp='cp -i'
+alias mv='mv -i'
+alias reload='exec zsh'         # reload shell after editing dotfiles
+alias path='echo -e ${PATH//:/\\n}'
+
+alias network='networkQuality'
+alias myip='curl -s https://ifconfig.me; echo'
+alias ports='lsof -iTCP -sTCP:LISTEN -n -P'
+
+# Housekeeping 
+# -------------------------------------------------------------------
+alias cleands='find . -type f -name "*.DS_Store" -delete'
+alias showfiles='defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
+alias hidefiles='defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
+alias brewup='brew update && brew upgrade && brew cleanup'
+alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+
 # Editors and languages
 # -------------------------------------------------------------------
 alias pubkey="more ~/.ssh/id_ed25519.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
@@ -24,10 +41,8 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias findd="find . -type d -iname" # find a directory
 alias findf="find . -type f -iname" # find a file 
-alias fuck='sudo $(fc -ln -1)' # Redo last command with sudo
 
-alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
-alias network='networkQuality'
+
 
 # Git
 # ---------------------------------------------------------------------
