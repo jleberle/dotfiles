@@ -1,10 +1,7 @@
 # Dependences and settings
 cask_args appdir: "/Applications"
 
-tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "buo/cask-upgrade" # handle App Store app updates: brew cu
-tap "homebrew/core"
 tap "homebrew/services"
 brew "mas"
 
@@ -38,18 +35,21 @@ brew "gnupg"
 brew "hugo"
 brew "imagemagick"
 brew "lazygit"
-brew "mactex"
 brew "neovim"
 brew "pandoc"
 brew "pandoc-crossref"
 brew "pinentry-mac"
+brew "ripgrep"
+brew "starship"
 brew "wget"
+brew "zoxide"
 brew "zsh"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
 # GUI apps
 cask "firefox"
+cask "mactex"
 cask "obsidian"
 cask "tropy"
 cask "zoom"
