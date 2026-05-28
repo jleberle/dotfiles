@@ -4,41 +4,150 @@
 # dependencies = ["requests"]
 # ///
 
-# Usage: waybackup <URL>
-# Saves the URL to the Wayback Machine and prints the snapshot URL.
+"""
+Save a URL to the Internet Archive Wayback Machine.
+
+Usage:
+    waybackup <URL>
+
+Prints the archived snapshot URL on success.
+"""
+
+from __future__ import annotations
 
 import sys
+import time
+from urllib.parse import quote, urlparse
+
 import requests
 
-base_url = 'https://web.archive.org'
+WAYBACK_SAVE_PREFIX = "https://web.archive.org/save/"
 
 
-def main():
+def validate_url(url: str) -> bool:
+    parsed = urlparse(url)
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def extract_snapshot_url(response: requests.Response) -> str | None:
+    # Final redirected URL
+    if response.url.startswith("https://web.archive.org/web/"):
+        return response.url
+
+    # Standard Wayback header
+    content_location = response.headers.get("Content-Location")
+    if content_location:
+        return "https://web.archive.org" + content_location
+
+    # Redirect header
+    location = response.headers.get("Location")
+    if location:
+        if location.startswith("http"):
+            return location
+        return "https://web.archive.org" + location
+
+    return None
+
+
+def save_url(session: requests.Session, target: str) -> str:
+    save_url = WAYBACK_SAVE_PREFIX + quote(target, safe="")
+
+    response = session.get(
+        save_url,
+        allow_redirects=True,
+        timeout=120,
+    )
+
+    response.raise_for_status()
+
+    snapshot = extract_snapshot_url(response)
+    if snapshot:
+        return snapshot
+
+    # Sometimes archive processing is delayed.
+    # Retry final URL a few times.
+    for _ in range(15):
+        time.sleep(2)
+
+        retry = session.get(
+            save_url,
+            allow_redirects=True,
+            timeout=120,
+        )
+
+        retry.raise_for_status()
+
+        snapshot = extract_snapshot_url(retry)
+        if snapshot:
+            return snapshot
+
+    # Last-ditch fallback:
+    # search response body for snapshot URL
+    text = response.text
+
+    marker = "https://web.archive.org/web/"
+    idx = text.find(marker)
+
+    if idx != -1:
+        end = text.find('"', idx)
+        if end != -1:
+            return text[idx:end]
+
+    raise RuntimeError("Could not determine snapshot URL")
+
+
+def main() -> int:
     if len(sys.argv) != 2:
-        print('Usage: waybackup <URL>', file=sys.stderr)
+        print("Usage: waybackup <URL>", file=sys.stderr)
         return 2
 
     target = sys.argv[1]
 
+    if not validate_url(target):
+        print("Invalid URL", file=sys.stderr)
+        return 2
+
+    session = requests.Session()
+
+    session.headers.update(
+        {
+            "User-Agent": (
+                "Mozilla/5.0 (compatible; waybackup/1.0)"
+            ),
+            "Accept": (
+                "text/html,application/xhtml+xml,"
+                "application/xml;q=0.9,*/*;q=0.8"
+            ),
+        }
+    )
+
     try:
-        r = requests.get(base_url + '/save/' + target, timeout=200)
-    except requests.RequestException as e:
-        print('Request failed: ' + str(e), file=sys.stderr)
+        snapshot = save_url(session, target)
+
+    except requests.Timeout:
+        print("Request timed out", file=sys.stderr)
         return 1
 
-    if r.status_code == requests.codes.ok:
-        location = r.headers.get('content-location')
-        if location:
-            print(base_url + location)
-            return 0
-        # Save succeeded but no snapshot path was returned; fall back to the
-        # original URL so the caller still has something usable.
-        print(target)
-        return 0
+    except requests.HTTPError as e:
+        status = (
+            e.response.status_code
+            if e.response is not None
+            else "unknown"
+        )
+        print(f"HTTP error: {status}", file=sys.stderr)
+        return 1
 
-    print('Error in response: ' + str(r.status_code), file=sys.stderr)
-    return 1
+    except requests.RequestException as e:
+        print(f"Request failed: {e}", file=sys.stderr)
+        return 1
+
+    except RuntimeError as e:
+        print(str(e), file=sys.stderr)
+        return 1
+
+    print(snapshot)
+    return 0
 
 
-if __name__ == '__main__':
-    sys.exit(main())
+if __name__ == "__main__":
+    raise SystemExit(main())
