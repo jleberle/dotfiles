@@ -29,8 +29,7 @@ alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
 # Editors and languages
 # -------------------------------------------------------------------
-alias pubkey="more ~/.ssh/id_ed25519.pub | pbcopy | echo '=> Public key copied to pasteboard.'"
-
+alias pubkey='pbcopy < ~/.ssh/id_ed25519.pub && echo "=> Public key copied to pasteboard."'
 alias cb='pbcopy'        # pipe into clipboard:  echo hi | cb
 alias cv='pbpaste'       # paste from clipboard
 
@@ -39,8 +38,8 @@ alias cv='pbpaste'       # paste from clipboard
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias findd="find . -type d -iname" # find a directory
-alias findf="find . -type f -iname" # find a file 
+alias findd="fd . -type d -iname" # find a directory
+alias findf="fd . -type f -iname" # find a file 
 
 
 
