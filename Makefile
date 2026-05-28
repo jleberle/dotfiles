@@ -1,3 +1,6 @@
+LAUNCHD_UID := $(shell id -u)
+LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
+
 default :
 	@echo "There is no default for your own safety."
 
@@ -25,3 +28,15 @@ auth :
 	ln -sf $(HOME)/.dotfiles/general/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
 apps :
 	brew bundle install --file=$(HOME)/.dotfiles/homebrew/brewfile
+brew :
+	@echo "Installing Homebrew auto-update LaunchAgents"
+	mkdir -p $(HOME)/.local
+	mkdir -p $(LAUNCH_AGENTS)
+	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/launchd/org.jaredeberle.brewupdate.plist > $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
+	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/launchd/org.jaredeberle.brewlogclean.plist > $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
+	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate 2>/dev/null
+	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewlogclean 2>/dev/null
+	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
+	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
+	@echo "Installed. Logs accumulate in $(HOME)/.local/brew_update_logs.txt"
+	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
