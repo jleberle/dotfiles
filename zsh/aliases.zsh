@@ -16,8 +16,6 @@ alias recent='eza -lah --sort=modified'
 # biggest files
 alias biggest='eza -lah --sort=size --reverse'
 
-alias grep='rg'
-
 alias cp='cp -i'
 alias mv='mv -i'
 alias reload='exec zsh'         # reload shell after editing dotfiles

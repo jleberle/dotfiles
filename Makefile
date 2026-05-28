@@ -2,7 +2,7 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-.PHONY: default git zsh auth apps brew ghostty
+.PHONY: default git zsh auth apps brew ghostty tmux
 
 default :
 	@echo "There is no default for your own safety."
@@ -21,16 +21,16 @@ auth :
 	mkdir -p $(HOME)/.ssh/control
 	chmod 700 $(HOME)/.ssh/control
 	@echo "Symlinking SSH Configurations"
-	ln -sf $(HOME)/.dotfiles/general/ssh-config $(HOME)/.ssh/config
+	ln -sf $(HOME)/.dotfiles/General/ssh-config $(HOME)/.ssh/config
 	@echo "Creating GPG home directory"
 	mkdir -p $(HOME)/.gnupg
 	chmod 700 $(HOME)/.gnupg
 	@echo "Symlinking GPG Files"
-	ln -sf $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
-	ln -sf $(HOME)/.dotfiles/general/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
-	ln -sf $(HOME)/.dotfiles/general/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
+	ln -sf $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
+	ln -sf $(HOME)/.dotfiles/General/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
+	ln -sf $(HOME)/.dotfiles/General/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
 apps :
-	brew bundle install --file=$(HOME)/.dotfiles/homebrew/brewfile
+	brew bundle install --file=$(HOME)/.dotfiles/Homebrew/brewfile
 brew :
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
@@ -47,3 +47,6 @@ ghostty :
 	@echo "Symlinking Ghostty config"
 	mkdir -p "$(GHOSTTY_DIR)"
 	ln -sf $(HOME)/.dotfiles/ghostty/config "$(GHOSTTY_DIR)/config"
+tmux :
+	@echo "Symlinking tmux config"
+	ln -sf $(HOME)/.dotfiles/General/tmux.conf $(HOME)/.tmux.conf

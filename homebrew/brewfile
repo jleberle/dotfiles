@@ -58,6 +58,7 @@ mas "Keynote", id:409183694
 mas "Soulver 3", id:1508732804
 
 # Fonts
+cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
 cask "font-ibm-plex"
 cask "font-fira-code"
 cask "font-inconsolata"
