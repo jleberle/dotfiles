@@ -123,6 +123,19 @@ export FZF_CTRL_T_OPTS="
 "
 
 # ------------------------------------------------------------------------------
+# Zoxide
+# ------------------------------------------------------------------------------
+
+# Cache `zoxide init zsh`; rebuild if the zoxide binary is newer than the cache.
+zoxide_cache="$ZSH_CACHE_DIR/zoxide.zsh"
+zoxide_bin="$BREW_PREFIX/bin/zoxide"
+if [[ ! -s "$zoxide_cache" || "$zoxide_bin" -nt "$zoxide_cache" ]]; then
+  "$zoxide_bin" init zsh >| "$zoxide_cache"
+fi
+source "$zoxide_cache"
+unset zoxide_cache zoxide_bin
+
+# ------------------------------------------------------------------------------
 # Plugins
 # ------------------------------------------------------------------------------
 
