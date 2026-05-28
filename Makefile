@@ -7,16 +7,7 @@ misc :
 	ln -s $(HOME)/.dotfiles/general/gitignore $(HOME)/.gitignore
 	@echo "Symlinking ZSH Files"
 	ln -s $(HOME)/.dotfiles/zsh/zshrc.zsh $(HOME)/.zshrc
-	ln -s $(HOME)/.dotfiles/zsh/zshenv.zsh $(HOME)/.zshenv
 	@echo "Symlinking SSH Configurations"
 	ln -s $(HOME)/.dotfiles/general/ssh-config $(HOME)/.ssh/config
 	@echo "Symlinking GPG Files"
   ln -s $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
-
-neovim :
-	@echo "Symlinking Neovim dotfiles"
-	ln -s $(HOME)/.dotfiles/neovim $(HOME)/.config/nvim
-
-all: misc neovim
-
-.PHONY : all default git zsh neovim install
