@@ -1,20 +1,22 @@
 [user]
     name = Jared Eberle
 	email = jared@jaredeberle.org
-	signingkey = ~/.ssh/id_ed25519
+	signingkey = ~/.ssh/id_ed25519.pub
 
 [gpg]
 	format = ssh
 
 [gpg "ssh"]
 	allowedSignersFile = ~/.dotfiles/Git/allowed_signers
-	
+
 [commit]
 	gpgsign = true
-	
+	verbose = true
+
 [tag]
 	gpgsign = true
-		
+	sort = version:refname
+	
 [github]
     user = jleberle
 
@@ -34,7 +36,7 @@
 
 [color]
     ui = auto
-    
+  
 [core]
     editor = nvim
     autocrlf = input
@@ -45,13 +47,11 @@
     whitespace = fix
 
 [merge]
-    tool = vimdiff
+    tool = nvimdiff
+    conflictstyle = zdiff3
 
 [mergetool]
     keepBackup = false
-
-[help]
-    autocorrect = 1
 
 [pull]
 	rebase = true
@@ -59,21 +59,17 @@
 [push]
     autoSetupRemote = true
     default = current
-    
+   
 [diff]
     colorMoved = default
+    algorithm = histogram
 
 [rebase]
     autoStash = true
-
-[merge]
-    conflictstyle = zdiff3
+    updateRefs = true
 
 [fetch]
     prune = true
-
-[color]
-    ui = auto
 
 [rerere]
     enabled = true
@@ -83,3 +79,6 @@
 	
 [init]
 	defaultBranch = main
+
+[branch]
+	sort = -committerdate
