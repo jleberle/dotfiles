@@ -18,7 +18,6 @@ Host *
     # Prevent accidental credential leakage
     ForwardAgent no
     ForwardX11 no
-    AddKeysToAgent no
 
     # Session reliability
     ServerAliveInterval 60
