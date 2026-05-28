@@ -1,0 +1,64 @@
+# Dependences and settings
+cask_args appdir: "/Applications"
+
+tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "homebrew/cask-fonts" # find fonts with: brew search font
+tap "buo/cask-upgrade" # handle App Store app updates: brew cu
+tap "homebrew/core"
+tap "homebew/services"
+brew "mas"
+
+# macOS Utilities
+brew "thaw" # fork of Ice, which seems to be abandoned
+
+# Languages
+brew "go"
+brew "golang-migrate"
+brew "lua"
+brew "node"
+cask "r"
+
+# Language tools
+brew "pyenv"
+brew "rbenv"
+
+# CLI tools
+brew "bat"
+brew "coreutils"
+brew "curl"
+brew "eza"
+brew "fd"
+brew "fzf"
+brew "gibo" # Sensible .gitignore defaults
+brew "git"
+brew "git-delta" # Used in combination with lazygit
+brew "git-lfs" # Versioning large files
+brew "gnupg"
+brew "hugo"
+brew "imagemagick"
+brew "lazygit"
+brew "mactex"
+brew "neovim"
+brew "pandoc"
+brew "pandoc-crossref"
+brew "pinentry-mac"
+brew "wget"
+brew "zsh"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+
+# GUI apps
+cask "firefox"
+cask "obsidian"
+cask "tropy"
+cask "zoom"
+cask "zotero"
+mas "Keynote", id:409183694
+mas "Soulver 3", id:1508732804
+
+# Fonts
+cask "font-ibm-plex"
+cask "font-fira-code"
+cask "font-inconsolata"
+cask "font-source-sans-3"
