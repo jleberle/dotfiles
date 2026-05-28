@@ -7,4 +7,4 @@ export MANPAGER="nvim +Man!"
 export LESS="-R"
 
 # Match bat's syntax theme to the Nord terminal theme
-export BAT_THEME="Nord"
+export BAT_THEME="Catppuccin Mocha"

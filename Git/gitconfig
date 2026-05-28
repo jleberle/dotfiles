@@ -50,7 +50,7 @@
   navigate = true
   line-numbers = true
   hyperlinks = true
-  syntax-theme = Nord
+  syntax-theme = Catppuccin Mocha
 
 [apply]
     whitespace = fix
