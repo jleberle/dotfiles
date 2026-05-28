@@ -5,6 +5,7 @@ alias vim='nvim'
 alias cat="bat"
 
 # Eza
+alias ls='eza --icons'
 alias ll='eza -lh --git --icons --group-directories-first'
 alias la='eza -lah --git --icons --group-directories-first'
 alias lt='eza --tree --level=2 --icons'
