@@ -1,4 +1,2 @@
-# Create a new directory and enter it
-function mkd() {
-	mkdir -p "$@" && cd "$_";
-}
+# Create a directory and cd into it
+mkdir -p "$@" && cd "$_"

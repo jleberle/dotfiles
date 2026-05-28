@@ -1,6 +1,4 @@
-# All in one Git
-function acp() {
-  git add .
-  git commit -S -m "$1"
-  git push
-}
+# All in one Git: add, signed commit, push
+git add .
+git commit -S -m "$1"
+git push

@@ -1,5 +1,3 @@
-# Functions
-# (f)ind by (n)ame
-# usage: fn foo 
-# to find all files containing 'foo' in the name
-function fn() { ls **/*$1* }
+# (f)ind by (n)ame: list files whose name contains $1
+# usage: fn foo
+ls -- **/*"$1"*(N)

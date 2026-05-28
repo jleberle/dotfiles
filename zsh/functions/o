@@ -1,9 +1,6 @@
-# `o` with no arguments opens the current directory, otherwise opens the given
-# location
-function o() {
-	if [ $# -eq 0 ]; then
-		open .;
-	else
-		open "$@";
-	fi;
-}
+# Open cwd if no args, otherwise open the given paths
+if (( $# == 0 )); then
+  open .
+else
+  open "$@"
+fi
