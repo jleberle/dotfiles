@@ -11,7 +11,6 @@ setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
-setopt INC_APPEND_HISTORY
 setopt EXTENDED_HISTORY
 setopt HIST_VERIFY 
 setopt HIST_FIND_NO_DUPS
@@ -130,8 +129,11 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 # Better previews
 export FZF_CTRL_T_OPTS="
-  --preview 'bat --color=always --style=numbers --line-range=:500 {}'
-"
+  --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons --color=always {}'"
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --color=bg+:#3B4252,fg+:#ECEFF4,hl:#81A1C1,hl+:#81A1C1,border:#4C566A"
 
 # ------------------------------------------------------------------------------
 # Zoxide

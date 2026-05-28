@@ -43,6 +43,15 @@
     excludesfile = ~/.gitignore
     pager = delta
 
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+  navigate = true
+  line-numbers = true
+  hyperlinks = true
+  syntax-theme = Nord
+
 [apply]
     whitespace = fix
 

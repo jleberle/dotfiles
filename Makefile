@@ -2,7 +2,7 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-.PHONY: default git zsh auth apps brew ghostty tmux
+.PHONY: default git zsh auth apps brewauto ghostty tmux
 
 default :
 	@echo "There is no default for your own safety."
@@ -31,7 +31,7 @@ auth :
 	ln -sf $(HOME)/.dotfiles/General/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
 apps :
 	brew bundle install --file=$(HOME)/.dotfiles/Homebrew/brewfile
-brew :
+brewauto :
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
