@@ -1,5 +1,8 @@
 LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
+GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
+
+.PHONY: default git zsh auth apps brew ghostty
 
 default :
 	@echo "There is no default for your own safety."
@@ -40,3 +43,7 @@ brew :
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
 	@echo "Installed. Logs accumulate in $(HOME)/.local/brew_update_logs.txt"
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
+ghostty :
+	@echo "Symlinking Ghostty config"
+	mkdir -p "$(GHOSTTY_DIR)"
+	ln -sf $(HOME)/.dotfiles/ghostty/config "$(GHOSTTY_DIR)/config"
