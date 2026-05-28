@@ -5,6 +5,8 @@
 # ///
 # encoding: utf8
 
+# Credit: Dr Drang https://github.com/drdrang/ipic. I've updated the script to work with depends and clean up output HTML to correctly display utf-8 characters
+
 import requests
 import docopt
 import os
@@ -12,12 +14,12 @@ import html
 import subprocess
   
 # You may want to change these.
-myDir = os.environ['HOME'] + '/Desktop/'    # directory for HTML file
+myDir = os.environ['HOME'] + '/Downloads/'    # directory for HTML file
 browser = 'com.apple.Safari'                # browser bundle identifier
   
 usage = '''Generate and open a web page of thumbnail images and links to larger
 images for items in the iTunes/App/Mac App Stores. Only one option is
-allowed. The HTML file is saved on your Desktop.
+allowed. The HTML file is saved on your Downloads folder.
 
 Usage:
   ipic (-i | -m | -a | -f | -t | -b) SEARCHTERM
