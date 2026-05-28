@@ -51,6 +51,8 @@ fpath=(
 )
 
 autoload -Uz compinit
+compinit
+autoload -Uz "$HOME/.dotfiles/zsh/functions/"*
 
 # Faster startup with cached completion dump
 compinit -d "$ZSH_CACHE_DIR/.zcompdump"
