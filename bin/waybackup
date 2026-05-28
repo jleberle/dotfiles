@@ -21,7 +21,7 @@ def main():
     target = sys.argv[1]
 
     try:
-        r = requests.get(base_url + '/save/' + target, timeout=60)
+        r = requests.get(base_url + '/save/' + target, timeout=200)
     except requests.RequestException as e:
         print('Request failed: ' + str(e), file=sys.stderr)
         return 1
