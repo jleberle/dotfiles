@@ -4,10 +4,37 @@ alias v='nvim'
 alias vim='nvim'
 alias cat="bat"
 
-alias ls='eza --icons'
-alias ll='eza -lah --icons'
+# basic replacements
+alias ls='eza --group-directories-first --icons'
+alias ll='eza -lh --group-directories-first --icons'
+alias la='eza -lah --group-directories-first --icons'
+
+# tree views
 alias lt='eza --tree --level=2 --icons'
-alias tree='eza --tree --icons'
+alias lta='eza --tree --level=3 --all --icons'
+
+# git-aware listings
+alias lg='eza -lah --git --icons'
+
+# sort helpers
+alias lm='eza -lah --sort=modified --reverse'
+alias lsz='eza -lah --sort=size'
+
+# directories only
+alias lsd='eza -D --icons'
+
+# detailed / nerd mode
+alias lx='eza -lah@ --git --extended --icons'
+
+# one item per line
+alias l1='eza -1'
+
+# recent files first
+alias recent='eza -lah --sort=modified'
+
+# biggest files
+alias biggest='eza -lah --sort=size --reverse'
+
 alias grep='rg'
 
 alias cp='cp -i'
