@@ -38,10 +38,8 @@ alias cv='pbpaste'       # paste from clipboard
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
-alias findd="fd . -type d -iname" # find a directory
-alias findf="fd . -type f -iname" # find a file 
-
-
+alias findd='fd --type d'   # find a directory:  findd foo
+alias findf='fd --type f'   # find a file:       findf foo
 
 # Git
 # ---------------------------------------------------------------------

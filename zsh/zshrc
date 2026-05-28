@@ -13,6 +13,8 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 setopt INC_APPEND_HISTORY
 setopt EXTENDED_HISTORY
+setopt HIST_VERIFY 
+setopt HIST_FIND_NO_DUPS
 
 # Expire duplicate entries first when trimming history
 setopt HIST_EXPIRE_DUPS_FIRST
@@ -43,6 +45,15 @@ export ZSH_CACHE_DIR="$HOME/.cache/zsh"
 
 # Apple Silicon Homebrew prefix
 BREW_PREFIX="/opt/homebrew"
+
+# Colors for the completion menu (consumed by the list-colors zstyle below).
+# Use GNU dircolors if available, otherwise a sane built-in default.
+# Note: eza also honors LS_COLORS, so this affects its output too.
+if (( $+commands[dircolors] )); then
+  export LS_COLORS="$(dircolors -b)"
+else
+  export LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=34;42'
+fi
 
 # ------------------------------------------------------------------------------
 # Completion System
@@ -139,10 +150,14 @@ unset zoxide_cache zoxide_bin
 # Plugins
 # ------------------------------------------------------------------------------
 
-source "$BREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-# Syntax highlighting should stay near bottom
-source "$BREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# Source each plugin only if present, so a missing/uninstalled plugin
+# doesn't throw errors on startup. Syntax highlighting must stay last.
+for plugin in \
+  zsh-autosuggestions/zsh-autosuggestions.zsh \
+  zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do
+  [[ -r "$BREW_PREFIX/share/$plugin" ]] && source "$BREW_PREFIX/share/$plugin"
+done
+unset plugin
 
 # ------------------------------------------------------------------------------
 # Aliases
