@@ -1,24 +1,6 @@
-# History
-HISTSIZE=100000
-SAVEHIST=100000
-HISTFILE=~/.zsh_history
-
-setopt autocd
-setopt sharehistory
-setopt histignoredups
-
-# Completion
-autoload -Uz compinit
-compinit
-
-# Plugins
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.dotfiles/zsh/functions.zsh
-
 # Aliases
 # --------------------------------------------------------------------
-alias vim='nvim'
+alias v='nvim'
 alias ls="eza"
 alias cat="bat"
 
@@ -38,13 +20,3 @@ alias fuck='sudo $(fc -ln -1)' # Redo last command with sudo
 
 alias flushdns='sudo dscacheutil -flushcache; sudo killall - HUP mDNSResponder'
 alias network='networkQuality'
-
-#Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# FZF
-source <(fzf --zsh)
-
-# Prompt
-eval "$(starship init zsh)"
-

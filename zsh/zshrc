@@ -1,0 +1,31 @@
+# History
+HISTSIZE=100000
+SAVEHIST=100000
+HISTFILE=~/.zsh_history
+
+setopt autocd
+setopt sharehistory
+setopt histignoredups
+
+# Completion
+autoload -Uz compinit
+compinit
+
+# FZF
+source <(fzf --zsh)
+
+# Plugins
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Custom Functions
+source ~/.dotfiles/zsh/functions.zsh
+
+# Aliases
+source ~/.dotfiles/zsh/aliases.zsh
+
+# Prompt
+eval "$(starship init zsh)"
+
+# Highlighting
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
