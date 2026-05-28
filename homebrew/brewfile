@@ -3,10 +3,9 @@ cask_args appdir: "/Applications"
 
 tap "homebrew/bundle"
 tap "homebrew/cask"
-tap "homebrew/cask-fonts" # find fonts with: brew search font
 tap "buo/cask-upgrade" # handle App Store app updates: brew cu
 tap "homebrew/core"
-tap "homebew/services"
+tap "homebrew/services"
 brew "mas"
 
 # macOS Utilities
@@ -22,6 +21,7 @@ cask "r"
 # Language tools
 brew "pyenv"
 brew "rbenv"
+brew "uv" # runs bin/ python scripts via inline PEP 723 deps
 
 # CLI tools
 brew "bat"
