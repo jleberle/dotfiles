@@ -8,5 +8,5 @@ DAY_OF_MONTH=$(date +%d)
 
 # Check if it's the first Monday of the month
 if [ "$DAY_OF_WEEK" -eq 1 ] && [ "$DAY_OF_MONTH" -le 7 ]; then
-  rm ~/.local/brew_update_logs.txt
+  rm -f ~/.local/brew_update_logs.txt
 fi

@@ -4,6 +4,7 @@
 import requests
 import docopt
 import os
+import html
 import subprocess
   
 # You may want to change these.
@@ -77,7 +78,7 @@ names = [ x[name] for x in results ]
   
   # Construct the HTML.
 linkFmt = '<a href="{1}"><img src="{0}" alt="{2}", title="{2}" /></a>'
-links = [linkFmt.format(x, y, z.encode('utf8'))
+links = [linkFmt.format(x, y, html.escape(z, quote=True))
             for x, y, z in zip(turls, burls, names) ]
 html = '''<html>                                                        <head><title>{0} pictures</title></head>
 <body>
@@ -87,7 +88,9 @@ html = '''<html>                                                        <head><t
 </html>'''.format(searchterm, '\n'.join(links))
   
   # Create an HTML file and open it.
-htmlFile = myDir + searchterm + '.html'
+# Sanitize the search term so it can't escape the Desktop directory.
+safeName = os.path.basename(searchterm).strip() or 'ipic'
+htmlFile = os.path.join(myDir, safeName + '.html')
 with open(htmlFile, 'w') as f:
     f.write(html)
   

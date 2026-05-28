@@ -1,4 +1,10 @@
 # All in one Git: add, signed commit, push
-git add .
-git commit -S -m "$1"
-git push
+# usage: acp <commit message>
+if [[ -z "$1" ]]; then
+  echo "usage: acp <commit message>" >&2
+  return 1
+fi
+
+git add . &&
+  git commit -S -m "$1" &&
+  git push
