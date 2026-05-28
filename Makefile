@@ -15,5 +15,7 @@ auth :
 	ln -s $(HOME)/.dotfiles/general/ssh-config $(HOME)/.ssh/config
 	@echo "Symlinking GPG Files"
 	ln -s $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
+	ln -s $(HOME)/.dotfiles/general/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
+	ln -s $(HOME)/.dotfiles/general/dirmngr.conf ~/.gnupg/dirmngr.conf
 apps :
 	brew bundle install --file=$(HOME)/.dotfiles/homebrew/brewfile
