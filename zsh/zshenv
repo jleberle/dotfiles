@@ -6,5 +6,5 @@ export MANPAGER="nvim +Man!"
 # Keep ANSI colors when paging (e.g. piped --help, colored output)
 export LESS="-R"
 
-# Match bat's syntax theme to the Nord terminal theme
+# Match bat's syntax theme to the Catppuccin Mocha terminal theme
 export BAT_THEME="Catppuccin Mocha"
