@@ -1,0 +1,16 @@
+title: "Research Paper"
+author: "Your Name"
+date: 2026-05-28
+
+bibliography:
+  - bibliography/references.bib
+
+csl: chicago-author-date.csl
+
+link-citations: true
+
+geometry: margin=1in
+
+fontsize: 12pt
+
+linestretch: 1.5
