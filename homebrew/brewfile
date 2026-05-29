@@ -2,11 +2,7 @@
 cask_args appdir: "/Applications"
 
 tap "buo/cask-upgrade" # handle App Store app updates: brew cu
-tap "homebrew/services"
 brew "mas"
-
-# macOS Utilities
-brew "thaw" # fork of Ice, which seems to be abandoned
 
 # Languages
 brew "go"
@@ -51,10 +47,10 @@ brew "zsh-syntax-highlighting"
 # GUI apps
 cask "bbedit"
 cask "ghostty"
-cask "firefox"
 cask "mactex"
 cask "obsidian"
 cask "tropy"
+cask "waterfox"
 cask "zoom"
 cask "zotero"
 mas "Keynote", id:409183694
