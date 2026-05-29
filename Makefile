@@ -2,7 +2,7 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-.PHONY: default git zsh auth apps brewauto ghostty tmux nvim vale
+.PHONY: default git fish auth apps brewauto ghostty tmux nvim vale
 
 default :
 	@echo "There is no default for your own safety."
@@ -11,13 +11,14 @@ git :
 	@echo "Symlinking Git Files"
 	ln -sf $(HOME)/.dotfiles/git/gitconfig $(HOME)/.gitconfig
 	ln -sf $(HOME)/.dotfiles/git/gitignore $(HOME)/.gitignore
-zsh :
-	@echo "Symlinking ZSH Files"
-	ln -sf $(HOME)/.dotfiles/zsh/zshrc $(HOME)/.zshrc
-	ln -sf $(HOME)/.dotfiles/zsh/zshenv $(HOME)/.zshenv
-	ln -sf $(HOME)/.dotfiles/zsh/zprofile $(HOME)/.zprofile
+fish :
+	@echo "Symlinking fish config"
 	mkdir -p $(HOME)/.config
-	ln -sf $(HOME)/.dotfiles/zsh/starship.toml $(HOME)/.config/starship.toml
+	ln -sfn $(HOME)/.dotfiles/fish $(HOME)/.config/fish
+	ln -sf $(HOME)/.dotfiles/fish/starship.toml $(HOME)/.config/starship.toml
+	@echo "Config symlinked. To use fish as your login shell (optional):"
+	@echo "  echo /opt/homebrew/bin/fish | sudo tee -a /etc/shells"
+	@echo "  chsh -s /opt/homebrew/bin/fish"
 auth :
 	@echo "Creating SSH ControlPath directory"
 	mkdir -p $(HOME)/.ssh/control

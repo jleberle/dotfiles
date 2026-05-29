@@ -48,3 +48,9 @@ opt.spelllang = { "en_us" }
 
 -- Better completion
 opt.completeopt = "menu,menuone,noselect"
+
+-- Use a POSIX shell for :!, system(), :terminal, and plugin shell-outs,
+-- regardless of the login shell. Guards against a non-POSIX login shell
+-- (e.g. fish) breaking plugins that pass POSIX command strings. This also
+-- governs :terminal — to open an interactive fish there, run `:terminal fish`.
+opt.shell = "/bin/sh"

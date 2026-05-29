@@ -1,19 +1,19 @@
 # Dependences and settings
-cask_args appdir: "/Applications"
+cask_args appdir: "/Applications" # install GUI casks into /Applications
 
 tap "buo/cask-upgrade" # handle App Store app updates: brew cu
-brew "mas"
+brew "mas" # Mac App Store CLI (installs the `mas` entries below)
 
 # Languages
-brew "go"
-brew "golang-migrate"
-brew "lua"
-brew "node"
-cask "r"
+brew "go" # Go toolchain
+brew "golang-migrate" # database migration CLI (Go)
+brew "lua" # Lua interpreter
+brew "node" # Node.js runtime (also powers prettier, bash-language-server)
+cask "r" # R statistical computing language
 
 # Language tools
-brew "pyenv"
-brew "rbenv"
+brew "pyenv" # Python version manager
+brew "rbenv" # Ruby version manager
 brew "uv" # runs bin/ python scripts via inline PEP 723 deps
 
 # Neovim LSPs, formatters, linters (referenced by nvim/lua/plugins/*)
@@ -27,70 +27,68 @@ brew "vale"               # prose linter (nvim-lint)
 brew "tree-sitter-cli"    # parser generator CLI (nvim-treesitter main branch builds parsers with it)
 
 # CLI tools
-brew "bat"
-brew "coreutils"
-brew "curl"
+brew "bat" # cat clone with syntax highlighting (aliased to `cat`)
+brew "coreutils" # GNU core utilities (provides dircolors for LS_COLORS)
+brew "curl" # data transfer / HTTP client
 brew "exiftool" # media metadata (read/write)
-brew "eza"
-brew "fd"
+brew "eza" # modern ls replacement (aliased to ls/ll/la/lt)
+brew "fd" # fast find replacement (used by fzf and findd/findf)
 brew "ffmpeg" # audio/video transcoding
-brew "fzf"
+brew "fish"   # primary shell (config in fish/)
+brew "fzf" # fuzzy finder (Ctrl-R/Ctrl-T/Alt-C keybindings)
 brew "ghostscript" # PostScript/PDF engine
 brew "gibo" # Sensible .gitignore defaults
-brew "git"
+brew "git" # version control
 brew "git-delta" # Used in combination with lazygit
 brew "git-lfs" # Versioning large files
-brew "gnupg"
+brew "gnupg" # GPG encryption / key management
 brew "grc" # generic command-output colouriser
-brew "hugo"
-brew "imagemagick"
-brew "lazygit"
+brew "hugo" # static site generator
+brew "imagemagick" # image conversion / manipulation
+brew "lazygit" # terminal git UI (aliased to lg)
 brew "lychee" # fast link checker (markdown/prose)
-brew "neovim"
-brew "pandoc"
-brew "pandoc-crossref"
-brew "pinentry-mac"
+brew "neovim" # text editor (config in nvim/)
+brew "pandoc" # document converter (prose/Pandoc export workflow)
+brew "pandoc-crossref" # Pandoc filter for figure/table/equation cross-references
+brew "pinentry-mac" # GPG passphrase prompt on macOS
 brew "pipx" # isolated Python CLI installs
 brew "qpdf" # PDF transformation
-brew "ripgrep"
+brew "ripgrep" # fast recursive search (used by Telescope in nvim)
 brew "spark" # sparkline generator
-brew "starship"
-brew "tmux"
-brew "wget"
-brew "zoxide"
-brew "zsh"
-brew "zsh-autosuggestions"
-brew "zsh-syntax-highlighting"
+brew "starship" # cross-shell prompt (config in fish/starship.toml)
+brew "tmux" # terminal multiplexer (config general/tmux.conf)
+brew "wget" # file downloader
+brew "zoxide" # smarter cd via frecency (the `z` command)
 
 # GUI apps
-cask "acorn"
-cask "alfred"
-cask "bbedit"
-cask "calibre"
-cask "ghostty"
-cask "hazel"
-cask "hazeover"
-cask "hyperkey"
-cask "iina"
-cask "mactex"
+cask "acorn" # raster image editor
+cask "alfred" # launcher / productivity
+cask "bbedit" # text editor (used by the bb function)
+cask "calibre" # e-book library management
+cask "ghostty" # terminal emulator (config in ghostty/)
+cask "hazel" # automated file organization rules
+cask "hazeover" # dims inactive windows
+cask "hyperkey" # remap Caps Lock to a hyper modifier
+cask "iina" # media player
+cask "mactex" # LaTeX distribution (PDF export via Pandoc)
 cask "marked" # Marked 2 (markdown preview)
-cask "musicbrainz-picard"
-cask "netnewswire"
-cask "obscura-vpn"
-cask "obsidian"
-cask "rectangle"
-cask "skim"
-cask "tropy"
-cask "typeit4me"
-cask "waterfox"
-cask "zoom"
-cask "zotero"
-mas "Keynote", id:409183694
-mas "Soulver 3", id:1508732804
+cask "musicbrainz-picard" # music file tagger
+cask "netnewswire" # RSS reader
+cask "obscura-vpn" # VPN client
+cask "obsidian" # markdown notes / knowledge base
+cask "rectangle" # window snapping / management
+cask "skim" # PDF reader (LaTeX preview)
+cask "tropy" # research photo/source organizer
+cask "typeit4me" # text expander
+cask "waterfox" # web browser
+cask "zoom" # video conferencing
+cask "zotero" # reference / citation manager
+mas "Keynote", id:409183694 # presentation app (Mac App Store)
+mas "Soulver 3", id:1508732804 # notepad calculator (Mac App Store)
 
 # Fonts
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
-cask "font-ibm-plex"
-cask "font-fira-code"
-cask "font-inconsolata"
-cask "font-source-sans-3"
+cask "font-ibm-plex" # IBM Plex type family
+cask "font-fira-code" # monospace font with programming ligatures
+cask "font-inconsolata" # monospace font
+cask "font-source-sans-3" # humanist sans-serif (prose/document body text)

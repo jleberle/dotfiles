@@ -1,7 +1,0 @@
-# No arg: launch BBEdit. Dir arg: open and cd. File arg: open.
-if [[ -z "$1" ]]; then
-  bbedit --launch
-else
-  bbedit "$1"
-  [[ -d "$1" ]] && cd "$1"
-fi

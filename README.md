@@ -3,7 +3,7 @@
 A macOS-focused, speed-oriented development and **prose-writing** environment.
 Everything is symlinked from `~/.dotfiles` via a `Makefile`, so a new machine
 comes up the same as the old one. The editor (Neovim), terminal (Ghostty),
-multiplexer (tmux), shell (Zsh), and color theme (**Catppuccin Mocha**) are all
+multiplexer (tmux), shell (fish), and color theme (**Catppuccin Mocha**) are all
 wired to work together.
 
 > **Platform:** macOS only. It assumes Apple Silicon Homebrew (`/opt/homebrew`),
@@ -19,7 +19,7 @@ wired to work together.
 - [Neovim](#neovim)
 - [tmux](#tmux)
 - [Ghostty](#ghostty)
-- [Zsh](#zsh)
+- [Fish](#fish)
 - [Git](#git)
 - [Prose & Pandoc workflow](#prose--pandoc-workflow)
 - [Bin scripts](#bin-scripts)
@@ -47,7 +47,7 @@ cd ~/.dotfiles
 make apps
 
 # 5. Symlink configs (run the ones you want)
-make zsh git auth ghostty tmux nvim vale
+make fish git auth ghostty tmux nvim vale
 
 # 6. Install scheduled Homebrew jobs (optional)
 make brewauto
@@ -57,7 +57,7 @@ Then finish the per-app setup:
 
 | App     | One-time step                                                                 |
 |---------|-------------------------------------------------------------------------------|
-| Zsh     | `exec zsh` (or open a new terminal) to load the new shell                     |
+| Fish    | Add fish to `/etc/shells`, `chsh -s /opt/homebrew/bin/fish`, then open a new terminal |
 | tmux    | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
 | Neovim  | launch `nvim`; `lazy.nvim` bootstraps and installs plugins automatically      |
 | Neovim  | run `:TSUpdate` once so Tree-sitter parsers finish compiling                  |
@@ -76,7 +76,7 @@ just prints a warning) so nothing destructive happens by accident.
 | Target     | What it does                                                                                 |
 |------------|----------------------------------------------------------------------------------------------|
 | `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`                           |
-| `zsh`      | Symlinks `zshrc`/`zshenv`/`zprofile`, plus `starship.toml` → `~/.config/starship.toml`        |
+| `fish`     | Symlinks the whole `fish/` dir → `~/.config/fish`, plus `starship.toml` → `~/.config/starship.toml` |
 | `auth`     | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
 | `apps`     | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)            |
 | `ghostty`  | Symlinks Ghostty config into `~/Library/Application Support/com.mitchellh.ghostty/`           |
@@ -238,36 +238,41 @@ Application Support.
 | `mouse-hide-while-typing`      | `true`                         | —                                              |
 | `cursor-style-blink`           | `false`                        | Steady cursor                                  |
 | `window-save-state`            | `always`                       | Restores layout/working dirs after restart     |
-| `shell-integration`            | `zsh` + `cursor,sudo,title`    | Prompt/cursor reporting for Starship & Neovim  |
+| `shell-integration`            | `detect` + `cursor,sudo,title` | Auto-detects the shell; prompt/cursor reporting for Starship & Neovim |
 
 > Reload Ghostty config with **`Cmd-Shift-,`**.
 
 ---
 
-## Zsh
+## Fish
 
 Configured for speed: external tool initializations (`fzf`, `zoxide`,
 `starship`) are **cached to disk** and only regenerated when the binary is
-newer than the cache. A single guarded `compinit` skips the security check when
-the completion dump is fresh (< 24h). Plugins are sourced only if present, so a
-missing one never errors on startup.
+newer than the cache. Autosuggestions, syntax highlighting, and completions are
+built into fish, so there are no shell plugins to source or `compinit` to run.
 
-- `zshenv` — environment (`EDITOR=nvim`, `MANPAGER="nvim +Man!"`, `BAT_THEME`).
-- `zprofile` — PATH (`~/.dotfiles/bin`, `~/.local/bin`) + Homebrew shellenv.
-- `zshrc` — history, options, completion, keybindings, fzf, zoxide, plugins,
-  aliases, prompt.
-- `aliases.zsh` — see below.
-- `functions/` — autoloaded shell functions (see below).
+- `conf.d/env.fish` — environment (`EDITOR=nvim`, `MANPAGER="nvim +Man!"`,
+  `BAT_THEME`, `LS_COLORS`), PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the
+  Homebrew shellenv. `conf.d/*.fish` is auto-sourced for every session.
+- `conf.d/options.fish` — documents how zsh `setopt`s map to fish defaults and
+  disables the startup greeting.
+- `conf.d/aliases.fish` — see below.
+- `config.fish` — interactive setup: keybindings, fzf, zoxide, prompt.
+- `functions/` — autoloaded functions (see below).
 - `starship.toml` — minimal prompt: directory, git branch/status, prompt
   character (green ❯ on success, red on error).
 
 ### Shell behavior
 
-- **History:** 100k entries, **shared** across sessions, dedup-aware,
-  timestamped.
-- `AUTO_CD` (type a dir name to `cd`), `AUTO_PUSHD` directory stack,
-  `EXTENDED_GLOB`, `NO_CLOBBER` (protects against `>` overwrites).
-- Plugins: `zsh-autosuggestions`, `zsh-syntax-highlighting` (sourced last).
+- **History:** **shared** across sessions, de-duplicated, and effectively
+  unbounded — all by default (no `HISTSIZE`/`SHARE_HISTORY` to configure).
+- **Autosuggestions** and **syntax highlighting** are built in (replacing
+  `zsh-autosuggestions`/`zsh-syntax-highlighting`), as are man-page-backed
+  **completions** (no `compinit`).
+- **Directory history** — `prevd`/`nextd` (Alt-←/→) and `cd -` cover the
+  `AUTO_PUSHD` workflow; `**` recursive globbing is built in.
+- **Gaps vs zsh:** fish has no `AUTO_CD` (use `cd`, or zoxide's `z`), no
+  `NO_CLOBBER` (`>` overwrites — use `>>`), and no `HIST_IGNORE_SPACE`.
 
 ### Keybindings
 
@@ -307,7 +312,7 @@ picker.
 |----------------------|-----------------------------------------|
 | `cp` / `mv`          | `cp -i` / `mv -i` (prompt before clobber)|
 | `..` / `...` / `....`| `cd ..` / `cd ../..` / `cd ../../..`     |
-| `reload`             | `exec zsh`                              |
+| `reload`             | `exec fish`                             |
 | `path`               | Print `$PATH` one entry per line        |
 
 **Clipboard & keys**
@@ -344,7 +349,7 @@ picker.
 | `gco`  | `git checkout`                                          |
 | `gb`   | `git branch`                                            |
 
-### Functions (`zsh/functions/`)
+### Functions (`fish/functions/`)
 
 Autoloaded — call them like commands.
 
@@ -421,7 +426,7 @@ This setup is tuned for academic / long-form writing in Markdown.
 
 ## Bin scripts
 
-On `PATH` via `zprofile`. The Python scripts use
+On `PATH` via `fish/conf.d/env.fish`. The Python scripts use
 [`uv`](https://docs.astral.sh/uv/)'s inline (PEP 723) dependencies — no venv to
 manage.
 
@@ -475,14 +480,14 @@ Installed by `make auth`.
 ├── Makefile              # symlink/install targets
 ├── README.md
 ├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup)
+├── fish/                 # config.fish, conf.d, functions, starship.toml
 ├── general/              # ssh, gpg, dirmngr, tmux, vale configs
 ├── ghostty/              # terminal config
 ├── git/                  # gitconfig, gitignore, allowed_signers
 ├── homebrew/             # Brewfile
 ├── launchd/              # LaunchAgent plist templates
 ├── nvim/                 # Neovim config (see Neovim section)
-├── templates/            # Pandoc metadata + project Vale config
-└── zsh/                  # zshrc/zshenv/zprofile, aliases, functions, starship
+└── templates/            # Pandoc metadata + project Vale config
 ```
 
 ---

@@ -1,3 +1,0 @@
-# (f)ind by (n)ame: list files whose name contains $1
-# usage: fn foo
-ls -- **/*"$1"*(N)

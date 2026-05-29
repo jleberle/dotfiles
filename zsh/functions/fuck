@@ -1,2 +1,0 @@
-# Re-run the previous command under sudo (entire pipeline runs as root)
-sudo zsh -c "$(fc -ln -1)"

@@ -1,2 +1,0 @@
-# Open man pages in Preview
-man -t "$@" | open -f -a "Preview"
