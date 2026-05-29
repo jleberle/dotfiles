@@ -9,8 +9,8 @@ default :
 
 git :
 	@echo "Symlinking Git Files"
-	ln -sf $(HOME)/.dotfiles/Git/gitconfig $(HOME)/.gitconfig
-	ln -sf $(HOME)/.dotfiles/Git/gitignore $(HOME)/.gitignore
+	ln -sf $(HOME)/.dotfiles/git/gitconfig $(HOME)/.gitconfig
+	ln -sf $(HOME)/.dotfiles/git/gitignore $(HOME)/.gitignore
 zsh :	
 	@echo "Symlinking ZSH Files"
 	ln -sf $(HOME)/.dotfiles/zsh/zshrc $(HOME)/.zshrc
@@ -21,16 +21,16 @@ auth :
 	mkdir -p $(HOME)/.ssh/control
 	chmod 700 $(HOME)/.ssh/control
 	@echo "Symlinking SSH Configurations"
-	ln -sf $(HOME)/.dotfiles/General/ssh-config $(HOME)/.ssh/config
+	ln -sf $(HOME)/.dotfiles/general/ssh-config $(HOME)/.ssh/config
 	@echo "Creating GPG home directory"
 	mkdir -p $(HOME)/.gnupg
 	chmod 700 $(HOME)/.gnupg
 	@echo "Symlinking GPG Files"
-	ln -sf $(HOME)/.dotfiles/General/gpg.conf $(HOME)/.gnupg/gpg.conf
-	ln -sf $(HOME)/.dotfiles/General/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
-	ln -sf $(HOME)/.dotfiles/General/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
+	ln -sf $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
+	ln -sf $(HOME)/.dotfiles/general/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
+	ln -sf $(HOME)/.dotfiles/general/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
 apps :
-	brew bundle install --file=$(HOME)/.dotfiles/Homebrew/brewfile
+	brew bundle install --file=$(HOME)/.dotfiles/homebrew/brewfile
 brewauto :
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
@@ -51,4 +51,4 @@ tmux :
 	@echo "Symlinking tmux config"
 	mkdir -p $(HOME)/.tmux
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-	ln -sf $(HOME)/.dotfiles/General/tmux.conf $(HOME)/.tmux.conf
+	ln -sf $(HOME)/.dotfiles/general/tmux.conf $(HOME)/.tmux.conf
