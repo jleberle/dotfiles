@@ -24,6 +24,7 @@ brew "stylua"             # lua formatter (conform)
 brew "black"              # python formatter (conform)
 brew "prettier"           # markdown formatter (conform)
 brew "vale"               # prose linter (nvim-lint)
+brew "tree-sitter-cli"    # parser generator CLI (nvim-treesitter main branch builds parsers with it)
 
 # CLI tools
 brew "bat"
