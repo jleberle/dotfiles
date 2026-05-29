@@ -29,22 +29,30 @@ brew "vale"               # prose linter (nvim-lint)
 brew "bat"
 brew "coreutils"
 brew "curl"
+brew "exiftool" # media metadata (read/write)
 brew "eza"
 brew "fd"
+brew "ffmpeg" # audio/video transcoding
 brew "fzf"
+brew "ghostscript" # PostScript/PDF engine
 brew "gibo" # Sensible .gitignore defaults
 brew "git"
 brew "git-delta" # Used in combination with lazygit
 brew "git-lfs" # Versioning large files
 brew "gnupg"
+brew "grc" # generic command-output colouriser
 brew "hugo"
 brew "imagemagick"
 brew "lazygit"
+brew "lychee" # fast link checker (markdown/prose)
 brew "neovim"
 brew "pandoc"
 brew "pandoc-crossref"
 brew "pinentry-mac"
+brew "pipx" # isolated Python CLI installs
+brew "qpdf" # PDF transformation
 brew "ripgrep"
+brew "spark" # sparkline generator
 brew "starship"
 brew "tmux"
 brew "wget"
@@ -54,11 +62,25 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
 # GUI apps
+cask "acorn"
+cask "alfred"
 cask "bbedit"
+cask "calibre"
 cask "ghostty"
+cask "hazel"
+cask "hazeover"
+cask "hyperkey"
+cask "iina"
 cask "mactex"
+cask "marked" # Marked 2 (markdown preview)
+cask "musicbrainz-picard"
+cask "netnewswire"
+cask "obscura-vpn"
 cask "obsidian"
+cask "rectangle"
+cask "skim"
 cask "tropy"
+cask "typeit4me"
 cask "waterfox"
 cask "zoom"
 cask "zotero"
