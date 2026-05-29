@@ -11,11 +11,13 @@ git :
 	@echo "Symlinking Git Files"
 	ln -sf $(HOME)/.dotfiles/git/gitconfig $(HOME)/.gitconfig
 	ln -sf $(HOME)/.dotfiles/git/gitignore $(HOME)/.gitignore
-zsh :	
+zsh :
 	@echo "Symlinking ZSH Files"
 	ln -sf $(HOME)/.dotfiles/zsh/zshrc $(HOME)/.zshrc
 	ln -sf $(HOME)/.dotfiles/zsh/zshenv $(HOME)/.zshenv
 	ln -sf $(HOME)/.dotfiles/zsh/zprofile $(HOME)/.zprofile
+	mkdir -p $(HOME)/.config
+	ln -sf $(HOME)/.dotfiles/zsh/starship.toml $(HOME)/.config/starship.toml
 auth :
 	@echo "Creating SSH ControlPath directory"
 	mkdir -p $(HOME)/.ssh/control
