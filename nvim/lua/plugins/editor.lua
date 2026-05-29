@@ -22,23 +22,33 @@ return {
 
 	{
 		"nvim-treesitter/nvim-treesitter",
-		event = { "BufReadPost", "BufNewFile" },
+		branch = "main",
 		build = ":TSUpdate",
+		event = { "BufReadPost", "BufNewFile" },
 		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = {
-					"markdown",
-					"markdown_inline",
-					"lua",
-					"python",
-					"bash",
-					"json",
-					"yaml",
-				},
-				highlight = {
-					enable = true,
-				},
+			-- main branch API: no .configs.setup / ensure_installed / highlight.
+			-- Parsers are installed imperatively (async; already-installed ones
+			-- are skipped), and highlighting is started per-buffer on FileType.
+			require("nvim-treesitter").install({
+				"markdown",
+				"markdown_inline",
+				"lua",
+				"python",
+				"bash",
+				"json",
+				"yaml",
 			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = { "markdown", "lua", "python", "sh", "bash", "json", "yaml" },
+				callback = function()
+					-- pcall guards the first run, before parsers finish installing.
+					pcall(vim.treesitter.start)
+				end,
+			})
+
+			-- The buffer that triggered loading may have fired FileType already.
+			pcall(vim.treesitter.start)
 		end,
 	},
 

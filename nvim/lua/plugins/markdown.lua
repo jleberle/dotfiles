@@ -18,6 +18,12 @@ return {
 			bullet = {
 				enabled = true,
 			},
+
+			-- No `latex` treesitter parser / pylatexenc installed; off by
+			-- default avoids the one-time "missing latex" notice on startup.
+			latex = {
+				enabled = false,
+			},
 		},
 	},
 }

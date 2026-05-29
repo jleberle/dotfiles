@@ -18,3 +18,7 @@ env/
 *.scriv
 
 **/.claude/settings.local.json
+
+# Python bytecode
+__pycache__/
+*.pyc

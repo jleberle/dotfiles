@@ -2,7 +2,7 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-.PHONY: default git zsh auth apps brewauto ghostty tmux nvim
+.PHONY: default git zsh auth apps brewauto ghostty tmux nvim vale
 
 default :
 	@echo "There is no default for your own safety."
@@ -52,8 +52,15 @@ ghostty :
 tmux :
 	@echo "Symlinking tmux config"
 	mkdir -p $(HOME)/.tmux
-	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+	[ -d $(HOME)/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm $(HOME)/.tmux/plugins/tpm
 	ln -sf $(HOME)/.dotfiles/general/tmux.conf $(HOME)/.tmux.conf
 nvim :
 	@echo "Symlinking nvim config"
 	ln -sf $(HOME)/.dotfiles/nvim $(HOME)/.config/nvim
+vale :
+	@echo "Installing global Vale config (used by nvim-lint for prose)"
+	mkdir -p $(HOME)/.local/share/vale/styles
+	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/general/vale.ini > $(HOME)/.vale.ini
+	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
+	@echo "Built-in 'Vale' style needs no sync. To add packages, list them under"
+	@echo "Packages in the config, then run: vale sync"

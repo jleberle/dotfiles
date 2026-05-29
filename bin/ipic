@@ -86,7 +86,7 @@ names = [ x[name] for x in results ]
 linkFmt = '<a href="{1}"><img src="{0}" alt="{2}", title="{2}" /></a>'
 links = [linkFmt.format(x, y, html.escape(z, quote=True))
             for x, y, z in zip(turls, burls, names) ]
-html = '''<html>
+page = '''<html>
 <head><meta charset="utf-8"><title>{0} pictures</title></head>
 <body>
 <h1>“{0}” pictures</h1>
@@ -99,6 +99,6 @@ html = '''<html>
 safeName = os.path.basename(searchterm).strip() or 'ipic'
 htmlFile = os.path.join(myDir, safeName + '.html')
 with open(htmlFile, 'w', encoding='utf-8') as f:
-    f.write(html)
+    f.write(page)
   
 subprocess.check_call(['open', '-b', browser, htmlFile])

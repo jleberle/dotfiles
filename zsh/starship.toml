@@ -8,7 +8,7 @@ style = "bold #cba6f7"
 
 [git_branch]
 symbol = " "
-style = "bold #f9c74f"
+style = "bold #f9e2af"
 format = "[$symbol$branch ]($style)"
 
 [git_status]

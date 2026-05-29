@@ -3,7 +3,7 @@
 # Get current date and time in format "YYYY-MM-DD @ HH:MM:SS"
 TIMESTAMP=$(date "+%Y-%m-%d @ %H:%M:%S")
 echo ""
-echo "Executed \"update_brew.sh\" at $TIMESTAMP"
+echo "Executed \"homebrewupdate.sh\" at $TIMESTAMP"
 echo ""
 
 # Update Homebrew itself

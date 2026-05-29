@@ -15,8 +15,6 @@ background-blur-radius = 18
 
 shell-integration = zsh
 
-gtk-single-instance = true
-
 # -----------------------------
 # macOS / nvim / tmux usability
 # -----------------------------
