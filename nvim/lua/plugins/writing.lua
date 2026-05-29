@@ -1,6 +1,7 @@
 return {
 	{
 		"folke/zen-mode.nvim",
+		cmd = "ZenMode",
 		opts = {
 			window = {
 				width = 90,
@@ -10,6 +11,7 @@ return {
 
 	{
 		"echasnovski/mini.nvim",
+		event = { "BufReadPre", "BufNewFile" },
 		config = function()
 			require("mini.pairs").setup()
 			require("mini.comment").setup()
@@ -19,6 +21,7 @@ return {
 
 	{
 		"folke/twilight.nvim",
+		cmd = { "Twilight", "TwilightEnable" },
 		opts = {},
 	},
 }

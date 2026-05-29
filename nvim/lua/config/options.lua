@@ -15,6 +15,10 @@ opt.sidescrolloff = 8
 opt.splitbelow = true
 opt.splitright = true
 
+-- Share the macOS system clipboard (works with pbcopy/pbpaste, ghostty
+-- copy-on-select, and tmux set-clipboard; crosses SSH via OSC 52)
+opt.clipboard = "unnamedplus"
+
 -- Search
 opt.ignorecase = true
 opt.smartcase = true
@@ -38,10 +42,9 @@ opt.breakindent = true
 opt.textwidth = 80
 opt.colorcolumn = "81"
 
-opt.spell = true
+-- spell / conceallevel are enabled per-filetype (see config/autocmds.lua) so
+-- they don't fire spell underlines or hide characters in code buffers.
 opt.spelllang = { "en_us" }
-
-opt.conceallevel = 2
 
 -- Better completion
 opt.completeopt = "menu,menuone,noselect"

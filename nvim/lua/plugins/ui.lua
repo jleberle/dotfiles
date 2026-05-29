@@ -1,19 +1,24 @@
 return {
 	{
-		"folke/tokyonight.nvim",
+		"catppuccin/nvim",
+		name = "catppuccin",
 		priority = 1000,
 		lazy = false,
 		config = function()
-			vim.cmd.colorscheme("tokyonight-moon")
+			require("catppuccin").setup({
+				flavour = "mocha",
+			})
+			vim.cmd.colorscheme("catppuccin-mocha")
 		end,
 	},
 
 	{
 		"nvim-lualine/lualine.nvim",
+		event = "VeryLazy",
 		config = function()
 			require("lualine").setup({
 				options = {
-					theme = "tokyonight",
+					theme = "catppuccin",
 					globalstatus = true,
 				},
 			})

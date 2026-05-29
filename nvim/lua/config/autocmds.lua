@@ -12,3 +12,9 @@ autocmd("FileType", {
 		vim.opt_local.formatoptions:remove("t")
 	end,
 })
+
+-- Reload files changed outside nvim (e.g. pandoc output, git ops in another
+-- tmux pane). Relies on tmux's `focus-events on`.
+autocmd({ "FocusGained", "BufEnter", "TermClose", "TermLeave" }, {
+	command = "checktime",
+})

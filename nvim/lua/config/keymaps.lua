@@ -15,15 +15,15 @@ map("n", "<leader>z", "<cmd>ZenMode<cr>")
 -- Oil file browser
 map("n", "-", "<cmd>Oil<cr>")
 
--- Pandoc exports
+-- Pandoc exports (shellescape so filenames with spaces work)
 map("n", "<leader>ph", function()
-	local file = vim.fn.expand("%")
-	local output = vim.fn.expand("%:r") .. ".html"
-	vim.cmd("!" .. "pandoc " .. file .. " -o " .. output)
+	local file = vim.fn.shellescape(vim.fn.expand("%"))
+	local output = vim.fn.shellescape(vim.fn.expand("%:r") .. ".html")
+	vim.cmd("!pandoc " .. file .. " -o " .. output)
 end)
 
 map("n", "<leader>pp", function()
-	local file = vim.fn.expand("%")
-	local output = vim.fn.expand("%:r") .. ".pdf"
-	vim.cmd("!" .. "pandoc " .. file .. " -o " .. output)
+	local file = vim.fn.shellescape(vim.fn.expand("%"))
+	local output = vim.fn.shellescape(vim.fn.expand("%:r") .. ".pdf")
+	vim.cmd("!pandoc " .. file .. " -o " .. output)
 end)
