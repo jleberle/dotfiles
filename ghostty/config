@@ -15,8 +15,6 @@ background-blur-radius = 18
 
 shell-integration = zsh
 
-copy-on-select = true
-
 gtk-single-instance = true
 
 # -----------------------------

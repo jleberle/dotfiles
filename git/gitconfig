@@ -7,7 +7,7 @@
 	format = ssh
 
 [gpg "ssh"]
-	allowedSignersFile = $HOME/.dotfiles/Git/allowed_signers
+	allowedSignersFile = $HOME/.dotfiles/git/allowed_signers
 
 [commit]
 	gpgsign = true
