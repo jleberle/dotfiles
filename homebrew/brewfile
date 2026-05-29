@@ -16,6 +16,15 @@ brew "pyenv"
 brew "rbenv"
 brew "uv" # runs bin/ python scripts via inline PEP 723 deps
 
+# Neovim LSPs, formatters, linters (referenced by nvim/lua/plugins/*)
+brew "lua-language-server" # lua_ls
+brew "pyright"             # python LSP
+brew "bash-language-server" # bashls
+brew "stylua"             # lua formatter (conform)
+brew "black"              # python formatter (conform)
+brew "prettier"           # markdown formatter (conform)
+brew "vale"               # prose linter (nvim-lint)
+
 # CLI tools
 brew "bat"
 brew "coreutils"
