@@ -49,4 +49,6 @@ ghostty :
 	ln -sf $(HOME)/.dotfiles/ghostty/config "$(GHOSTTY_DIR)/config"
 tmux :
 	@echo "Symlinking tmux config"
+	mkdir -p $(HOME)/.tmux
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	ln -sf $(HOME)/.dotfiles/General/tmux.conf $(HOME)/.tmux.conf
