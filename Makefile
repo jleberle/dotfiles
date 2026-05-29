@@ -2,7 +2,7 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-.PHONY: default git zsh auth apps brewauto ghostty tmux
+.PHONY: default git zsh auth apps brewauto ghostty tmux nvim
 
 default :
 	@echo "There is no default for your own safety."
@@ -52,3 +52,6 @@ tmux :
 	mkdir -p $(HOME)/.tmux
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	ln -sf $(HOME)/.dotfiles/general/tmux.conf $(HOME)/.tmux.conf
+nvim :
+	@echo "Symlinking nvim config"
+	ln -sf $(HOME)/.dotfiles/nvim $(HOME)/.config/nvim
