@@ -94,7 +94,9 @@ mas "Soulver 3", id:1508732804 # notepad calculator (Mac App Store)
 mas "ublock origin lite", id:6745342698 # Ad Blocker
 # Fonts
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
-cask "font-ibm-plex" # IBM Plex type family
+cask "font-ibm-plex-sans" # IBM Plex Sans type 
+cask "font-ibm-plex-mono" # IBM Plex Mono 
+cask "font-ibm-plex-serif" #IBM Plex Serif 
 cask "font-fira-code" # monospace font with programming ligatures
 cask "font-inconsolata" # monospace font
 cask "font-source-sans-3" # humanist sans-serif (prose/document body text)
