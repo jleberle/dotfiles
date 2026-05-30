@@ -25,7 +25,9 @@ alias biggest 'eza -lah --sort=size --reverse'
 alias cp 'cp -i'
 alias mv 'mv -i'
 alias reload 'exec fish'        # reload shell after editing dotfiles
-alias path 'string join \n $PATH'
+# NB: not `path` — that's a fish builtin (`path filter`/`basename`/…); shadowing
+# it breaks completions (e.g. git's) that call the builtin.
+alias paths 'string join \n $PATH'
 
 alias network 'networkQuality'
 alias myip 'curl -s https://ifconfig.me; echo'
