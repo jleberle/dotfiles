@@ -313,7 +313,7 @@ picker.
 | `cp` / `mv`          | `cp -i` / `mv -i` (prompt before clobber)|
 | `..` / `...` / `....`| `cd ..` / `cd ../..` / `cd ../../..`     |
 | `reload`             | `exec fish`                             |
-| `path`               | Print `$PATH` one entry per line        |
+| `paths`              | Print `$PATH` one entry per line        |
 
 **Clipboard & keys**
 
