@@ -69,7 +69,7 @@ cask "ghostty" # terminal emulator (config in ghostty/)
 cask "hazel" # automated file organization rules
 cask "iina" # media player
 cask "mactex" # LaTeX distribution (PDF export via Pandoc)
-cask "marked" # Marked 2 (markdown preview)
+cask "marked-app" # Marked 2 (markdown preview)
 cask "musicbrainz-picard" # music file tagger
 cask "netnewswire" # RSS reader
 cask "obscura-vpn" # VPN client
