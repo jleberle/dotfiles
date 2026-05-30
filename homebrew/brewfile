@@ -9,7 +9,7 @@ brew "go" # Go toolchain
 brew "golang-migrate" # database migration CLI (Go)
 brew "lua" # Lua interpreter
 brew "node" # Node.js runtime (also powers prettier, bash-language-server)
-cask "r" # R statistical computing language
+cask "r-app" # R statistical computing language
 
 # Language tools
 brew "pyenv" # Python version manager
@@ -48,6 +48,7 @@ brew "imagemagick" # image conversion / manipulation
 brew "lazygit" # terminal git UI (aliased to lg)
 brew "lychee" # fast link checker (markdown/prose)
 brew "neovim" # text editor (config in nvim/)
+brew "ocrmypdf" #OCR software
 brew "pandoc" # document converter (prose/Pandoc export workflow)
 brew "pandoc-crossref" # Pandoc filter for figure/table/equation cross-references
 brew "pinentry-mac" # GPG passphrase prompt on macOS
@@ -61,14 +62,11 @@ brew "wget" # file downloader
 brew "zoxide" # smarter cd via frecency (the `z` command)
 
 # GUI apps
-cask "acorn" # raster image editor
 cask "alfred" # launcher / productivity
 cask "bbedit" # text editor (used by the bb function)
 cask "calibre" # e-book library management
 cask "ghostty" # terminal emulator (config in ghostty/)
 cask "hazel" # automated file organization rules
-cask "hazeover" # dims inactive windows
-cask "hyperkey" # remap Caps Lock to a hyper modifier
 cask "iina" # media player
 cask "mactex" # LaTeX distribution (PDF export via Pandoc)
 cask "marked" # Marked 2 (markdown preview)
@@ -79,13 +77,21 @@ cask "obsidian" # markdown notes / knowledge base
 cask "rectangle" # window snapping / management
 cask "skim" # PDF reader (LaTeX preview)
 cask "tropy" # research photo/source organizer
-cask "typeit4me" # text expander
 cask "waterfox" # web browser
 cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager
-mas "Keynote", id:409183694 # presentation app (Mac App Store)
+mas "acorn", id:6737921844 # imge editor
+mas "broadcasts", id:1469995354 # Internet Radio
+mas "hazeover", id:430798174 # blur background
+mas "keynote", id:361285480 # Presentation software
+mas "mela", id:1568924476 # Recipes
+mas "numbers", id: 361304891 # Spreadsheets
+mas "obsidian web clipper", id:6720708363 # Obsidian Web Clipper
+mas "pages", id: 361309726 # Documents
+mas "tot", id:1491071483 # Notes
+mas "typeit4me", id:6474688391 # text expansion
 mas "Soulver 3", id:1508732804 # notepad calculator (Mac App Store)
-
+mas "ublock origin lite", id:6745342698 # Ad Blocker
 # Fonts
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
 cask "font-ibm-plex" # IBM Plex type family
