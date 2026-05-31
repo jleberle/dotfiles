@@ -6,11 +6,16 @@
 # exist regardless of how the shell was started.
 # ------------------------------------------------------------------------------
 
-# --- Homebrew (Apple Silicon) -------------------------------------------------
+# --- Homebrew -----------------------------------------------------------------
 # Equivalent to `eval "$(brew shellenv)"` in zprofile. The `fish` argument makes
 # brew emit fish syntax (set -gx / fish_add_path) instead of POSIX exports.
+# Checks known prefixes in order: Apple Silicon, Intel Mac, Linux.
 if test -x /opt/homebrew/bin/brew
     /opt/homebrew/bin/brew shellenv fish | source
+else if test -x /usr/local/bin/brew
+    /usr/local/bin/brew shellenv fish | source
+else if test -x /home/linuxbrew/.linuxbrew/bin/brew
+    /home/linuxbrew/.linuxbrew/bin/brew shellenv fish | source
 end
 
 # --- PATH ---------------------------------------------------------------------

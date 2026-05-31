@@ -39,8 +39,10 @@ if status is-interactive
     set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 --color=border:#6c7086"
 
     # Cache `fzf --fish` output; rebuild if the fzf binary is newer than cache.
+    # Uses $HOMEBREW_PREFIX (set by `brew shellenv` in conf.d/env.fish) so this
+    # works on Apple Silicon (/opt/homebrew), Intel (/usr/local), and Linux.
     set -l fzf_cache $cache/fzf.fish
-    set -l fzf_bin /opt/homebrew/bin/fzf
+    set -l fzf_bin $HOMEBREW_PREFIX/bin/fzf
     if not test -s $fzf_cache; or test $fzf_bin -nt $fzf_cache
         $fzf_bin --fish >$fzf_cache
     end
@@ -50,7 +52,7 @@ if status is-interactive
     # Zoxide
     # --------------------------------------------------------------------------
     set -l zoxide_cache $cache/zoxide.fish
-    set -l zoxide_bin /opt/homebrew/bin/zoxide
+    set -l zoxide_bin $HOMEBREW_PREFIX/bin/zoxide
     if not test -s $zoxide_cache; or test $zoxide_bin -nt $zoxide_cache
         $zoxide_bin init fish >$zoxide_cache
     end
@@ -60,7 +62,7 @@ if status is-interactive
     # Prompt (starship — config at fish/starship.toml -> ~/.config/starship.toml)
     # --------------------------------------------------------------------------
     set -l starship_cache $cache/starship.fish
-    set -l starship_bin /opt/homebrew/bin/starship
+    set -l starship_bin $HOMEBREW_PREFIX/bin/starship
     if not test -s $starship_cache; or test $starship_bin -nt $starship_cache
         $starship_bin init fish >$starship_cache
     end

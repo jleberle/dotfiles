@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Resolve brew regardless of architecture (Apple Silicon, Intel, Linux).
+# Try known locations in order; fall back to PATH.
+if   [[ -x /opt/homebrew/bin/brew ]]; then BREW=/opt/homebrew/bin/brew   # Apple Silicon
+elif [[ -x /usr/local/bin/brew    ]]; then BREW=/usr/local/bin/brew       # Intel Mac
+elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then BREW=/home/linuxbrew/.linuxbrew/bin/brew
+else BREW=$(command -v brew)
+fi
+
+if [[ -z $BREW ]]; then
+    echo "brew not found" >&2
+    exit 1
+fi
+
 # Get current date and time in format "YYYY-MM-DD @ HH:MM:SS"
 TIMESTAMP=$(date "+%Y-%m-%d @ %H:%M:%S")
 echo ""
@@ -8,27 +21,27 @@ echo ""
 
 # Update Homebrew itself
 echo "Updating Homebrew..."
-/opt/homebrew/bin/brew update
+"$BREW" update
 echo ""
 
 # Check for outdated packages
 echo "Checking for outdated packages..."
-/opt/homebrew/bin/brew outdated
+"$BREW" outdated
 echo ""
 
 # Upgrade all outdated packages
 echo "Upgrading outdated packages..."
-/opt/homebrew/bin/brew upgrade
+"$BREW" upgrade
 echo ""
 
 # Optional: Upgrade casks (applications) as well
 # echo "Upgrading outdated casks (applications)..."
-# /opt/homebrew/bin/brew upgrade --cask
+# "$BREW" upgrade --cask
 # echo ""
 
 # Remove stale downloads and old versions
 echo "Cleaning up..."
-/opt/homebrew/bin/brew cleanup
+"$BREW" cleanup
 echo ""
 
 echo "Brew update complete!"
