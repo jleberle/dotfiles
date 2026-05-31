@@ -26,6 +26,11 @@ echo ""
 # /opt/homebrew/bin/brew upgrade --cask
 # echo ""
 
+# Remove stale downloads and old versions
+echo "Cleaning up..."
+/opt/homebrew/bin/brew cleanup
+echo ""
+
 echo "Brew update complete!"
 echo ""
 echo "------------------------------------------------------------------------------"

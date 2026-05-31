@@ -52,13 +52,14 @@ alias .... 'cd ../../..'
 alias findd 'fd --type d'   # find a directory:  findd foo
 alias findf 'fd --type f'   # find a file:       findf foo
 
-# Git
-alias lg 'lazygit'
-alias gs 'git status -sb'
-alias ga 'git add'
-alias gc 'git commit -S'        # matches your signed-commit convention in `acp`
-alias gp 'git push'
-alias gd 'git diff'             # delta picks this up via your gitconfig
-alias gl 'git log --oneline --graph --decorate -20'
-alias gco 'git checkout'
-alias gb 'git branch'
+# Git — abbreviations expand inline before Enter so you can see what runs.
+# `abbr` is fish-native; aliases would hide the expansion.
+abbr -a lg lazygit
+abbr -a gs 'git status -sb'
+abbr -a ga 'git add'
+abbr -a gc 'git commit -S'
+abbr -a gp 'git push'
+abbr -a gd 'git diff'
+abbr -a gl 'git log --oneline --graph --decorate -20'
+abbr -a gco 'git checkout'
+abbr -a gb 'git branch'

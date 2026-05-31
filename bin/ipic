@@ -12,6 +12,7 @@ import docopt
 import os
 import html
 import subprocess
+import sys
   
 # You may want to change these.
 myDir = os.environ['HOME'] + '/Downloads/'    # directory for HTML file
@@ -78,6 +79,11 @@ iURL = 'https://itunes.apple.com/search'
 parameters = {'term': searchterm, 'media': media, 'entity': entity}
 r = requests.get(iURL, params=parameters)
 results = r.json()['results']
+
+if not results:
+    print(f"No results found for '{searchterm}'.", file=sys.stderr)
+    sys.exit(1)
+
 turls = [ x['artworkUrl100'] for x in results ]
 burls = [ x.replace('100x100', '{0}x{0}'.format(size)) for x in turls ]
 names = [ x[name] for x in results ]

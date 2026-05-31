@@ -2,7 +2,7 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-.PHONY: default git fish auth apps brewauto ghostty tmux nvim vale
+.PHONY: default git fish auth apps brewauto ghostty tmux nvim vale doctor
 
 default :
 	@echo "There is no default for your own safety."
@@ -65,3 +65,15 @@ vale :
 	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
 	@echo "Built-in 'Vale' style needs no sync. To add packages, list them under"
 	@echo "Packages in the config, then run: vale sync"
+doctor :
+	@echo "Checking symlinks..."
+	@test -L $(HOME)/.gitconfig           || echo "WARNING: .gitconfig not symlinked (run: make git)"
+	@test -L $(HOME)/.gitignore           || echo "WARNING: .gitignore not symlinked (run: make git)"
+	@test -L $(HOME)/.config/fish         || echo "WARNING: fish config not symlinked (run: make fish)"
+	@test -L $(HOME)/.config/starship.toml || echo "WARNING: starship.toml not symlinked (run: make fish)"
+	@test -L $(HOME)/.ssh/config          || echo "WARNING: ssh config not symlinked (run: make auth)"
+	@test -L $(HOME)/.gnupg/gpg.conf      || echo "WARNING: gpg.conf not symlinked (run: make auth)"
+	@test -L $(HOME)/.tmux.conf           || echo "WARNING: .tmux.conf not symlinked (run: make tmux)"
+	@test -L $(HOME)/.config/nvim         || echo "WARNING: nvim config not symlinked (run: make nvim)"
+	@test -L "$(GHOSTTY_DIR)/config"      || echo "WARNING: ghostty config not symlinked (run: make ghostty)"
+	@echo "Done."

@@ -20,6 +20,8 @@ Host *
     ForwardX11 no
 
     # Session reliability
+    # ServerAliveInterval sends keepalives to all hosts — intentional, prevents
+    # idle disconnects on long-running sessions (tmux, remote editors, etc.)
     ServerAliveInterval 60
     ServerAliveCountMax 3
     TCPKeepAlive no

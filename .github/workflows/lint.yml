@@ -1,0 +1,31 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck (bin scripts)
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './bin'
+
+      - name: fish syntax check
+        run: |
+          sudo apt-get install -y fish
+          for f in fish/config.fish fish/conf.d/*.fish fish/functions/*.fish; do
+            fish --no-execute "$f" || exit 1
+          done
+
+      - name: luacheck (nvim lua)
+        run: |
+          sudo apt-get install -y lua5.4 luarocks
+          sudo luarocks install luacheck
+          luacheck nvim/lua/ --globals vim --no-unused-args
