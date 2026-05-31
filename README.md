@@ -165,7 +165,7 @@ nvim/
   `:TSInstall`/`:TSUpdate`; highlighting starts per-filetype).
 - **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`
   (`pairs`, `comment`, `surround`).
-- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls` (loads only for
+- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls`, `gopls` (loads only for
   those filetypes).
 - **Completion:** `nvim-cmp` (lsp + buffer + path sources) using the built-in
   `vim.snippet` expander; loads on `InsertEnter`.
@@ -175,8 +175,8 @@ nvim/
   [Prose & Pandoc](#prose--pandoc-workflow).
 
 > All LSP servers, formatters, and linters are installed by the Brewfile
-> (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
-> `prettier`, `vale`) — there is no Mason layer.
+> (`lua-language-server`, `pyright`, `bash-language-server`, `gopls`, `stylua`,
+> `black`, `prettier`, `vale`) — there is no Mason layer.
 
 ---
 
@@ -195,6 +195,7 @@ twice to send a literal `Ctrl-a` to the underlying program.
 | `H` / `J` / `K` / `L`            | Resize the pane by 5 cells (repeatable)           |
 | `c`                              | New window in the current directory               |
 | `Tab`                            | Jump to the last (previous) window                |
+| `z`                              | Zoom / unzoom the current pane                    |
 | `r`                              | Reload `~/.tmux.conf`                              |
 | `I`                              | (TPM) install plugins                             |
 | `Option-h` / `Option-l`          | **No prefix** — previous / next window            |
@@ -209,14 +210,14 @@ twice to send a literal `Ctrl-a` to the underlying program.
 
 ### Behavior & options
 
-- **Mouse** support on; **256-color + true color** via `tmux-256color` and an
-  `RGB` terminal override.
+- **Mouse** support on; **256-color + true color** via `tmux-256color`.
 - `escape-time 0` and `focus-events on` for responsive Neovim integration
   (the Neovim config calls `checktime` on focus to auto-reload changed files).
 - Windows/panes are **1-indexed** and **renumber** when one closes.
 - `history-limit` is 100,000 lines.
-- Terminal overrides pass **undercurls**, **colored underlines**, and
-  **cursor-shape** changes through to Neovim.
+- `terminal-features` passes **RGB true color**, **colored underlines**
+  (undercurl diagnostics in Neovim), and **cursor-shape** changes through
+  (block in normal, beam in insert).
 - **Plugins** (via TPM): `tpm`, `catppuccin/tmux` (flavor `mocha`). The status
   line is composed from Catppuccin modules (session on the left, date/time on
   the right).
@@ -301,6 +302,7 @@ picker.
 | `ll`        | `eza -lh --git --icons --group-directories-first`       |
 | `la`        | `eza -lah --git --icons --group-directories-first`      |
 | `lt`        | `eza --tree --level=2 --icons`                          |
+| `ltt`       | `eza --tree --level=3 --icons`                          |
 | `recent`    | `eza -lah --sort=modified`                              |
 | `biggest`   | `eza -lah --sort=size --reverse`                        |
 | `findd`     | `fd --type d`                                           |
@@ -330,6 +332,8 @@ picker.
 | `myip`       | Public IP via `ifconfig.me`                              |
 | `ports`      | Listening TCP ports (`lsof`)                             |
 | `network`    | `networkQuality` speed test                              |
+| `disk`       | `df -h` — free/used space per mount                      |
+| `usage`      | `du -sh -- *` — directory sizes in cwd (pairs with `biggest`) |
 | `brewup`     | `brew update && upgrade && cleanup`                      |
 | `flushdns`   | Flush the macOS DNS cache                                |
 | `cleands`    | Delete `.DS_Store` files under the current tree          |
@@ -344,10 +348,14 @@ picker.
 | `ga`   | `git add`                                               |
 | `gc`   | `git commit -S` (signed)                                |
 | `gp`   | `git push`                                              |
+| `gpl`  | `git pull`                                              |
+| `gf`   | `git fetch`                                             |
 | `gd`   | `git diff` (rendered by delta)                          |
+| `gds`  | `git diff --staged`                                     |
 | `gl`   | `git log --oneline --graph --decorate -20`              |
 | `gco`  | `git checkout`                                          |
 | `gb`   | `git branch`                                            |
+| `grst` | `git restore`                                           |
 
 ### Functions (`fish/functions/`)
 
@@ -355,8 +363,9 @@ Autoloaded — call them like commands.
 
 | Function          | Usage / behavior                                                       |
 |-------------------|------------------------------------------------------------------------|
-| `acp <message>`   | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)     |
-| `bb [path]`       | Launch BBEdit; with a dir, open **and** `cd` into it                   |
+| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)     |
+| `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim |
+| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                   |
 | `cdf`             | `cd` to the directory open in the front Finder window                  |
 | `fn <text>`       | List files whose name contains `<text>` (recursive glob)               |
 | `fuck`            | Re-run the previous command under `sudo`                               |
