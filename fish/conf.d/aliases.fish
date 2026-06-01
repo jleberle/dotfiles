@@ -75,3 +75,6 @@ abbr -a gl  'git log --oneline --graph --decorate -20'
 abbr -a gco 'git checkout'
 abbr -a gb  'git branch'
 abbr -a grst 'git restore'
+
+# Website theme submodule update
+alias update-theme 'git -C /Users/jaredeberle/git/website submodule update --remote themes/PaperMod'

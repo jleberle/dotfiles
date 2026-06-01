@@ -1,6 +1,6 @@
 local opt = vim.opt
 
-vim.g.mapleader = " "
+vim.g.mapleader = ","
 
 -- UI
 opt.number = true

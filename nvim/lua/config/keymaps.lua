@@ -1,5 +1,12 @@
 local map = vim.keymap.set
 
+-- Diagnostics
+map("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostic" })
+
+-- Navigate by display line (respects word-wrap)
+map({ "n", "x" }, "j", "gj")
+map({ "n", "x" }, "k", "gk")
+
 -- Save/Quit
 map("n", "<leader>w", "<cmd>w<cr>")
 map("n", "<leader>q", "<cmd>q<cr>")
