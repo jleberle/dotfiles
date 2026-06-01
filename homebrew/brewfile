@@ -38,7 +38,7 @@ brew "fish"   # primary shell (config in fish/)
 brew "fzf" # fuzzy finder (Ctrl-R/Ctrl-T/Alt-C keybindings)
 brew "ghostscript" # PostScript/PDF engine
 brew "gibo" # Sensible .gitignore defaults
-brew "git" # version control
+brew "git" # version jontrol
 brew "git-delta" # Used in combination with lazygit
 brew "git-lfs" # Versioning large files
 brew "gitup" # Update multiple repos at once
@@ -66,6 +66,7 @@ brew "zoxide" # smarter cd via frecency (the `z` command)
 cask "alfred" # launcher / productivity
 cask "bbedit" # text editor (used by the bb function)
 cask "calibre" # e-book library management
+cask "downie" # Video Downloader
 cask "ghostty" # terminal emulator (config in ghostty/)
 cask "hazel" # automated file organization rules
 cask "iina" # media player
