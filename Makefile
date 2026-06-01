@@ -2,6 +2,13 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
+# Detect Homebrew prefix for cross-architecture installs.
+HOMEBREW_PREFIX := $(shell \
+	if [ -x /opt/homebrew/bin/brew ]; then echo /opt/homebrew; \
+	elif [ -x /usr/local/bin/brew ]; then echo /usr/local; \
+	elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then echo /home/linuxbrew/.linuxbrew; \
+	else brew --prefix 2>/dev/null || echo /usr/local; fi)
+
 .PHONY: default git fish auth apps brewauto ghostty tmux nvim vale doctor
 
 default :
@@ -30,7 +37,9 @@ auth :
 	chmod 700 $(HOME)/.gnupg
 	@echo "Symlinking GPG Files"
 	ln -sf $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
-	ln -sf $(HOME)/.dotfiles/general/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
+	@echo "Writing gpg-agent.conf (pinentry path depends on Homebrew prefix: $(HOMEBREW_PREFIX))"
+	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(HOME)/.dotfiles/general/gpg-agent.conf > $(HOME)/.gnupg/gpg-agent.conf
+	chmod 600 $(HOME)/.gnupg/gpg-agent.conf
 	ln -sf $(HOME)/.dotfiles/general/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
 apps :
 	brew bundle install --file=$(HOME)/.dotfiles/homebrew/brewfile
@@ -73,7 +82,9 @@ doctor :
 	@test -L $(HOME)/.config/starship.toml || echo "WARNING: starship.toml not symlinked (run: make fish)"
 	@test -L $(HOME)/.ssh/config          || echo "WARNING: ssh config not symlinked (run: make auth)"
 	@test -L $(HOME)/.gnupg/gpg.conf      || echo "WARNING: gpg.conf not symlinked (run: make auth)"
+	@test -f $(HOME)/.gnupg/gpg-agent.conf || echo "WARNING: gpg-agent.conf not generated (run: make auth)"
 	@test -L $(HOME)/.tmux.conf           || echo "WARNING: .tmux.conf not symlinked (run: make tmux)"
 	@test -L $(HOME)/.config/nvim         || echo "WARNING: nvim config not symlinked (run: make nvim)"
 	@test -L "$(GHOSTTY_DIR)/config"      || echo "WARNING: ghostty config not symlinked (run: make ghostty)"
+	@test -f $(HOME)/.vale.ini            || echo "WARNING: .vale.ini not generated (run: make vale)"
 	@echo "Done."

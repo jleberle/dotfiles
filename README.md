@@ -55,13 +55,14 @@ make brewauto
 
 Then finish the per-app setup:
 
-| App     | One-time step                                                                 |
-|---------|-------------------------------------------------------------------------------|
-| Fish    | Add fish to `/etc/shells`, `chsh -s /opt/homebrew/bin/fish`, then open a new terminal |
-| tmux    | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
-| Neovim  | launch `nvim`; `lazy.nvim` bootstraps and installs plugins automatically      |
-| Neovim  | run `:TSUpdate` once so Tree-sitter parsers finish compiling                  |
-| Vale    | `make vale` already wrote `~/.vale.ini`; the built-in style needs no `sync`   |
+| App       | One-time step                                                                 |
+|-----------|-------------------------------------------------------------------------------|
+| Fish      | Add fish to `/etc/shells`, `chsh -s /opt/homebrew/bin/fish`, then open a new terminal |
+| tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
+| Neovim    | launch `nvim`; `lazy.nvim` bootstraps and installs plugins automatically      |
+| Neovim    | run `:TSUpdate` once so Tree-sitter parsers finish compiling                  |
+| Vale      | `make vale` already wrote `~/.vale.ini`; the built-in style needs no `sync`   |
+| BasicTeX  | run the `tlmgr install` command in the [Prose & Pandoc](#prose--pandoc-workflow) section |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
 > `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
@@ -165,7 +166,7 @@ nvim/
   `:TSInstall`/`:TSUpdate`; highlighting starts per-filetype).
 - **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`
   (`pairs`, `comment`, `surround`).
-- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls`, `gopls` (loads only for
+- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls` (loads only for
   those filetypes).
 - **Completion:** `nvim-cmp` (lsp + buffer + path sources) using the built-in
   `vim.snippet` expander; loads on `InsertEnter`.
@@ -175,7 +176,7 @@ nvim/
   [Prose & Pandoc](#prose--pandoc-workflow).
 
 > All LSP servers, formatters, and linters are installed by the Brewfile
-> (`lua-language-server`, `pyright`, `bash-language-server`, `gopls`, `stylua`,
+> (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`,
 > `black`, `prettier`, `vale`) — there is no Mason layer.
 
 ---
@@ -428,8 +429,17 @@ This setup is tuned for academic / long-form writing in Markdown.
   - `cd` into the document's own directory first, so relative paths in
     `metadata.yaml` (bibliography, CSL) and relative images resolve correctly,
   - auto-add `--metadata-file=metadata.yaml` when a sibling file exists.
-- PDF export uses the LaTeX engine from **MacTeX** (installed via the Brewfile
-  cask).
+- PDF export uses the LaTeX engine from **BasicTeX** (installed via the Brewfile
+  cask). After `make apps`, run the following to install the packages required by
+  the CV and syllabus templates:
+
+```sh
+tlmgr install \
+  tex-gyre xcharter sourcesans microtype geometry \
+  titlesec titling parskip enumitem fancyhdr \
+  booktabs adjustbox xcolor float listings \
+  tools graphics ec collection-fontsrecommended
+```
 
 ---
 

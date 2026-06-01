@@ -19,9 +19,10 @@ shell-integration = detect
 # macOS / nvim / tmux usability
 # -----------------------------
 
-# Send Option as Alt/Meta so tmux's M-h / M-l window switches and nvim
-# Alt-mappings work instead of inserting accented characters.
-macos-option-as-alt = true
+# Send left Option as Alt/Meta so tmux's M-h / M-l window switches and nvim
+# Alt-mappings work. Right Option is left as-is for macOS accented characters
+# (é, ü, ñ, etc.).
+macos-option-as-alt = left
 
 copy-on-select = clipboard
 mouse-hide-while-typing = true

@@ -1,12 +1,10 @@
 #!/bin/bash
+set -euo pipefail
 
-# Get the current day of the week (1 = Monday, 7 = Sunday)
-DAY_OF_WEEK=$(date +%u)
-
-# Get the current day of the month
+# Launchd schedules this on Mondays, so only the "first of the month" guard
+# is needed here — the day-of-week check is redundant.
 DAY_OF_MONTH=$(date +%d)
 
-# Check if it's the first Monday of the month
-if [ "$DAY_OF_WEEK" -eq 1 ] && [ "$DAY_OF_MONTH" -le 7 ]; then
-  rm -f ~/.local/brew_update_logs.txt
+if [ "$DAY_OF_MONTH" -le 7 ]; then
+  rm -f "$HOME/.local/brew_update_logs.txt"
 fi

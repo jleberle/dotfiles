@@ -1,13 +1,16 @@
 Host codeberg
   User git
   HostName codeberg.org
+  UseKeychain yes
+  AddKeysToAgent yes
+  ControlMaster auto
+  ControlPersist 10m
+  ControlPath ~/.ssh/control/%C
 
 Host *
     # Modern identity handling
     IdentitiesOnly yes
     IdentityFile ~/.ssh/id_ed25519
-    UseKeychain yes
-    AddKeysToAgent yes
 
     # Safer host verification
     StrictHostKeyChecking yes
@@ -36,9 +39,5 @@ Host *
     GSSAPIAuthentication no
 
     # Logging
-    LogLevel VERBOSE
+    LogLevel INFO
 
-    # Safer multiplexing (optional)
-    ControlMaster auto
-    ControlPersist 10m
-    ControlPath ~/.ssh/control/%C

@@ -15,7 +15,9 @@ return {
 	{
 		"nvim-lualine/lualine.nvim",
 		event = "VeryLazy",
+		dependencies = { "echasnovski/mini.nvim" },
 		config = function()
+			require("mini.icons").setup()
 			require("lualine").setup({
 				options = {
 					theme = "catppuccin-mocha",

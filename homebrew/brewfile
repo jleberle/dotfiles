@@ -5,8 +5,6 @@ tap "buo/cask-upgrade" # handle App Store app updates: brew cu
 brew "mas" # Mac App Store CLI (installs the `mas` entries below)
 
 # Languages
-brew "go" # Go toolchain
-brew "golang-migrate" # database migration CLI (Go)
 brew "lua" # Lua interpreter
 brew "node" # Node.js runtime (also powers prettier, bash-language-server)
 cask "r-app" # R statistical computing language
@@ -20,11 +18,11 @@ brew "uv" # runs bin/ python scripts via inline PEP 723 deps
 brew "lua-language-server" # lua_ls
 brew "pyright"             # python LSP
 brew "bash-language-server" # bashls
-brew "gopls"              # go LSP
 brew "stylua"             # lua formatter (conform)
 brew "black"              # python formatter (conform)
 brew "prettier"           # markdown formatter (conform)
 brew "vale"               # prose linter (nvim-lint)
+brew "luacheck"           # Lua linter (CI lint workflow)
 brew "tree-sitter-cli"    # parser generator CLI (nvim-treesitter main branch builds parsers with it)
 
 # CLI tools
@@ -70,7 +68,7 @@ cask "calibre" # e-book library management
 cask "ghostty" # terminal emulator (config in ghostty/)
 cask "hazel" # automated file organization rules
 cask "iina" # media player
-cask "mactex" # LaTeX distribution (PDF export via Pandoc)
+cask "basictex" # minimal LaTeX distribution (PDF export via Pandoc)
 cask "marked-app" # Marked 2 (markdown preview)
 cask "musicbrainz-picard" # music file tagger
 cask "netnewswire" # RSS reader
@@ -83,6 +81,8 @@ cask "waterfox" # web browser
 cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager
 mas "acorn", id:6737921844 # image editor
+mas "dropover", id:1355679052 # drag-and-drop shelf
+mas "folder quick look", id:6753110395 # Quick Look folder previews
 mas "broadcasts", id:1469995354 # Internet Radio
 mas "hazeover", id:430798174 # blur background
 mas "keynote", id:361285480 # Presentation software

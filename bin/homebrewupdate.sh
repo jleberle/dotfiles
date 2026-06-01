@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Resolve brew regardless of architecture (Apple Silicon, Intel, Linux).
 # Try known locations in order; fall back to PATH.
@@ -34,10 +35,10 @@ echo "Upgrading outdated packages..."
 "$BREW" upgrade
 echo ""
 
-# Optional: Upgrade casks (applications) as well
-# echo "Upgrading outdated casks (applications)..."
-# "$BREW" upgrade --cask
-# echo ""
+# Upgrade outdated casks (applications)
+echo "Upgrading outdated casks..."
+"$BREW" upgrade --cask
+echo ""
 
 # Remove stale downloads and old versions
 echo "Cleaning up..."

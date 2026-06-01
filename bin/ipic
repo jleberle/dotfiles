@@ -11,6 +11,7 @@ import requests
 import docopt
 import os
 import html
+import re
 import subprocess
 import sys
   
@@ -78,6 +79,7 @@ else:
 iURL = 'https://itunes.apple.com/search'
 parameters = {'term': searchterm, 'media': media, 'entity': entity}
 r = requests.get(iURL, params=parameters)
+r.raise_for_status()
 results = r.json()['results']
 
 if not results:
@@ -101,8 +103,9 @@ page = '''<html>
 </html>'''.format(searchterm, '\n'.join(links))
   
   # Create an HTML file and open it.
-# Sanitize the search term so it can't escape the Desktop directory.
-safeName = os.path.basename(searchterm).strip() or 'ipic'
+# Sanitize the search term: strip path separators and characters that are
+# invalid or problematic in macOS filenames (:, *, ?, ", <, >, |, NUL).
+safeName = re.sub(r'[^\w\s-]', '_', searchterm).strip() or 'ipic'
 htmlFile = os.path.join(myDir, safeName + '.html')
 with open(htmlFile, 'w', encoding='utf-8') as f:
     f.write(page)

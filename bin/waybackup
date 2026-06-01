@@ -22,6 +22,7 @@ from urllib.parse import quote, urlparse
 import requests
 
 WAYBACK_SAVE_PREFIX = "https://web.archive.org/save/"
+WAYBACK_AVAILABILITY_API = "https://archive.org/wayback/available"
 
 
 def validate_url(url: str) -> bool:
@@ -49,11 +50,26 @@ def extract_snapshot_url(response: requests.Response) -> str | None:
     return None
 
 
+def poll_availability(session: requests.Session, target: str, after_timestamp: str) -> str | None:
+    """Poll the availability API for a snapshot saved at or after after_timestamp."""
+    resp = session.get(
+        WAYBACK_AVAILABILITY_API,
+        params={"url": target, "timestamp": after_timestamp},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    snapshot = data.get("archived_snapshots", {}).get("closest", {})
+    if snapshot.get("available") and snapshot.get("url"):
+        return snapshot["url"]
+    return None
+
+
 def save_url(session: requests.Session, target: str) -> str:
-    save_url = WAYBACK_SAVE_PREFIX + quote(target, safe="")
+    submit_url = WAYBACK_SAVE_PREFIX + quote(target, safe="")
 
     response = session.get(
-        save_url,
+        submit_url,
         allow_redirects=True,
         timeout=120,
     )
@@ -64,30 +80,20 @@ def save_url(session: requests.Session, target: str) -> str:
     if snapshot:
         return snapshot
 
-    # Sometimes archive processing is delayed.
-    # Retry final URL a few times.
-    for _ in range(15):
-        time.sleep(2)
+    # Archive processing can be delayed. Poll the availability API (read-only)
+    # rather than re-submitting the save request repeatedly.
+    after_timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    for attempt in range(15):
+        time.sleep(2 * (attempt + 1))  # gentle backoff: 2s, 4s, 6s, …
 
-        retry = session.get(
-            save_url,
-            allow_redirects=True,
-            timeout=120,
-        )
-
-        retry.raise_for_status()
-
-        snapshot = extract_snapshot_url(retry)
+        snapshot = poll_availability(session, target, after_timestamp)
         if snapshot:
             return snapshot
 
-    # Last-ditch fallback:
-    # search response body for snapshot URL
+    # Last-ditch fallback: search the original response body for a snapshot URL.
     text = response.text
-
     marker = "https://web.archive.org/web/"
     idx = text.find(marker)
-
     if idx != -1:
         end = text.find('"', idx)
         if end != -1:

@@ -5,6 +5,33 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-01 — Go removal; MacTeX → BasicTeX; Neovim cleanup; SSH/GPG hardening
+
+### Changed
+- Neovim: removed `go` treesitter parser and FileType pattern (`editor.lua`)
+- Neovim: `nvim-cmp` `<CR>` confirm changed to `select = false` (explicit selection only)
+- Neovim: Twilight now activates automatically with ZenMode (`writing.lua`)
+- Neovim: `mini.icons` wired as lualine dependency for file-type icons (`ui.lua`)
+- SSH: moved `UseKeychain`, `AddKeysToAgent`, and multiplexing options from
+  `Host *` to `Host codeberg` only; multiplexing added to codeberg for future hosts
+- GPG: removed unused `default-cache-ttl-ssh` / `max-cache-ttl-ssh` from
+  `gpg-agent.conf` (gpg-agent is not brokering SSH)
+
+## 2026-06-01 — Go removal; MacTeX → BasicTeX; Brewfile housekeeping
+
+### Changed
+- Removed Go toolchain from Brewfile (`go`, `golang-migrate`, `gopls`) and from
+  Neovim LSP config (`gopls` wired out of `lsp.lua`, `go` filetype removed)
+- Replaced `mactex` cask with `basictex` (~100 MB vs 17 GB); added `tlmgr install`
+  command to README and Quick Start table for the packages required by the CV and
+  syllabus templates (`sourcesanspro` → `sourcesans` is the correct TeX Live name)
+
+### Added
+- Brewfile: `mas "dropover"` (id:1355679052) and `mas "folder quick look"`
+  (id:6753110395) to match installed App Store apps
+
+---
+
 ## 2026-05-31 — Improvements & forward compatibility
 
 ### Added

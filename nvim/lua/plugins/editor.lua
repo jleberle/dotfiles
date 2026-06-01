@@ -35,13 +35,12 @@ return {
 				"lua",
 				"python",
 				"bash",
-				"go",
 				"json",
 				"yaml",
 			})
 
 			vim.api.nvim_create_autocmd("FileType", {
-				pattern = { "markdown", "lua", "python", "sh", "bash", "go", "json", "yaml" },
+				pattern = { "markdown", "lua", "python", "sh", "bash", "json", "yaml" },
 				callback = function()
 					-- pcall guards the first run, before parsers finish installing.
 					pcall(vim.treesitter.start)
