@@ -74,6 +74,7 @@ cask "musicbrainz-picard" # music file tagger
 cask "netnewswire" # RSS reader
 cask "obscura-vpn" # VPN client
 cask "obsidian" # markdown notes / knowledge base
+cask "hyperkey" # remap Caps Lock to Hyper key (⌃⌥⌘⇧)
 cask "rectangle" # window snapping / management
 cask "skim" # PDF reader (LaTeX preview)
 cask "tropy" # research photo/source organizer
@@ -87,13 +88,14 @@ mas "broadcasts", id:1469995354 # Internet Radio
 mas "hazeover", id:430798174 # blur background
 mas "keynote", id:361285480 # Presentation software
 mas "mela", id:1568924476 # Recipes
-mas "numbers", id: 361304891 # Spreadsheets
+mas "numbers", id:361304891 # Spreadsheets
 mas "obsidian web clipper", id:6720708363 # Obsidian Web Clipper
-mas "pages", id: 361309726 # Documents
+mas "pages", id:361309726 # Documents
 mas "tot", id:1491071483 # Notes
 mas "typeit4me", id:6474688391 # text expansion
 mas "Soulver 3", id:1508732804 # notepad calculator (Mac App Store)
 mas "ublock origin lite", id:6745342698 # Ad Blocker
+
 # Fonts
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
 cask "font-ibm-plex-sans" # IBM Plex Sans type 
