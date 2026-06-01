@@ -42,6 +42,7 @@ brew "gibo" # Sensible .gitignore defaults
 brew "git" # version control
 brew "git-delta" # Used in combination with lazygit
 brew "git-lfs" # Versioning large files
+brew "gitup" # Update multiple repos at once
 brew "gnupg" # GPG encryption / key management
 brew "grc" # generic command-output colouriser
 brew "hugo" # static site generator
