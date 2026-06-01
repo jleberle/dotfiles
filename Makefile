@@ -80,8 +80,7 @@ vale :
 	mkdir -p $(HOME)/.local/share/vale/styles
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/general/vale.ini > $(HOME)/.vale.ini
 	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
-	@echo "Built-in 'Vale' style needs no sync. To add packages, list them under"
-	@echo "Packages in the config, then run: vale sync"
+	vale sync
 doctor :
 	@echo "Checking symlinks..."
 	@test -L $(HOME)/.gitconfig           || echo "WARNING: .gitconfig not symlinked (run: make git)"

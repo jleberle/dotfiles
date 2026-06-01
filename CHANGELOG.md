@@ -5,6 +5,14 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-01 — Vale: add prose linting packages
+
+### Added
+- `general/vale.ini`: added proselint, write-good, Readability, and alex as Vale packages and base styles
+- `Makefile` (`vale` target): now runs `vale sync` automatically after writing `~/.vale.ini`
+
+---
+
 ## 2026-06-01 — Audit fixes: hardening, guards, documentation
 
 ### Added
