@@ -18,6 +18,7 @@ git :
 	@echo "Symlinking Git Files"
 	ln -sf $(HOME)/.dotfiles/git/gitconfig $(HOME)/.gitconfig
 	ln -sf $(HOME)/.dotfiles/git/gitignore $(HOME)/.gitignore
+	@command -v delta >/dev/null 2>&1 || echo "WARNING: delta not found — git diff/log will fail. Run: make apps"
 fish :
 	@echo "Symlinking fish config"
 	mkdir -p $(HOME)/.config
@@ -37,11 +38,16 @@ auth :
 	chmod 700 $(HOME)/.gnupg
 	@echo "Symlinking GPG Files"
 	ln -sf $(HOME)/.dotfiles/general/gpg.conf $(HOME)/.gnupg/gpg.conf
-	@echo "Writing gpg-agent.conf (pinentry path depends on Homebrew prefix: $(HOMEBREW_PREFIX))"
-	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(HOME)/.dotfiles/general/gpg-agent.conf > $(HOME)/.gnupg/gpg-agent.conf
-	chmod 600 $(HOME)/.gnupg/gpg-agent.conf
+	@echo "Generating gpg-agent.conf (pinentry path depends on Homebrew prefix: $(HOMEBREW_PREFIX))"
+	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(HOME)/.dotfiles/general/gpg-agent.conf.tmpl > $(HOME)/.dotfiles/general/gpg-agent.conf
+	chmod 600 $(HOME)/.dotfiles/general/gpg-agent.conf
+	ln -sf $(HOME)/.dotfiles/general/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
 	ln -sf $(HOME)/.dotfiles/general/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
 apps :
+	@command -v brew >/dev/null 2>&1 || { \
+		echo "Homebrew not found. Installing..."; \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+	}
 	brew bundle install --file=$(HOME)/.dotfiles/homebrew/brewfile
 brewauto :
 	@echo "Installing Homebrew auto-update LaunchAgents"
@@ -49,6 +55,8 @@ brewauto :
 	mkdir -p $(LAUNCH_AGENTS)
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/launchd/org.jaredeberle.brewupdate.plist > $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/launchd/org.jaredeberle.brewlogclean.plist > $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
+	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
+	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
 	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate 2>/dev/null
 	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewlogclean 2>/dev/null
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
@@ -82,7 +90,7 @@ doctor :
 	@test -L $(HOME)/.config/starship.toml || echo "WARNING: starship.toml not symlinked (run: make fish)"
 	@test -L $(HOME)/.ssh/config          || echo "WARNING: ssh config not symlinked (run: make auth)"
 	@test -L $(HOME)/.gnupg/gpg.conf      || echo "WARNING: gpg.conf not symlinked (run: make auth)"
-	@test -f $(HOME)/.gnupg/gpg-agent.conf || echo "WARNING: gpg-agent.conf not generated (run: make auth)"
+	@test -L $(HOME)/.gnupg/gpg-agent.conf || echo "WARNING: gpg-agent.conf not symlinked (run: make auth)"
 	@test -L $(HOME)/.tmux.conf           || echo "WARNING: .tmux.conf not symlinked (run: make tmux)"
 	@test -L $(HOME)/.config/nvim         || echo "WARNING: nvim config not symlinked (run: make nvim)"
 	@test -L "$(GHOSTTY_DIR)/config"      || echo "WARNING: ghostty config not symlinked (run: make ghostty)"

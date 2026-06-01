@@ -5,6 +5,28 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-01 — Audit fixes: hardening, guards, documentation
+
+### Added
+- Brewfile: `bash`, `kagi for safari`, `StopTheMadness`, `StopTheScript`, `Vinegar`
+- `cdf`, `pman`, `o`: macOS guard — print clear error and return 1 on Linux
+- `aliases.fish`: macOS-only aliases (`network`, `showfiles`, `hidefiles`, `flushdns`, `pubkey`, `cb`, `cv`) wrapped in `if test (uname) = Darwin`
+- `cdf`: error message when no Finder window is open
+- `make apps`: auto-installs Homebrew via the official script if `brew` is not found
+- `make git`: warns if `delta` is not installed before symlinks are written
+- `make brewauto`: runs `plutil -lint` on both generated plists before loading them
+- README: "Verify your setup" block with `make doctor` and spot-check commands
+- README: lazy-lock update instructions (`:Lazy update` + commit)
+- README: templates section expanded with copy commands and CSL path explanation
+
+### Changed
+- `gpg-agent.conf` renamed to `gpg-agent.conf.tmpl`; `make auth` now generates the resolved file into the dotfiles dir and symlinks it (`~/.gnupg/gpg-agent.conf` → `general/gpg-agent.conf`); generated file is gitignored
+- `make doctor`: gpg-agent check upgraded from `-f` (file exists) to `-L` (is a symlink)
+- `git/gitconfig`: `signingkey` changed from `~/.ssh/id_ed25519.pub` to absolute path to guarantee expansion across all Git versions
+- `launchd/org.jaredeberle.brewupdate.plist`: removed redundant `EnvironmentVariables`/`PATH` block — `homebrewupdate.sh` resolves `brew` itself
+- `newdoc`: CSL path hardcoded to `$HOME/.dotfiles/templates/chicago-notes-bibliography-17th-edition.csl`
+- README: Git section notes `delta` must be installed before `make git`
+
 ## 2026-06-01 — Go removal; MacTeX → BasicTeX; Neovim cleanup; SSH/GPG hardening
 
 ### Changed

@@ -67,6 +67,24 @@ Then finish the per-app setup:
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
 > `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
 
+### Verify your setup
+
+Run `make doctor` at any time to check that all symlinks are in place:
+
+```sh
+make doctor
+```
+
+Each missing symlink prints a `WARNING` with the exact `make` target to fix it.
+To spot-check key tools are on `PATH`:
+
+```sh
+nvim --version   # should be ≥ 0.10
+fish --version
+delta --version
+starship --version
+```
+
 ---
 
 ## Makefile targets
@@ -174,6 +192,10 @@ nvim/
   `prettier` (Markdown). Trigger with `<leader>cf`.
 - **Linting:** `nvim-lint` runs `vale` on Markdown (read/save) — see
   [Prose & Pandoc](#prose--pandoc-workflow).
+
+> **Plugin pins:** `lazy-lock.json` is committed so every machine gets the same
+> plugin versions. To update all plugins to their latest commits, run `:Lazy update`
+> inside Neovim, then commit the resulting `lazy-lock.json` change.
 
 > All LSP servers, formatters, and linters are installed by the Brewfile
 > (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`,
@@ -381,7 +403,8 @@ Autoloaded — call them like commands.
 
 SSH-based commit/tag **signing** is enabled (`gpg.format = ssh`, signing key
 `~/.ssh/id_ed25519.pub`, verified against `git/allowed_signers`). `delta` is the
-pager/diff renderer (Catppuccin Mocha theme).
+pager/diff renderer (Catppuccin Mocha theme) — it must be installed before
+`make git` is run, or `git diff`/`git log` will fail. `make apps` installs it.
 
 **Sensible defaults baked in:** `pull.rebase`, `push.autoSetupRemote` +
 `default = current`, `rebase.autoStash` + `updateRefs`, `fetch.prune`,
@@ -420,9 +443,18 @@ This setup is tuned for academic / long-form writing in Markdown.
   `.vale.ini` placed in a repo overrides the global one.
 - **Templates** in `templates/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
-    `csl: chicago-author-date.csl`, `geometry`, `fontsize`, `linestretch`).
-    Copy it next to a document and edit.
-  - `vale.ini` — a per-project Vale config (relative `StylesPath`).
+    `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
+    ```sh
+    cp ~/.dotfiles/templates/metadata.yaml .
+    ```
+  - `chicago-notes-bibliography-17th-edition.csl` — CSL style file referenced
+    automatically by `newdoc` (hardcoded to `~/.dotfiles/templates/`). Pandoc
+    exports via `<leader>ph`/`<leader>pp` will resolve it from there.
+  - `vale.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
+    project root to override the global `~/.vale.ini`:
+    ```sh
+    cp ~/.dotfiles/templates/vale.ini .
+    ```
 - **Export** with `<leader>ph` (HTML) or `<leader>pp` (PDF). Both:
   - run `pandoc --filter pandoc-crossref --citeproc` (cross-references resolve
     *before* citations),

@@ -20,7 +20,7 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
 
     set -l today (date +%Y-%m-%d)
 
-    printf '---\ntitle: "%s"\nauthor: "Jared Eberle"\ndate: %s\n\nbibliography:\n  - bibliography/references.bib\n\ncsl: chicago-author-date.csl\n\nlink-citations: true\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $today > $filename
+    printf '---\ntitle: "%s"\nauthor: "Jared Eberle"\ndate: %s\n\nbibliography:\n  - bibliography/references.bib\n\ncsl: %s/.dotfiles/templates/chicago-notes-bibliography-17th-edition.csl\n\nlink-citations: true\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $today $HOME > $filename
 
     nvim $filename
 end

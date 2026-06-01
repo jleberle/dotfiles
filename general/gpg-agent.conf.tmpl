@@ -1,0 +1,10 @@
+# Template — do not symlink or use directly.
+# Run `make auth` to substitute __HOMEBREW_PREFIX__ and produce
+# general/gpg-agent.conf, which is then symlinked to ~/.gnupg/gpg-agent.conf.
+pinentry-program __HOMEBREW_PREFIX__/bin/pinentry-mac
+
+default-cache-ttl 600
+max-cache-ttl 7200
+
+# Prevent other processes from injecting cached passphrases.
+no-allow-external-cache

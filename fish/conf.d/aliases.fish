@@ -28,21 +28,23 @@ alias reload 'exec fish'        # reload shell after editing dotfiles
 # it breaks completions (e.g. git's) that call the builtin.
 alias paths 'string join \n $PATH'
 
-alias network 'networkQuality'
 alias myip 'curl -s https://ifconfig.me; echo'
 alias ports 'lsof -iTCP -sTCP:LISTEN -n -P'
 
 # Housekeeping
 alias cleands 'find . -type f -name "*.DS_Store" -delete'
-alias showfiles 'defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
-alias hidefiles 'defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
 alias brewup 'brew update && brew upgrade && brew upgrade --cask && brew cleanup'
-alias flushdns 'sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
-# Editors and languages
-alias pubkey 'pbcopy < ~/.ssh/id_ed25519.pub && echo "=> Public key copied to pasteboard."'
-alias cb 'pbcopy'        # pipe into clipboard:  echo hi | cb
-alias cv 'pbpaste'       # paste from clipboard
+# macOS-only aliases
+if test (uname) = Darwin
+    alias network 'networkQuality'
+    alias showfiles 'defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
+    alias hidefiles 'defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
+    alias flushdns 'sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+    alias pubkey 'pbcopy < ~/.ssh/id_ed25519.pub && echo "=> Public key copied to pasteboard."'
+    alias cb 'pbcopy'        # pipe into clipboard:  echo hi | cb
+    alias cv 'pbpaste'       # paste from clipboard
+end
 
 # System management
 alias .. 'cd ..'

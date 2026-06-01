@@ -1,7 +1,7 @@
 [user]
 	name = Jared Eberle
 	email = jared@jaredeberle.org
-	signingkey = ~/.ssh/id_ed25519.pub
+	signingkey = /Users/jaredeberle/.ssh/id_ed25519.pub
 
 [gpg]
 	format = ssh
