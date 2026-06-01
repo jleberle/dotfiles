@@ -6,7 +6,7 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
     end
 
     set -l filename $argv[1]
-    set -l title (test (count $argv) -ge 2; and echo "$argv[2..-1]"; or echo "Untitled")
+    set -l title (test (count $argv) -ge 2; and string join " " $argv[2..-1]; or echo "Untitled")
 
     # Append .md if no extension given
     if not string match -q '*.*' $filename

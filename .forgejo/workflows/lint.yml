@@ -10,12 +10,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: shellcheck (bin scripts)
         run: |
           sudo apt-get install -y shellcheck
           shellcheck bin/homebrewupdate.sh
+          shellcheck bin/homebrewlogclean.sh
 
       - name: fish syntax check
         run: |

@@ -2,8 +2,7 @@
 # Aliases  (mirrors zsh/aliases.zsh)
 #
 # In fish, `alias` defines a thin wrapper function (any extra arguments are
-# appended). For abbreviations that expand inline as you type, `abbr` is the
-# fish-native alternative — see fish/README.md.
+# appended). For abbreviations that expand inline as you type, use `abbr`.
 # ------------------------------------------------------------------------------
 
 alias v 'nvim'
@@ -37,7 +36,7 @@ alias ports 'lsof -iTCP -sTCP:LISTEN -n -P'
 alias cleands 'find . -type f -name "*.DS_Store" -delete'
 alias showfiles 'defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
 alias hidefiles 'defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
-alias brewup 'brew update && brew upgrade && brew cleanup'
+alias brewup 'brew update && brew upgrade && brew upgrade --cask && brew cleanup'
 alias flushdns 'sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
 # Editors and languages

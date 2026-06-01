@@ -24,8 +24,8 @@ fish :
 	ln -sfn $(HOME)/.dotfiles/fish $(HOME)/.config/fish
 	ln -sf $(HOME)/.dotfiles/fish/starship.toml $(HOME)/.config/starship.toml
 	@echo "Config symlinked. To use fish as your login shell (optional):"
-	@echo "  echo /opt/homebrew/bin/fish | sudo tee -a /etc/shells"
-	@echo "  chsh -s /opt/homebrew/bin/fish"
+	@echo "  echo $(HOMEBREW_PREFIX)/bin/fish | sudo tee -a /etc/shells"
+	@echo "  chsh -s $(HOMEBREW_PREFIX)/bin/fish"
 auth :
 	@echo "Creating SSH ControlPath directory"
 	mkdir -p $(HOME)/.ssh/control

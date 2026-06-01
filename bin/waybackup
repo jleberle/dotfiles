@@ -68,6 +68,10 @@ def poll_availability(session: requests.Session, target: str, after_timestamp: s
 def save_url(session: requests.Session, target: str) -> str:
     submit_url = WAYBACK_SAVE_PREFIX + quote(target, safe="")
 
+    # Capture before submitting so any snapshot created during the request is
+    # not missed by the availability poll.
+    after_timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+
     response = session.get(
         submit_url,
         allow_redirects=True,
@@ -82,7 +86,6 @@ def save_url(session: requests.Session, target: str) -> str:
 
     # Archive processing can be delayed. Poll the availability API (read-only)
     # rather than re-submitting the save request repeatedly.
-    after_timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
     for attempt in range(15):
         time.sleep(2 * (attempt + 1))  # gentle backoff: 2s, 4s, 6s, …
 

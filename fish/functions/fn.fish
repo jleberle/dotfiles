@@ -4,6 +4,6 @@ function fn --description '(f)ind by (n)ame: list files whose name contains the 
     # the fish analog of zsh's (N) null_glob qualifier.
     set -l matches **/*"$argv[1]"*
     if set -q matches[1]
-        ls -d -- $matches
+        eza -d -- $matches
     end
 end

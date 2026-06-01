@@ -7,7 +7,7 @@ function acp --description 'All-in-one Git: add, signed commit, push'
 
     git add .
 
-    if test -z "$(git diff --cached --name-only)"
+    if git diff --cached --quiet
         echo "Nothing to commit." >&2
         return 1
     end
