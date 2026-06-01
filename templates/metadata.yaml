@@ -9,6 +9,8 @@ csl: chicago-author-date.csl
 
 link-citations: true
 
+reference-doc: /Users/jaredeberle/.dotfiles/templates/reference.docx
+
 geometry: margin=1in
 
 fontsize: 12pt
