@@ -438,7 +438,8 @@ tlmgr install \
   tex-gyre xcharter sourcesans microtype geometry \
   titlesec titling parskip enumitem fancyhdr \
   booktabs adjustbox xcolor float listings \
-  tools graphics ec collection-fontsrecommended
+  tools graphics ec collection-fontsrecommended \
+  xstring fontaxes ly1
 ```
 
 ---
