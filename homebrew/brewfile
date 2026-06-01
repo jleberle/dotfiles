@@ -67,6 +67,7 @@ cask "alfred" # launcher / productivity
 cask "bbedit" # text editor (used by the bb function)
 cask "calibre" # e-book library management
 cask "downie" # Video Downloader
+cask "firefox" # Browser
 cask "ghostty" # terminal emulator (config in ghostty/)
 cask "hazel" # automated file organization rules
 cask "iina" # media player
@@ -80,7 +81,6 @@ cask "hyperkey" # remap Caps Lock to Hyper key (⌃⌥⌘⇧)
 cask "rectangle" # window snapping / management
 cask "skim" # PDF reader (LaTeX preview)
 cask "tropy" # research photo/source organizer
-cask "waterfox" # web browser
 cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager
 mas "acorn", id:6737921844 # image editor
