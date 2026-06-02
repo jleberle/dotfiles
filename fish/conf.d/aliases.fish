@@ -76,5 +76,8 @@ abbr -a gco 'git checkout'
 abbr -a gb  'git branch'
 abbr -a grst 'git restore'
 
+# Gitup with bookmarks file
+alias gitup 'gitup -b ~/.dotfiles/git/gitup-bookmarks'
+
 # Website theme submodule update
 alias update-theme 'git -C /Users/jaredeberle/git/website submodule update --remote themes/PaperMod'
