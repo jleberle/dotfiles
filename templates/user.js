@@ -184,6 +184,10 @@ user_pref("layout.word_select.eat_space_to_next_word", false);
 // visit https://github.com/yokoffing/Betterfox/blob/main/Smoothfox.js
 // Enter your scrolling overrides below this line:
 
+// recommended for 60hz+ displays
+user_pref("apz.overscroll.enabled", true); // DEFAULT NON-LINUX
+user_pref("general.smoothScroll", true); // DEFAULT
+user_pref("mousewheel.default.delta_multiplier_y", 275); // 250-400; adjust this number to your liking
 
 /****************************************************************************
  * START: MY OVERRIDES                                                      *
@@ -206,7 +210,7 @@ user_pref("extensions.formautofill.creditCards.enabled", false);
 user_pref("security.webauth.webauthn", false);
 
 // PREF: set DoH provider
-user_pref("network.trr.uri", "https://dns.dnswarden.com/00000000000000000000028"); // Hagezi Normal + TIF
+user_pref("network.trr.uri", "https://dns.nextdns.io/<ID>/Firefox"); // Hagezi Normal + TIF
 
 // PREF: enforce DNS-over-HTTPS (DoH)
 user_pref("network.trr.mode", 3);
@@ -251,6 +255,10 @@ user_pref("javascript.options.wasm_optimizingjit", false);
 user_pref("captivedetect.canonicalURL", ""); 
 user_pref("network.captive-portal-service.enabled", false); 
 user_pref("network.connectivity-service.enabled", false); 
+
+// PREF: Disable Built-In VPN
+user_pref("browser.ipProtection.enabled", false);
+user_pref("browser.ipProtection.added"), false);
 /****************************************************************************
  * END: BETTERFOX                                                           *
 ****************************************************************************/
