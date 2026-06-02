@@ -3,9 +3,9 @@ author: "Jared Eberle"
 date: 2026-05-28
 
 bibliography:
-  - bibliography/references.bib
+  - ~/Documents/Library/Library.bib
 
-csl: chicago-author-date.csl
+csl: ~/dotfiles/templates/chicago-notes-bibliography-17th-edition.csl
 
 link-citations: true
 
