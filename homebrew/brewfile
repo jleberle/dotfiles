@@ -7,11 +7,9 @@ brew "mas" # Mac App Store CLI (installs the `mas` entries below)
 brew "bash" # Modern bash (macOS ships 3.2; 4+ needed for mapfile, etc.)
 brew "lua" # Lua interpreter
 brew "node" # Node.js runtime (also powers prettier, bash-language-server)
-cask "r-app" # R statistical computing language
 
 # Language tools
 brew "pyenv" # Python version manager
-brew "rbenv" # Ruby version manager
 brew "uv" # runs bin/ python scripts via inline PEP 723 deps
 
 # Neovim LSPs, formatters, linters (referenced by nvim/lua/plugins/*)
@@ -29,33 +27,26 @@ brew "vale"               # prose linter (nvim-lint)
 brew "bat" # cat clone with syntax highlighting (aliased to `cat`)
 brew "coreutils" # GNU core utilities (provides dircolors for LS_COLORS)
 brew "curl" # data transfer / HTTP client
-brew "exiftool" # media metadata (read/write)
 brew "eza" # modern ls replacement (aliased to ls/ll/la/lt)
 brew "fd" # fast find replacement (used by fzf and findd/findf)
-brew "ffmpeg" # audio/video transcoding
 brew "fish"   # primary shell (config in fish/)
 brew "fzf" # fuzzy finder (Ctrl-R/Ctrl-T/Alt-C keybindings)
-brew "ghostscript" # PostScript/PDF engine
-brew "gibo" # Sensible .gitignore defaults
-brew "git" # version jontrol
-brew "git-delta" # Used in combination with lazygit
-brew "git-lfs" # Versioning large files
-brew "gitup" # Update multiple repos at once
+brew "ghostscript" # PostScript/PDF engine (CV, syllabi PDF builds; website image processing)
+brew "git" # version control
+brew "git-delta" # diff pager (used by git and lazygit)
+brew "gitup" # update multiple repos at once
 brew "gnupg" # GPG encryption / key management
 brew "hugo" # static site generator
-brew "imagemagick" # image conversion / manipulation
+brew "imagemagick" # image conversion (website to-avif.sh)
 brew "lazygit" # terminal git UI (aliased to lg)
 brew "lychee" # fast link checker (markdown/prose)
 brew "neovim" # text editor (config in nvim/)
-brew "ocrmypdf" #OCR software
 brew "pandoc" # document converter (prose/Pandoc export workflow)
 brew "pandoc-crossref" # Pandoc filter for figure/table/equation cross-references
 brew "pinentry-mac" # GPG passphrase prompt on macOS
-brew "pipx" # isolated Python CLI installs
-brew "qpdf" # PDF transformation
+brew "qpdf" # PDF transformation (CV, syllabi PDF builds)
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
 brew "tmux" # terminal multiplexer (config general/tmux.conf)
-brew "wget" # file downloader
 brew "zoxide" # smarter cd via frecency (the `z` command)
 
 # GUI apps
@@ -92,7 +83,7 @@ mas "numbers", id:361304891 # Spreadsheets
 mas "obsidian web clipper", id:6720708363 # Obsidian Web Clipper
 mas "pages", id:361309726 # Documents
 mas "Soulver 3", id:1508732804 # notepad calculator (Mac App Store)
-mas "StopTheMadness", id:6471380298 #StopTheMadness
+mas "StopTheMadness", id:6471380298 # StopTheMadness
 mas "StopTheScript", id:1588394487 # JavaScript Blocker
 mas "tot", id:1491071483 # Notes
 mas "typeit4me", id:6474688391 # text expansion
@@ -103,7 +94,7 @@ mas "Vinegar", id:1591303229 # Replace Youtube Player
 cask "font-fira-code" # monospace font with programming ligatures
 cask "font-ibm-plex-mono" # IBM Plex Mono
 cask "font-ibm-plex-sans" # IBM Plex Sans type
-cask "font-ibm-plex-serif" #IBM Plex Serif
+cask "font-ibm-plex-serif" # IBM Plex Serif
 cask "font-inconsolata" # monospace font
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
 cask "font-source-sans-3" # humanist sans-serif (prose/document body text)
