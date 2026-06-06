@@ -32,7 +32,7 @@ set -gx GPG_TTY (tty)
 # --- Editors / pagers (mirrors zshenv) ----------------------------------------
 set -gx EDITOR nvim
 set -gx VISUAL nvim
-set -gx PAGER less
+set -gx PAGER 'bat --style=plain'
 set -gx MANPAGER 'nvim +Man!'
 
 # Keep ANSI colors when paging (e.g. piped --help, colored output)
