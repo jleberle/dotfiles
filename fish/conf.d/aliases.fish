@@ -24,6 +24,7 @@ alias biggest 'eza -lah --sort=size --reverse'
 alias cp 'cp -i'
 alias mv 'mv -i'
 alias reload 'exec fish'        # reload shell after editing dotfiles
+alias tmux 'tmux new-session -A -s main'  # attach to main session or create it
 # NB: not `path` — that's a fish builtin (`path filter`/`basename`/…); shadowing
 # it breaks completions (e.g. git's) that call the builtin.
 alias paths 'string join \n $PATH'

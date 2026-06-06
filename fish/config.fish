@@ -58,13 +58,5 @@ if status is-interactive
     end
     source $zoxide_cache
 
-    # --------------------------------------------------------------------------
-    # Prompt (starship — config at fish/starship.toml -> ~/.config/starship.toml)
-    # --------------------------------------------------------------------------
-    set -l starship_cache $cache/starship.fish
-    set -l starship_bin $HOMEBREW_PREFIX/bin/starship
-    if not test -s $starship_cache; or test $starship_bin -nt $starship_cache
-        $starship_bin init fish >$starship_cache
-    end
-    source $starship_cache
+    # Prompt is handled by fish/functions/fish_prompt.fish (native fish, no external dependency)
 end

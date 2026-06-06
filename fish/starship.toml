@@ -4,18 +4,18 @@ format = "$directory$git_branch$git_status$character"
 
 [directory]
 truncation_length = 3
-style = "bold #cba6f7"
+style = "bold #B48EAD"
 
 [git_branch]
-symbol = " "
-style = "bold #f9e2af"
+symbol = " "
+style = "bold #EBCB8B"
 format = "[$symbol$branch ]($style)"
 
 [git_status]
-style = "#89b4fa"
+style = "#81A1C1"
 format = "([$all_status$ahead_behind ]($style))"
 
 [character]
-success_symbol = "[❯](#a6e3a1)"
-error_symbol = "[❯](#f38ba8)"
-vicmd_symbol = "[❮](#89b4fa)"
+success_symbol = "[❯](#A3BE8C)"
+error_symbol = "[❯](#BF616A)"
+vicmd_symbol = "[❮](#81A1C1)"

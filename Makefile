@@ -23,7 +23,6 @@ fish :
 	@echo "Symlinking fish config"
 	mkdir -p $(HOME)/.config
 	ln -sfn $(HOME)/.dotfiles/fish $(HOME)/.config/fish
-	ln -sf $(HOME)/.dotfiles/fish/starship.toml $(HOME)/.config/starship.toml
 	@echo "Config symlinked. To use fish as your login shell (optional):"
 	@echo "  echo $(HOMEBREW_PREFIX)/bin/fish | sudo tee -a /etc/shells"
 	@echo "  chsh -s $(HOMEBREW_PREFIX)/bin/fish"
@@ -86,7 +85,6 @@ doctor :
 	@test -L $(HOME)/.gitconfig           || echo "WARNING: .gitconfig not symlinked (run: make git)"
 	@test -L $(HOME)/.gitignore           || echo "WARNING: .gitignore not symlinked (run: make git)"
 	@test -L $(HOME)/.config/fish         || echo "WARNING: fish config not symlinked (run: make fish)"
-	@test -L $(HOME)/.config/starship.toml || echo "WARNING: starship.toml not symlinked (run: make fish)"
 	@test -L $(HOME)/.ssh/config          || echo "WARNING: ssh config not symlinked (run: make auth)"
 	@test -L $(HOME)/.gnupg/gpg.conf      || echo "WARNING: gpg.conf not symlinked (run: make auth)"
 	@test -L $(HOME)/.gnupg/gpg-agent.conf || echo "WARNING: gpg-agent.conf not symlinked (run: make auth)"

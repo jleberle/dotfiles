@@ -57,7 +57,6 @@ brew "pipx" # isolated Python CLI installs
 brew "qpdf" # PDF transformation
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
 brew "spark" # sparkline generator
-brew "starship" # cross-shell prompt (config in fish/starship.toml)
 brew "tmux" # terminal multiplexer (config general/tmux.conf)
 brew "wget" # file downloader
 brew "zoxide" # smarter cd via frecency (the `z` command)

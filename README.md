@@ -82,7 +82,6 @@ To spot-check key tools are on `PATH`:
 nvim --version   # should be ≥ 0.10
 fish --version
 delta --version
-starship --version
 ```
 
 ---
