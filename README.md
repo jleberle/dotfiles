@@ -275,8 +275,9 @@ newer than the cache. Autosuggestions, syntax highlighting, and completions are
 built into fish, so there are no shell plugins to source or `compinit` to run.
 
 - `conf.d/env.fish` — environment (`EDITOR=nvim`, `MANPAGER="nvim +Man!"`,
-  `BAT_THEME`, `LS_COLORS`), PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the
-  Homebrew shellenv. `conf.d/*.fish` is auto-sourced for every session.
+  `BAT_THEME`, `LS_COLORS`, `HOMEBREW_NO_ANALYTICS`, `HOMEBREW_NO_ENV_HINTS`),
+  PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the Homebrew shellenv.
+  `conf.d/*.fish` is auto-sourced for every session.
 - `conf.d/options.fish` — documents how zsh `setopt`s map to fish defaults and
   disables the startup greeting.
 - `conf.d/aliases.fish` — see below.

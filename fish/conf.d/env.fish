@@ -10,6 +10,8 @@
 # Equivalent to `eval "$(brew shellenv)"` in zprofile. The `fish` argument makes
 # brew emit fish syntax (set -gx / fish_add_path) instead of POSIX exports.
 # Checks known prefixes in order: Apple Silicon, Intel Mac, Linux.
+set -gx HOMEBREW_NO_ENV_HINTS 1       # suppress hints in brew output
+set -gx HOMEBREW_NO_ANALYTICS 1       # disable telemetry
 if test -x /opt/homebrew/bin/brew
     /opt/homebrew/bin/brew shellenv fish | source
 else if test -x /usr/local/bin/brew

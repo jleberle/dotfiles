@@ -5,6 +5,21 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-06 — Brewfile cleanup, Homebrew privacy, mole
+
+### Added
+- `mole` to Brewfile — deep clean and optimize macOS
+- `HOMEBREW_NO_ENV_HINTS` and `HOMEBREW_NO_ANALYTICS` to `env.fish` — suppress
+  hints and disable Homebrew telemetry
+
+### Removed
+- `ffmpeg`, `exiftool`, `git-lfs`, `gibo`, `ocrmypdf`, `wget`, `rbenv`, `pipx`,
+  `r-app`, `pyenv`, `gh`, `grc`, `spark`, `starship` from Brewfile — none
+  actively used in dotfiles or any project
+- Improved Brewfile comments to note where each tool is used
+
+---
+
 ## 2026-06-06 — Nord theme, native fish prompt, dependency cleanup
 
 ### Added
