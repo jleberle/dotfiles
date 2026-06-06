@@ -262,7 +262,7 @@ Application Support.
 | `mouse-hide-while-typing`      | `true`                         | —                                              |
 | `cursor-style-blink`           | `false`                        | Steady cursor                                  |
 | `window-save-state`            | `always`                       | Restores layout/working dirs after restart     |
-| `shell-integration`            | `detect` + `cursor,sudo,title` | Auto-detects the shell; prompt/cursor reporting for Starship & Neovim |
+| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Starship & Neovim |
 
 > Reload Ghostty config with **`Cmd-Shift-,`**.
 
@@ -342,11 +342,12 @@ picker.
 
 **Clipboard & keys**
 
-| Alias    | Expands to                                         |
-|----------|----------------------------------------------------|
-| `cb`     | `pbcopy` (pipe into it: `echo hi \| cb`)            |
-| `cv`     | `pbpaste`                                           |
-| `pubkey` | Copy `~/.ssh/id_ed25519.pub` to the clipboard      |
+| Alias            | Expands to                                         |
+|------------------|----------------------------------------------------|
+| `cb`             | `pbcopy` (pipe into it: `echo hi \| cb`)           |
+| `cv`             | `pbpaste`                                          |
+| `pubkey-github`  | Copy `~/.ssh/id_github.pub` to the clipboard       |
+| `pubkey-codeberg`| Copy `~/.ssh/id_codeberg.pub` to the clipboard     |
 
 **System / network / housekeeping**
 
@@ -364,47 +365,54 @@ picker.
 
 **Git**
 
-| Alias  | Expands to                                              |
+| Abbr   | Expands to                                              |
 |--------|---------------------------------------------------------|
 | `lg`   | `lazygit`                                               |
 | `gs`   | `git status -sb`                                        |
 | `ga`   | `git add`                                               |
-| `gc`   | `git commit -S` (signed)                                |
+| `gc`   | `git commit`                                            |
 | `gp`   | `git push`                                              |
 | `gpl`  | `git pull`                                              |
 | `gf`   | `git fetch`                                             |
 | `gd`   | `git diff` (rendered by delta)                          |
 | `gds`  | `git diff --staged`                                     |
 | `gl`   | `git log --oneline --graph --decorate -20`              |
+| `glo`  | `git log --graph --decorate --oneline --all`            |
 | `gco`  | `git checkout`                                          |
 | `gb`   | `git branch`                                            |
 | `grst` | `git restore`                                           |
+| `gund` | `git reset --soft HEAD~1` (undo last commit)            |
+| `gus`  | `git restore --staged` (unstage)                        |
+| `glst` | `git log -1 HEAD` (show last commit)                    |
 
 ### Functions (`fish/functions/`)
 
 Autoloaded — call them like commands.
 
-| Function          | Usage / behavior                                                       |
-|-------------------|------------------------------------------------------------------------|
-| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)     |
+| Function                | Usage / behavior                                                          |
+|-------------------------|---------------------------------------------------------------------------|
+| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)        |
 | `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim |
-| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                   |
-| `cdf`             | `cd` to the directory open in the front Finder window                  |
-| `fn <text>`       | List files whose name contains `<text>` (recursive glob)               |
-| `fuck`            | Re-run the previous command under `sudo`                               |
-| `mkd <dir>`       | `mkdir -p` then `cd` into it                                           |
-| `o [paths]`       | `open` the current dir (no args) or the given paths                    |
-| `pman <cmd>`      | Open a man page rendered as a PDF in Preview                           |
-| `wordfrequency`   | Read stdin, print word counts sorted high→low (great for prose)        |
+| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                      |
+| `cdf`                   | `cd` to the directory open in the front Finder window                     |
+| `fn <text>`             | List files whose name contains `<text>` (recursive glob)                  |
+| `fuck`                  | Re-run the previous command under `sudo`                                  |
+| `gpg-master-import`     | Import the offline GPG master key from USB for editing                    |
+| `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only              |
+| `mkd <dir>`             | `mkdir -p` then `cd` into it                                              |
+| `o [paths]`             | `open` the current dir (no args) or the given paths                       |
+| `pman <cmd>`            | Open a man page rendered as a PDF in Preview                              |
+| `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)           |
 
 ---
 
 ## Git
 
-SSH-based commit/tag **signing** is enabled (`gpg.format = ssh`, signing key
-`~/.ssh/id_ed25519.pub`, verified against `git/allowed_signers`). `delta` is the
-pager/diff renderer (Catppuccin Mocha theme) — it must be installed before
-`make git` is run, or `git diff`/`git log` will fail. `make apps` installs it.
+GPG commit/tag **signing** is enabled (`gpg.format = openpgp`, signing key is
+the GPG primary key fingerprint). The same key is registered on both GitHub and
+Codeberg. `delta` is the pager/diff renderer (Catppuccin Mocha theme) — it must
+be installed before `make git` is run, or `git diff`/`git log` will fail.
+`make apps` installs it.
 
 **Sensible defaults baked in:** `pull.rebase`, `push.autoSetupRemote` +
 `default = current`, `rebase.autoStash` + `updateRefs`, `fetch.prune`,
@@ -414,19 +422,15 @@ most-recent commit.
 
 ### Git aliases
 
-| Alias       | Command                                                            |
-|-------------|-------------------------------------------------------------------|
-| `git st`    | `status -sb`                                                      |
-| `git co`    | `checkout`                                                        |
-| `git cb`    | `checkout -b`                                                     |
-| `git ci`    | `commit`                                                          |
-| `git amend` | `commit --amend`                                                 |
-| `git undo`  | `reset --soft HEAD~1` (undo last commit, keep changes)            |
-| `git last`  | `log -1 HEAD`                                                     |
-| `git lg`    | Pretty graph log                                                  |
-| `git lol`   | `log --graph --decorate --oneline --all`                          |
-| `git unstage` | `restore --staged`                                             |
-| `git discard` | `restore` (discard working-tree changes)                       |
+| Alias         | Command                                                          |
+|---------------|------------------------------------------------------------------|
+| `git amend`   | `commit --amend`                                                 |
+| `git undo`    | `reset --soft HEAD~1` (undo last commit, keep changes)           |
+| `git last`    | `log -1 HEAD`                                                    |
+| `git lg`      | Pretty graph log                                                 |
+| `git lol`     | `log --graph --decorate --oneline --all`                         |
+| `git unstage` | `restore --staged`                                               |
+| `git discard` | `restore` (discard working-tree changes)                         |
 
 ---
 
@@ -513,15 +517,21 @@ launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
 
 Installed by `make auth`.
 
-- **SSH** (`general/ssh-config`): modern crypto only (curve25519,
-  chacha20-poly1305 / AES-GCM), `IdentitiesOnly`, agent + Keychain integration,
-  strict host-key checking, connection multiplexing
-  (`ControlPath ~/.ssh/control/%C`, persisted 10m), no agent/X11 forwarding.
-  Includes a `codeberg` host shortcut.
+- **SSH** (`general/ssh-config`): dedicated key per host (`id_github`,
+  `id_codeberg`), modern crypto only (curve25519, chacha20-poly1305 / AES-GCM),
+  `IdentitiesOnly`, agent + Keychain integration, strict host-key checking,
+  connection multiplexing for Codeberg (`ControlPath ~/.ssh/control/%C`,
+  persisted 10m), no agent/X11 forwarding. Includes a `github-443` fallback
+  host alias for networks that block port 22.
 - **GPG** (`general/gpg.conf`, `gpg-agent.conf`, `dirmngr.conf`): hardened
   algorithm preferences (AES-256 / SHA-512), strong S2K, `pinentry-mac`,
-  privacy-conscious keyserver/dirmngr defaults. (Note: Git signing uses **SSH**,
-  not GPG — the GPG config is for general encryption/keys.)
+  privacy-conscious keyserver/dirmngr defaults. Git commit and tag signing uses
+  GPG (`gpg.format = openpgp`) — the same key works across GitHub and Codeberg
+  without cross-registering SSH keys.
+- **GPG master key management**: `gpg-master-import` / `gpg-master-done` fish
+  functions handle the import-edit-cleanup cycle for the offline master key.
+  `gpg-master-done` detects the machine (Leia/Ahsoka) and reimports only the
+  correct machine-specific subkeys.
 
 ---
 
@@ -535,7 +545,7 @@ Installed by `make auth`.
 ├── fish/                 # config.fish, conf.d, functions, starship.toml
 ├── general/              # ssh, gpg, dirmngr, tmux, vale configs
 ├── ghostty/              # terminal config
-├── git/                  # gitconfig, gitignore, allowed_signers
+├── git/                  # gitconfig, gitignore
 ├── homebrew/             # Brewfile
 ├── launchd/              # LaunchAgent plist templates
 ├── nvim/                 # Neovim config (see Neovim section)

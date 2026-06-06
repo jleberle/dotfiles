@@ -19,8 +19,9 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
     end
 
     set -l today (date +%Y-%m-%d)
+    set -l author (git config user.name)
 
-    printf '---\ntitle: "%s"\nauthor: "Jared Eberle"\ndate: %s\n\nbibliography:\n  - ~/Documents/Library/Library.bib\n\ncsl: %s/.dotfiles/templates/chicago-notes-bibliography-17th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/.dotfiles/templates/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $today $HOME $HOME > $filename
+    printf '---\ntitle: "%s"\nauthor: "%s"\ndate: %s\n\nbibliography:\n  - ~/Documents/Library/Library.bib\n\ncsl: %s/.dotfiles/templates/chicago-notes-bibliography-17th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/.dotfiles/templates/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $author $today $HOME $HOME > $filename
 
     nvim $filename
 end

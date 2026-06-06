@@ -1,3 +1,6 @@
+# Codeberg does not currently provide shared runners so this workflow will not
+# run automatically. Kept as a placeholder for if/when runners are configured.
+
 name: Lint
 
 on:
@@ -12,21 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: sudo apt-get install -y shellcheck fish lua5.4 luarocks && sudo luarocks install luacheck
+
       - name: shellcheck (bin scripts)
         run: |
-          sudo apt-get install -y shellcheck
           shellcheck bin/homebrewupdate.sh
           shellcheck bin/homebrewlogclean.sh
 
       - name: fish syntax check
         run: |
-          sudo apt-get install -y fish
           for f in fish/config.fish fish/conf.d/*.fish fish/functions/*.fish; do
             fish --no-execute "$f" || exit 1
           done
 
       - name: luacheck (nvim lua)
-        run: |
-          sudo apt-get install -y lua5.4 luarocks
-          sudo luarocks install luacheck
-          luacheck nvim/lua/ --globals vim --no-unused-args
+        run: luacheck nvim/lua/ --globals vim --no-unused-args

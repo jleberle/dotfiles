@@ -13,7 +13,7 @@ window-padding-y = 12
 background-opacity = 0.93
 background-blur-radius = 18
 
-shell-integration = detect
+shell-integration = fish
 
 # -----------------------------
 # macOS / nvim / tmux usability

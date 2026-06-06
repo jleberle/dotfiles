@@ -66,19 +66,23 @@ alias usage 'du -sh -- *'                   # directory sizes in cwd (pairs with
 abbr -a lg  lazygit
 abbr -a gs  'git status -sb'
 abbr -a ga  'git add'
-abbr -a gc  'git commit -S'
+abbr -a gc  'git commit'
 abbr -a gp  'git push'
 abbr -a gpl 'git pull'
 abbr -a gf  'git fetch'
 abbr -a gd  'git diff'
 abbr -a gds 'git diff --staged'
-abbr -a gl  'git log --oneline --graph --decorate -20'
-abbr -a gco 'git checkout'
-abbr -a gb  'git branch'
+abbr -a gl   'git log --oneline --graph --decorate -20'
+abbr -a glo  'git log --graph --decorate --oneline --all'
+abbr -a gco  'git checkout'
+abbr -a gb   'git branch'
 abbr -a grst 'git restore'
+abbr -a gund 'git reset --soft HEAD~1'
+abbr -a gus  'git restore --staged'
+abbr -a glst 'git log -1 HEAD'
 
 # Gitup with bookmarks file
 alias gitup 'gitup -b ~/.dotfiles/git/gitup-bookmarks'
 
 # Website theme submodule update
-alias update-theme 'git -C /Users/jaredeberle/git/website submodule update --remote themes/PaperMod'
+alias update-theme 'git -C $HOME/git/website submodule update --remote themes/PaperMod'

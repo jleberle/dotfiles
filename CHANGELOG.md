@@ -5,6 +5,35 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-06 — SSH hardening, GPG commit signing, key management
+
+### Added
+- SSH: dedicated key per host (`id_github`, `id_codeberg`) with explicit `IdentityFile` in each `Host` block
+- SSH: `github-443` fallback host alias (`ssh.github.com:443`) for networks that block port 22
+- `gpg-master-import` fish function: imports offline master key from USB with mount check
+- `gpg-master-done` fish function: exports machine-specific subkeys, wipes keyring, reimports correctly; detects machine via `scutil --get LocalHostName` (Leia/Ahsoka)
+- `env.fish`: `GPG_TTY` set to fix pinentry prompts in terminal
+- Git abbreviations: `glo` (full graph log), `gund` (undo), `gus` (unstage), `glst` (last commit)
+- `pubkey-github` and `pubkey-codeberg` aliases replacing the old `pubkey`
+
+### Changed
+- Git signing switched from SSH to GPG (`gpg.format = openpgp`); signing key updated to GPG fingerprint
+- `gc` abbreviation: removed redundant `-S` flag (signing handled globally by gitconfig)
+- `gpg.conf`: updated stale comment that incorrectly stated git signing used SSH
+- `ghostty/config`: `shell-integration` changed from `detect` to `fish`
+- `newdoc`: author pulled from `git config user.name` instead of hardcoded string
+- `aliases.fish`: `update-theme` uses `$HOME` instead of hardcoded absolute path
+- Forgejo CI workflow: consolidated `apt-get` installs into one step; added comment noting Codeberg has no runners
+- gitconfig: removed redundant aliases (`st`, `co`, `cb`, `br`, `ci`) covered by fish abbreviations
+
+### Removed
+- `git/allowed_signers` — no longer needed after switching to GPG signing
+- `buo/cask-upgrade` tap from Brewfile — `brew upgrade --cask` covers this natively
+- SSH `ControlMaster`/`ControlPersist`/`ControlPath` from GitHub host (unsupported by GitHub)
+- Fallback `IdentityFile ~/.ssh/id_ed25519` from `Host *`
+
+---
+
 ## 2026-06-01 — Vale: add prose linting packages
 
 ### Added
