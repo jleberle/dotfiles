@@ -28,7 +28,6 @@ Host github-443
 Host *
     # Modern identity handling
     IdentitiesOnly yes
-    IdentityFile ~/.ssh/id_ed25519
 
     # Safer host verification
     StrictHostKeyChecking yes

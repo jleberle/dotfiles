@@ -25,6 +25,10 @@ end
 # to universal variables, so nothing leaks into the repo's fish_variables.
 fish_add_path --global --prepend $HOME/.dotfiles/bin $HOME/.local/bin
 
+# --- GPG ----------------------------------------------------------------------
+# Required for pinentry to open a passphrase prompt in the current terminal
+set -gx GPG_TTY (tty)
+
 # --- Editors / pagers (mirrors zshenv) ----------------------------------------
 set -gx EDITOR nvim
 set -gx VISUAL nvim
