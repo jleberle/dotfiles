@@ -7,6 +7,15 @@ Host codeberg
   ControlPersist 10m
   ControlPath ~/.ssh/control/%C
 
+Host github
+  User git
+  HostName github.com
+  UseKeychain yes
+  AddKeysToAgent yes
+  ControlMaster auto
+  ControlPersist 10m
+  ControlPath ~/.ssh/control/%C
+
 Host *
     # Modern identity handling
     IdentitiesOnly yes

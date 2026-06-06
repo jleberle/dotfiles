@@ -1,7 +1,6 @@
 # Dependences and settings
 cask_args appdir: "/Applications" # install GUI casks into /Applications
 
-tap "buo/cask-upgrade" # handle App Store app updates: brew cu
 brew "mas" # Mac App Store CLI (installs the `mas` entries below)
 
 # Languages
@@ -37,6 +36,7 @@ brew "ffmpeg" # audio/video transcoding
 brew "fish"   # primary shell (config in fish/)
 brew "fzf" # fuzzy finder (Ctrl-R/Ctrl-T/Alt-C keybindings)
 brew "ghostscript" # PostScript/PDF engine
+brew "gh" # GitHub CLI (PRs, issues, workflows)
 brew "gibo" # Sensible .gitignore defaults
 brew "git" # version jontrol
 brew "git-delta" # Used in combination with lazygit
