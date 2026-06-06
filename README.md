@@ -3,7 +3,7 @@
 A macOS-focused, speed-oriented development and **prose-writing** environment.
 Everything is symlinked from `~/.dotfiles` via a `Makefile`, so a new machine
 comes up the same as the old one. The editor (Neovim), terminal (Ghostty),
-multiplexer (tmux), shell (fish), and color theme (**Catppuccin Mocha**) are all
+multiplexer (tmux), shell (fish), and color theme (**Nord**) are all
 wired to work together.
 
 > **Platform:** macOS only. It assumes Apple Silicon Homebrew (`/opt/homebrew`),
@@ -94,7 +94,7 @@ just prints a warning) so nothing destructive happens by accident.
 | Target     | What it does                                                                                 |
 |------------|----------------------------------------------------------------------------------------------|
 | `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`                           |
-| `fish`     | Symlinks the whole `fish/` dir → `~/.config/fish`, plus `starship.toml` → `~/.config/starship.toml` |
+| `fish`     | Symlinks the whole `fish/` dir → `~/.config/fish`                                                     |
 | `auth`     | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
 | `apps`     | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)            |
 | `ghostty`  | Symlinks Ghostty config into `~/Library/Application Support/com.mitchellh.ghostty/`           |
@@ -111,7 +111,7 @@ A lean, **prose-first** Neovim config built on `lazy.nvim`. The emphasis is
 fast startup (almost everything is lazy-loaded), Markdown/Pandoc authoring, and
 just enough LSP for the languages used in `bin/` (Lua, Python, Bash).
 
-**Leader key:** `Space`
+**Leader key:** `,` (comma)
 
 ### Layout
 
@@ -126,7 +126,7 @@ nvim/
     │   ├── autocmds.lua     # filetype + focus autocommands
     │   └── lazy.lua         # bootstraps lazy.nvim
     └── plugins/
-        ├── ui.lua           # catppuccin theme + lualine
+        ├── ui.lua           # nord theme + lualine
         ├── editor.lua       # oil, telescope, treesitter, gitsigns
         ├── completion.lua   # nvim-cmp
         ├── lsp.lua          # lspconfig + conform (formatting)
@@ -177,7 +177,7 @@ nvim/
 
 ### Plugins
 
-- **Theme/UI:** `catppuccin/nvim` (Mocha), `lualine` (globalstatus).
+- **Theme/UI:** `gbprod/nord.nvim`, `lualine` (globalstatus).
 - **Navigation:** `telescope` (lazy on `:Telescope`), `oil` (`-`), `gitsigns`.
 - **Syntax:** `nvim-treesitter` (**`main` branch** — parsers install via
   `:TSInstall`/`:TSUpdate`; highlighting starts per-filetype).
@@ -240,9 +240,8 @@ twice to send a literal `Ctrl-a` to the underlying program.
 - `terminal-features` passes **RGB true color**, **colored underlines**
   (undercurl diagnostics in Neovim), and **cursor-shape** changes through
   (block in normal, beam in insert).
-- **Plugins** (via TPM): `tpm`, `catppuccin/tmux` (flavor `mocha`). The status
-  line is composed from Catppuccin modules (session on the left, date/time on
-  the right).
+- **Plugins** (via TPM): `tpm`, `arcticicestudio/nord-tmux`. The status line
+  is composed from Nord modules (session on the left, date/time on the right).
 
 ---
 
@@ -253,7 +252,7 @@ Application Support.
 
 | Setting                        | Value                          | Notes                                          |
 |--------------------------------|--------------------------------|------------------------------------------------|
-| `theme`                        | Catppuccin Mocha               | Matches Neovim, tmux, bat, fzf                 |
+| `theme`                        | Nord                           | Matches Neovim, tmux, bat, fzf                 |
 | `font-family` / `font-size`    | JetBrainsMono Nerd Font / 15   | Nerd Font for icons in `eza`, lualine, etc.    |
 | `background-opacity` / blur    | `0.93` / `18`                  | Subtle translucency                            |
 | `copy-on-select`               | `clipboard`                    | Selecting text copies it                       |
@@ -261,7 +260,7 @@ Application Support.
 | `mouse-hide-while-typing`      | `true`                         | —                                              |
 | `cursor-style-blink`           | `false`                        | Steady cursor                                  |
 | `window-save-state`            | `always`                       | Restores layout/working dirs after restart     |
-| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Starship & Neovim |
+| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Neovim             |
 
 > Reload Ghostty config with **`Cmd-Shift-,`**.
 
@@ -269,14 +268,15 @@ Application Support.
 
 ## Fish
 
-Configured for speed: external tool initializations (`fzf`, `zoxide`,
-`starship`) are **cached to disk** and only regenerated when the binary is
-newer than the cache. Autosuggestions, syntax highlighting, and completions are
+Configured for speed: external tool initializations (`fzf`, `zoxide`) are
+**cached to disk** and only regenerated when the binary is newer than the
+cache. Autosuggestions, syntax highlighting, and completions are
 built into fish, so there are no shell plugins to source or `compinit` to run.
 
-- `conf.d/env.fish` — environment (`EDITOR=nvim`, `MANPAGER="nvim +Man!"`,
-  `BAT_THEME`, `LS_COLORS`, `HOMEBREW_NO_ANALYTICS`, `HOMEBREW_NO_ENV_HINTS`),
-  PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the Homebrew shellenv.
+- `conf.d/env.fish` — environment (`EDITOR=nvim`, `PAGER="bat --style=plain"`,
+  `MANPAGER="nvim +Man!"`, `BAT_THEME`, `LS_COLORS`, `HOMEBREW_NO_ANALYTICS`,
+  `HOMEBREW_NO_ENV_HINTS`), PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the
+  Homebrew shellenv.
   `conf.d/*.fish` is auto-sourced for every session.
 - `conf.d/options.fish` — documents how zsh `setopt`s map to fish defaults and
   disables the startup greeting.
@@ -523,11 +523,12 @@ Installed by `make auth`.
   connection multiplexing for Codeberg (`ControlPath ~/.ssh/control/%C`,
   persisted 10m), no agent/X11 forwarding. Includes a `github-443` fallback
   host alias for networks that block port 22.
-- **GPG** (`general/gpg.conf`, `gpg-agent.conf`, `dirmngr.conf`): hardened
-  algorithm preferences (AES-256 / SHA-512), strong S2K, `pinentry-mac`,
-  privacy-conscious keyserver/dirmngr defaults. Git commit and tag signing uses
-  GPG (`gpg.format = openpgp`) — the same key works across GitHub and Codeberg
-  without cross-registering SSH keys.
+- **GPG** (`general/gpg.conf`, `gpg-agent.conf`, `dirmngr.conf`, `common.conf`):
+  hardened algorithm preferences (AES-256 / SHA-512), strong S2K, `pinentry-mac`,
+  `import-minimal`/`export-minimal`, `no-allow-loopback-pinentry`, `use-keyboxd`
+  (`common.conf`), privacy-conscious keyserver/dirmngr defaults (LDAP disabled).
+  Git commit and tag signing uses GPG (`gpg.format = openpgp`) — the same key
+  works across GitHub and Codeberg without cross-registering SSH keys.
 - **GPG master key management**: `gpg-master-import` / `gpg-master-done` fish
   functions handle the import-edit-cleanup cycle for the offline master key.
   `gpg-master-done` detects the machine (Leia/Ahsoka) and reimports only the
@@ -542,7 +543,7 @@ Installed by `make auth`.
 ├── Makefile              # symlink/install targets
 ├── README.md
 ├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup)
-├── fish/                 # config.fish, conf.d, functions, starship.toml
+├── fish/                 # config.fish, conf.d, functions
 ├── general/              # ssh, gpg, dirmngr, tmux, vale configs
 ├── ghostty/              # terminal config
 ├── git/                  # gitconfig, gitignore

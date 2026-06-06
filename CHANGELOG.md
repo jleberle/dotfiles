@@ -5,6 +5,24 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-06 — GPG hardening, bat pager, Tor Browser, starship.toml removal
+
+### Added
+- `general/common.conf` tracked in dotfiles (`use-keyboxd`); `make auth` symlinks it to `~/.gnupg/common.conf`; `make doctor` checks the symlink
+- `gpg.conf`: `import-options import-minimal` and `export-options export-minimal` — strip subkeys/sigs on import/export
+- `gpg-agent.conf`: `no-allow-loopback-pinentry` — require physical pinentry, block programmatic passphrase injection
+- Tor Browser added to Brewfile
+
+### Changed
+- `PAGER` switched from `less` to `bat --style=plain` in `env.fish` — syntax-highlighted paging with clean output
+- `dirmngr.conf`: replaced `disable-ipv6` with `disable-ldap` — disables legacy LDAP protocol instead of IPv6
+
+### Removed
+- `gpg.conf`: removed deprecated `use-agent` and `sig-keyserver-url` directives
+- `fish/starship.toml` — file deleted; Starship is fully gone from the repo (already removed from config.fish and Makefile in earlier commits)
+
+---
+
 ## 2026-06-06 — Brewfile cleanup, Homebrew privacy, mole
 
 ### Added

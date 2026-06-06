@@ -39,6 +39,7 @@ brew "hugo" # static site generator
 brew "imagemagick" # image conversion (website to-avif.sh)
 brew "lazygit" # terminal git UI (aliased to lg)
 brew "lychee" # fast link checker (markdown/prose)
+brew "mole" # deep clean and optimize macOS
 brew "neovim" # text editor (config in nvim/)
 brew "pandoc" # document converter (prose/Pandoc export workflow)
 brew "pandoc-crossref" # Pandoc filter for figure/table/equation cross-references
@@ -46,7 +47,6 @@ brew "pinentry-mac" # GPG passphrase prompt on macOS
 brew "qpdf" # PDF transformation (CV, syllabi PDF builds)
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
 brew "tmux" # terminal multiplexer (config general/tmux.conf)
-brew "mole" # deep clean and optimize macOS
 brew "zoxide" # smarter cd via frecency (the `z` command)
 
 # GUI apps
@@ -65,10 +65,10 @@ cask "musicbrainz-picard" # music file tagger
 cask "netnewswire" # RSS reader
 cask "obs" # Screen Recording
 cask "obscura-vpn" # VPN client
-cask "tor-browser" # Privacy browser via Tor network
 cask "obsidian" # markdown notes / knowledge base
 cask "rectangle" # window snapping / management
 cask "skim" # PDF reader (LaTeX preview)
+cask "tor-browser" # Privacy browser via Tor network
 cask "tropy" # research photo/source organizer
 cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager

@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: sudo apt-get install -y shellcheck fish lua5.4 luarocks && sudo luarocks install luacheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck fish lua5.4 luarocks && sudo luarocks install luacheck
 
       - name: shellcheck (bin scripts)
         run: |

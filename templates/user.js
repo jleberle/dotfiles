@@ -258,7 +258,7 @@ user_pref("network.connectivity-service.enabled", false);
 
 // PREF: Disable Built-In VPN
 user_pref("browser.ipProtection.enabled", false);
-user_pref("browser.ipProtection.added"), false);
+user_pref("browser.ipProtection.added", false);
 /****************************************************************************
  * END: BETTERFOX                                                           *
 ****************************************************************************/

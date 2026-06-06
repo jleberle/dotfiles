@@ -15,7 +15,7 @@
 
 if status is-interactive
     # XDG-style cache location (mirrors ZSH_CACHE_DIR). Used to cache the
-    # `init` output of fzf/zoxide/starship, rebuilt only when the tool updates.
+    # `init` output of fzf/zoxide, rebuilt only when the tool updates.
     set -l cache $HOME/.cache/fish
     test -d $cache; or mkdir -p $cache
 

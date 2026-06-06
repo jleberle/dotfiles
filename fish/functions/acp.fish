@@ -12,6 +12,7 @@ function acp --description 'All-in-one Git: add, signed commit, push'
         return 1
     end
 
-    git commit -S -m "$argv" \
+    # Signing is handled globally by gitconfig (commit.gpgsign = true).
+    git commit -m "$argv" \
         && git push
 end

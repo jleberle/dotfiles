@@ -30,8 +30,8 @@ echo "Checking for outdated packages..."
 "$BREW" outdated
 echo ""
 
-# Capture Hugo version before upgrade
-HUGO=/opt/homebrew/bin/hugo
+# Capture Hugo version before upgrade (same prefix as the detected brew)
+HUGO="$(dirname "$BREW")/hugo"
 HUGO_BEFORE=$("$HUGO" version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
 
 # Upgrade all outdated packages

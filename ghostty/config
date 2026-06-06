@@ -37,6 +37,6 @@ window-save-state = always
 # -----------------------------
 
 # Valid value is a feature list (not a boolean). cursor + title keep the
-# prompt/cursor reporting that starship and nvim rely on; sudo preserves
+# prompt/cursor reporting that the fish prompt and nvim rely on; sudo preserves
 # integration across sudo sessions.
 shell-integration-features = cursor,sudo,title
