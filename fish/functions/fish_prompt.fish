@@ -2,7 +2,7 @@ function fish_prompt
     set -l last_status $status
 
     # Directory — truncated to 3 levels, Nord purple
-    set -l dir (prompt_pwd --full-length-dirs 0 --dir-length 3)
+    set -l dir (prompt_pwd --full-length-dirs 0 --dir-length 0)
     echo -n (set_color --bold '#B48EAD')$dir(set_color normal)
 
     # Git branch and status — only inside a git repo

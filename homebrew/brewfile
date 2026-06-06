@@ -43,7 +43,6 @@ brew "git-delta" # Used in combination with lazygit
 brew "git-lfs" # Versioning large files
 brew "gitup" # Update multiple repos at once
 brew "gnupg" # GPG encryption / key management
-brew "grc" # generic command-output colouriser
 brew "hugo" # static site generator
 brew "imagemagick" # image conversion / manipulation
 brew "lazygit" # terminal git UI (aliased to lg)
@@ -56,7 +55,6 @@ brew "pinentry-mac" # GPG passphrase prompt on macOS
 brew "pipx" # isolated Python CLI installs
 brew "qpdf" # PDF transformation
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
-brew "spark" # sparkline generator
 brew "tmux" # terminal multiplexer (config general/tmux.conf)
 brew "wget" # file downloader
 brew "zoxide" # smarter cd via frecency (the `z` command)
