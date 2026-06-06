@@ -1,13 +1,10 @@
 [user]
 	name = Jared Eberle
 	email = jared@jaredeberle.org
-	signingkey = /Users/jaredeberle/.ssh/id_ed25519.pub
+	signingkey = 17904CDD2FA1441662D0CCD1E0646B558C79DB58
 
 [gpg]
-	format = ssh
-
-[gpg "ssh"]
-	allowedSignersFile = ~/.dotfiles/git/allowed_signers
+	format = openpgp
 
 [commit]
 	gpgsign = true
