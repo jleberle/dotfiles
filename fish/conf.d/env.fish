@@ -38,8 +38,8 @@ set -gx MANPAGER 'nvim +Man!'
 # Keep ANSI colors when paging (e.g. piped --help, colored output)
 set -gx LESS -R
 
-# Match bat's syntax theme to the Catppuccin Mocha terminal theme
-set -gx BAT_THEME 'Catppuccin Mocha'
+# Match bat's syntax theme to the Nord terminal theme
+set -gx BAT_THEME 'Nord'
 
 # --- LS_COLORS ----------------------------------------------------------------
 # Consumed by eza (and any GNU ls). Prefer GNU dircolors; fall back to a sane

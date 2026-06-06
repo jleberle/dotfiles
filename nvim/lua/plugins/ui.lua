@@ -1,14 +1,11 @@
 return {
 	{
-		"catppuccin/nvim",
-		name = "catppuccin",
+		"gbprod/nord.nvim",
 		priority = 1000,
 		lazy = false,
 		config = function()
-			require("catppuccin").setup({
-				flavour = "mocha",
-			})
-			vim.cmd.colorscheme("catppuccin-mocha")
+			require("nord").setup({})
+			vim.cmd.colorscheme("nord")
 		end,
 	},
 
@@ -20,7 +17,7 @@ return {
 			require("mini.icons").setup()
 			require("lualine").setup({
 				options = {
-					theme = "catppuccin-mocha",
+					theme = "nord",
 					globalstatus = true,
 				},
 			})

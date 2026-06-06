@@ -35,8 +35,8 @@ if status is-interactive
     set -gx FZF_CTRL_T_OPTS "--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
     set -gx FZF_ALT_C_COMMAND 'fd --type d --hidden --follow --exclude .git'
     set -gx FZF_ALT_C_OPTS "--preview 'eza --tree --level=2 --icons --color=always {}'"
-    # Catppuccin Mocha palette (matches ghostty, nvim, bat, tmux)
-    set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 --color=border:#6c7086"
+    # Nord palette (matches ghostty, nvim, bat, tmux)
+    set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --color=bg+:#3B4252,bg:#2E3440,spinner:#81A1C1,hl:#616E88 --color=fg:#D8DEE9,header:#616E88,info:#81A1C1,pointer:#81A1C1 --color=marker:#81A1C1,fg+:#D8DEE9,prompt:#81A1C1,hl+:#81A1C1 --color=border:#4C566A"
 
     # Cache `fzf --fish` output; rebuild if the fzf binary is newer than cache.
     # Uses $HOMEBREW_PREFIX (set by `brew shellenv` in conf.d/env.fish) so this
