@@ -42,6 +42,7 @@ auth :
 	chmod 600 $(HOME)/.dotfiles/general/gpg-agent.conf
 	ln -sf $(HOME)/.dotfiles/general/gpg-agent.conf $(HOME)/.gnupg/gpg-agent.conf
 	ln -sf $(HOME)/.dotfiles/general/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
+	ln -sf $(HOME)/.dotfiles/general/common.conf $(HOME)/.gnupg/common.conf
 apps :
 	@command -v brew >/dev/null 2>&1 || { \
 		echo "Homebrew not found. Installing..."; \
@@ -88,6 +89,7 @@ doctor :
 	@test -L $(HOME)/.ssh/config          || echo "WARNING: ssh config not symlinked (run: make auth)"
 	@test -L $(HOME)/.gnupg/gpg.conf      || echo "WARNING: gpg.conf not symlinked (run: make auth)"
 	@test -L $(HOME)/.gnupg/gpg-agent.conf || echo "WARNING: gpg-agent.conf not symlinked (run: make auth)"
+	@test -L $(HOME)/.gnupg/common.conf    || echo "WARNING: common.conf not symlinked (run: make auth)"
 	@test -L $(HOME)/.tmux.conf           || echo "WARNING: .tmux.conf not symlinked (run: make tmux)"
 	@test -L $(HOME)/.config/nvim         || echo "WARNING: nvim config not symlinked (run: make nvim)"
 	@test -L "$(GHOSTTY_DIR)/config"      || echo "WARNING: ghostty config not symlinked (run: make ghostty)"

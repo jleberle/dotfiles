@@ -8,3 +8,6 @@ max-cache-ttl 7200
 
 # Prevent other processes from injecting cached passphrases.
 no-allow-external-cache
+
+# Require physical pinentry — block programmatic passphrase injection via loopback.
+no-allow-loopback-pinentry
