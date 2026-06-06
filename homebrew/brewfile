@@ -65,6 +65,7 @@ cask "musicbrainz-picard" # music file tagger
 cask "netnewswire" # RSS reader
 cask "obs" # Screen Recording
 cask "obscura-vpn" # VPN client
+cask "tor-browser" # Privacy browser via Tor network
 cask "obsidian" # markdown notes / knowledge base
 cask "rectangle" # window snapping / management
 cask "skim" # PDF reader (LaTeX preview)
