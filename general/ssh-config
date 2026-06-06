@@ -1,6 +1,7 @@
 Host codeberg
   User git
   HostName codeberg.org
+  IdentityFile ~/.ssh/id_codeberg
   UseKeychain yes
   AddKeysToAgent yes
   ControlMaster auto
@@ -10,11 +11,19 @@ Host codeberg
 Host github
   User git
   HostName github.com
+  IdentityFile ~/.ssh/id_github
   UseKeychain yes
   AddKeysToAgent yes
-  ControlMaster auto
-  ControlPersist 10m
-  ControlPath ~/.ssh/control/%C
+
+# Fallback: use port 443 if port 22 is blocked (e.g. restrictive networks)
+# Usage: git remote set-url origin git@github-443:user/repo.git
+Host github-443
+  User git
+  HostName ssh.github.com
+  Port 443
+  IdentityFile ~/.ssh/id_github
+  UseKeychain yes
+  AddKeysToAgent yes
 
 Host *
     # Modern identity handling

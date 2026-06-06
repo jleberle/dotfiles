@@ -1,0 +1,17 @@
+function gpg-master-import --description 'Import GPG master key from USB for editing'
+    set usb /Volumes/Files
+    set master_key $usb/key.asc
+
+    if not test -d $usb
+        echo "Error: USB drive not mounted at $usb" >&2
+        return 1
+    end
+
+    if not test -f $master_key
+        echo "Error: master key not found at $master_key" >&2
+        return 1
+    end
+
+    gpg --import $master_key
+    and echo "Master key imported. Run gpg-master-done when finished."
+end
