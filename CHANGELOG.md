@@ -5,6 +5,28 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-06 — Nord theme, native fish prompt, dependency cleanup
+
+### Added
+- Native `fish_prompt` function replacing Starship — identical output (directory,
+  git branch/status, prompt character) with no external dependency
+- `tmux` alias: `tmux new-session -A -s main` to avoid "no current session" error
+
+### Changed
+- Theme switched from Catppuccin Mocha to Nord across all tools: Ghostty, Neovim
+  (`gbprod/nord.nvim`), lualine, tmux (`arcticicestudio/nord-tmux`), bat, delta, fzf
+- Neovim: replaced `catppuccin/nvim` with `gbprod/nord.nvim` (actively maintained,
+  full treesitter and LSP semantic token support)
+- Tmux: replaced `catppuccin/tmux` with `arcticicestudio/nord-tmux`
+- `ghostty/config`: `shell-integration` changed from `detect` to `fish`
+- `fish_prompt`: `--dir-length 0` to show full directory names without abbreviation
+
+### Removed
+- Starship from Brewfile, `config.fish`, Makefile, and doctor target
+- `grc` and `spark` from Brewfile — not referenced anywhere in the config
+
+---
+
 ## 2026-06-06 — SSH hardening, GPG commit signing, key management
 
 ### Added

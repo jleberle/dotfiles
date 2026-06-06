@@ -280,10 +280,11 @@ built into fish, so there are no shell plugins to source or `compinit` to run.
 - `conf.d/options.fish` — documents how zsh `setopt`s map to fish defaults and
   disables the startup greeting.
 - `conf.d/aliases.fish` — see below.
-- `config.fish` — interactive setup: keybindings, fzf, zoxide, prompt.
+- `config.fish` — interactive setup: keybindings, fzf, zoxide.
 - `functions/` — autoloaded functions (see below).
-- `starship.toml` — minimal prompt: directory, git branch/status, prompt
-  character (green ❯ on success, red on error).
+- `functions/fish_prompt.fish` — native fish prompt: directory (Nord purple),
+  git branch (Nord yellow), git status indicators (Nord blue), prompt character
+  (green ❯ on success, red on error). No external dependency.
 
 ### Shell behavior
 
@@ -409,9 +410,8 @@ Autoloaded — call them like commands.
 
 GPG commit/tag **signing** is enabled (`gpg.format = openpgp`, signing key is
 the GPG primary key fingerprint). The same key is registered on both GitHub and
-Codeberg. `delta` is the pager/diff renderer (Catppuccin Mocha theme) — it must
-be installed before `make git` is run, or `git diff`/`git log` will fail.
-`make apps` installs it.
+Codeberg. `delta` is the pager/diff renderer (Nord theme) — it must be installed
+before `make git` is run, or `git diff`/`git log` will fail. `make apps` installs it.
 
 **Sensible defaults baked in:** `pull.rebase`, `push.autoSetupRemote` +
 `default = current`, `rebase.autoStash` + `updateRefs`, `fetch.prune`,
