@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale doctor
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex doctor
 
 default :
 	@echo "There is no default for your own safety."
@@ -103,6 +103,14 @@ brewauto :
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
 	@echo "Installed. Logs accumulate in $(HOME)/.local/brew_update_logs.txt"
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
+latex :
+	@command -v tlmgr >/dev/null 2>&1 || { echo "ERROR: tlmgr not found — install BasicTeX first (make apps)"; exit 1; }
+	tlmgr install \
+	    tex-gyre xcharter sourcesans microtype geometry \
+	    titlesec titling parskip enumitem fancyhdr \
+	    booktabs adjustbox xcolor float listings \
+	    tools graphics ec collection-fontsrecommended \
+	    xstring fontaxes ly1
 nvim :
 	@echo "Symlinking nvim config"
 	ln -sfn $(HOME)/.dotfiles/writing/nvim $(HOME)/.config/nvim

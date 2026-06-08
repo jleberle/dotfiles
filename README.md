@@ -58,7 +58,7 @@ Then finish the per-app setup:
 | Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                       |
 | tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
 | Neovim    | launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
-| BasicTeX  | run the `tlmgr install` command in the [Prose & Pandoc](#prose--pandoc-workflow) section |
+| BasicTeX  | run `make latex` to install the required `tlmgr` packages for PDF export |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
 > `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
@@ -100,6 +100,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `nvim`     | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                     |
 | `vale`     | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir           |
 | `brewauto` | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly              |
+| `latex`    | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)   |
 
 ---
 
@@ -464,16 +465,11 @@ This setup is tuned for academic / long-form writing in Markdown.
     `metadata.yaml` (bibliography, CSL) and relative images resolve correctly,
   - auto-add `--metadata-file=metadata.yaml` when a sibling file exists.
 - PDF export uses the LaTeX engine from **BasicTeX** (installed via the Brewfile
-  cask). After `make apps`, run the following to install the packages required by
-  the CV and syllabus templates:
+  cask). After `make apps`, install the packages required by the CV and syllabus
+  templates:
 
 ```sh
-tlmgr install \
-  tex-gyre xcharter sourcesans microtype geometry \
-  titlesec titling parskip enumitem fancyhdr \
-  booktabs adjustbox xcolor float listings \
-  tools graphics ec collection-fontsrecommended \
-  xstring fontaxes ly1
+make latex
 ```
 
 ---
