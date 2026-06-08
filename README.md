@@ -399,6 +399,7 @@ Autoloaded — call them like commands.
 
 | Function                | Usage / behavior                                                          |
 |-------------------------|---------------------------------------------------------------------------|
+| `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)        |
 | `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                      |
