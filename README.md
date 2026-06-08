@@ -46,11 +46,11 @@ cd ~/.dotfiles
 # 4. Install all apps, CLIs, fonts (Brewfile)
 make apps
 
-# 5. Symlink configs (run the ones you want)
-make shell git security firefox nvim vale
+# 5. Symlink all configs and install scheduled Homebrew jobs
+make install
 
-# 6. Install scheduled Homebrew jobs (optional)
-make brewauto
+# 6. Symlink Firefox user.js (requires Firefox launched at least once first)
+make firefox
 ```
 
 Then finish the per-app setup:
@@ -94,6 +94,7 @@ just prints a warning) so nothing destructive happens by accident.
 
 | Target     | What it does                                                                                 |
 |------------|----------------------------------------------------------------------------------------------|
+| `install`  | Runs `git shell security nvim vale brewauto` in order, then `doctor`                          |
 | `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config           |
 | `shell`    | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                 |
 | `security` | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |

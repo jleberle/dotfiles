@@ -11,10 +11,16 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default git shell security firefox apps brewauto nvim vale doctor
+.PHONY: default install git shell security firefox apps brewauto nvim vale doctor
 
 default :
 	@echo "There is no default for your own safety."
+
+install : git shell security nvim vale brewauto
+	@echo ""
+	@echo "Done. Run 'make firefox' after launching Firefox once."
+	@echo ""
+	@$(MAKE) doctor
 
 git :
 	@echo "Symlinking Git files"
