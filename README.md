@@ -36,20 +36,17 @@ wired to work together.
 # 1. Install the Xcode command-line tools (gives you git)
 xcode-select --install
 
-# 2. Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 3. Clone this repo to the expected location (~/.dotfiles is hard-coded in the Makefile)
+# 2. Clone this repo to the expected location (~/.dotfiles is hard-coded in the Makefile)
 git clone https://codeberg.org/<you>/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
-# 4. Install all apps, CLIs, fonts (Brewfile)
+# 3. Install Homebrew (if needed) and all apps, CLIs, fonts (Brewfile)
 make apps
 
-# 5. Symlink all configs and install scheduled Homebrew jobs
+# 4. Symlink all configs and install scheduled Homebrew jobs
 make install
 
-# 6. Symlink Firefox user.js (requires Firefox launched at least once first)
+# 5. Symlink Firefox user.js (requires Firefox launched at least once first)
 make firefox
 ```
 
