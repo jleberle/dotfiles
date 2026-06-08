@@ -4,18 +4,33 @@
 # Copy this file to ~/.config/neomutt/accounts/local.rc and fill in your
 # details. That path is NOT tracked by git (credentials are sensitive).
 #
-# Passwords are pulled from the macOS Keychain via `security`. To add:
-#   security add-internet-password -s imap.example.com -a you@example.com -w
+# Passwords: use one of the two approaches below.
+#
+# Option A — direct (simplest, works alongside Apple Mail):
+#   set imap_pass = "xxxx-xxxx-xxxx-xxxx"   # app-specific password
+#   chmod 600 ~/.config/neomutt/accounts/local.rc
+#
+# Option B — macOS Keychain (only works if Apple Mail is NOT configured for
+#   the same account; Apple Mail stores OAuth tokens under the same server
+#   keys and security find-internet-password will return those instead):
+#   security add-internet-password -l "NeoMutt IMAP" \
+#     -s imap.example.com -a you@example.com -T /usr/bin/security -w
+#   set imap_pass = `security find-internet-password \
+#     -s imap.example.com -a you@example.com -l "NeoMutt IMAP" -w 2>/dev/null`
+#
+# iCloud Mail servers (custom domain or @icloud.com):
+#   IMAP: imap.mail.me.com:993   SMTP: smtp.mail.me.com:587
+#   Requires an app-specific password from appleid.apple.com
 # ──────────────────────────────────────────────────────────────────────────────
 
 # Identity
 set realname = "Your Name"
 set from     = "you@example.com"
 
-# IMAP inbox
+# IMAP
 set folder    = "imaps://imap.example.com/"
 set imap_user = "you@example.com"
-set imap_pass = `security find-internet-password -s imap.example.com -a you@example.com -w 2>/dev/null`
+set imap_pass = "xxxx-xxxx-xxxx-xxxx"   # app-specific password
 
 # Default mailboxes
 set spoolfile = +INBOX
@@ -24,10 +39,14 @@ set trash     = +Trash
 set postponed = +Drafts
 mailboxes =INBOX =Sent =Drafts =Trash =Archive
 
-# SMTP
-set smtp_url  = "smtps://you@example.com@smtp.example.com:465/"
-set smtp_pass = `security find-internet-password -s smtp.example.com -a you@example.com -w 2>/dev/null`
+# SMTP (encode @ in username as %40)
+set smtp_url  = "smtp://you%40example.com@smtp.example.com:587/"
+set smtp_pass = "xxxx-xxxx-xxxx-xxxx"
 
 # TLS
 set ssl_starttls  = yes
 set ssl_force_tls = yes
+
+# iCloud-specific (uncomment if using iCloud Mail)
+# set imap_idle             = no
+# set imap_check_subscribed = no
