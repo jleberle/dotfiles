@@ -5,6 +5,19 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-08 — Prepend brew update logs; README/Makefile doc update
+
+### Changed
+- `bin/homebrewupdate.sh`: captures all output to a temp file and prepends it
+  to `~/.local/brew_update_logs.txt` so the newest run always appears at the
+  top of the file instead of at the bottom
+- `homebrew/org.jaredeberle.brewupdate.plist`: removed `StandardOutPath` and
+  `StandardErrorPath` — the script now owns its own logging
+- README Scripting → Launchd and `make brewauto` message updated to reflect
+  newest-run-first ordering
+
+---
+
 ## 2026-06-08 — README reorganization, check system, stale artifact cleanup
 
 ### Added

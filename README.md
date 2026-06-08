@@ -558,7 +558,7 @@ your real home at install time):
 | `org.jaredeberle.brewupdate`      | Mondays 09:00  | `bin/homebrewupdate.sh`                                               |
 | `org.jaredeberle.brewlogclean`    | Mondays 08:00  | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
 
-Logs accumulate at `~/.local/brew_update_logs.txt`. Trigger a run on demand:
+Logs are at `~/.local/brew_update_logs.txt` with the newest run at the top. Trigger a run on demand:
 
 ```sh
 launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate

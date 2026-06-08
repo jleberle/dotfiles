@@ -19,10 +19,6 @@
         <key>Minute</key><integer>0</integer>
     </dict>
 
-    <!-- launchd opens these in append mode, so logs accumulate. -->
-    <key>StandardOutPath</key>
-    <string>__HOME__/.local/brew_update_logs.txt</string>
-    <key>StandardErrorPath</key>
-    <string>__HOME__/.local/brew_update_logs.txt</string>
+    <!-- The script manages its own log (~/.local/brew_update_logs.txt), prepending each run. -->
 </dict>
 </plist>

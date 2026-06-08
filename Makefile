@@ -104,7 +104,7 @@ brewauto :
 	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewlogclean 2>/dev/null
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
-	@echo "Installed. Logs accumulate in $(HOME)/.local/brew_update_logs.txt"
+	@echo "Installed. Logs at $(HOME)/.local/brew_update_logs.txt (newest run first)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
 macos :
 	@echo "Keyboard"
