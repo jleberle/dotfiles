@@ -68,6 +68,8 @@ security :
 	@echo "Writing gpg-agent.conf (pinentry path depends on Homebrew prefix: $(HOMEBREW_PREFIX))"
 	@[ -f "$(HOME)/.dotfiles/security/gpg-agent.conf.tmpl" ] || \
 	    { echo "ERROR: gpg-agent.conf.tmpl not found — run: git pull"; exit 1; }
+	@[ -d "$(HOME)/.gnupg" ] && [ -w "$(HOME)/.gnupg" ] || \
+	    { echo "ERROR: $(HOME)/.gnupg is not a writable directory — check for a broken symlink or permission issue"; exit 1; }
 	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(HOME)/.dotfiles/security/gpg-agent.conf.tmpl > $(HOME)/.gnupg/gpg-agent.conf
 	chmod 600 $(HOME)/.gnupg/gpg-agent.conf
 	ln -sf $(HOME)/.dotfiles/security/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
