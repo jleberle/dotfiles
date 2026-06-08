@@ -5,6 +5,43 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-08 — New machine automation, Betterfox submodule, macOS defaults
+
+### Added
+- `make macos`: writes sensible macOS system defaults — keyboard repeat
+  (`ApplePressAndHoldEnabled`, `KeyRepeat 2`, `InitialKeyRepeat 15`), Finder
+  (extensions, path bar, status bar, folder sort, current-folder search, no
+  extension-change warning, no `.DS_Store` on network/USB), Dock (autohide, no
+  recent apps, minimize-to-app), screenshots (saved to `~/Desktop/Screenshots`,
+  no shadow), and system (expanded save/print panels, save to disk not iCloud,
+  no smart quotes/dashes, immediate screensaver password); restarts Finder, Dock,
+  and SystemUIServer to apply immediately
+- `make latex`: installs the `tlmgr` packages required for PDF export via BasicTeX;
+  guards against running when `tlmgr` is not found
+- `make chsh`: adds fish to `/etc/shells` and sets it as the login shell via `dscl`
+  (idempotent; requires sudo)
+- `make install`: updated post-run message to note `make firefox` and `make latex`
+- Betterfox tracked as a git submodule at `security/betterfox/`; `make firefox` now
+  concatenates `security/betterfox/user.js` + `security/user-overrides.js` into a
+  single `user.js` written to the active Firefox profile (Firefox only reads `user.js`
+  natively — `user-overrides.js` is never edited by upstream)
+- `make betterfox-update`: pulls the latest Betterfox commit into the submodule
+- `security/user-overrides.js`: personal Firefox prefs extracted from the old
+  `security/user.js` — Smoothfox scroll tuning, DoH/NextDNS, shutdown sanitizing,
+  service worker and JIT hardening, captive portal disable, built-in VPN disable
+
+### Changed
+- Quick start clone command updated to `--recurse-submodules` (required for Betterfox)
+- `make apps`: Homebrew auto-install means the manual Homebrew install step is removed
+  from the quick start
+- README quick start updated to reflect full new-machine sequence:
+  `apps → install → macos → chsh → firefox → latex`
+
+### Removed
+- `security/user.js`: replaced by Betterfox submodule + `user-overrides.js`
+
+---
+
 ## 2026-06-08 — Repo restructure, bat and lazygit configs, Firefox user.js wiring
 
 ### Added
