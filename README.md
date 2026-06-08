@@ -47,7 +47,7 @@ cd ~/.dotfiles
 make apps
 
 # 5. Symlink configs (run the ones you want)
-make fish git auth ghostty tmux nvim vale
+make shell git security firefox nvim vale
 
 # 6. Install scheduled Homebrew jobs (optional)
 make brewauto
@@ -57,6 +57,7 @@ Then finish the per-app setup:
 
 | App       | One-time step                                                                 |
 |-----------|-------------------------------------------------------------------------------|
+| Firefox   | Launch Firefox once to create the profile, then run `make firefox`                    |
 | Fish      | Add fish to `/etc/shells`, `chsh -s /opt/homebrew/bin/fish`, then open a new terminal |
 | tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
 | Neovim    | launch `nvim`; `lazy.nvim` bootstraps and installs plugins automatically      |
@@ -93,13 +94,12 @@ just prints a warning) so nothing destructive happens by accident.
 
 | Target     | What it does                                                                                 |
 |------------|----------------------------------------------------------------------------------------------|
-| `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`                           |
-| `fish`     | Symlinks the whole `fish/` dir → `~/.config/fish`                                                     |
-| `auth`     | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
+| `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config           |
+| `shell`    | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                 |
+| `security` | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
+| `firefox`  | Detects the default Firefox profile via `installs.ini` and symlinks `user.js` into it          |
 | `apps`     | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)            |
-| `ghostty`  | Symlinks Ghostty config into `~/Library/Application Support/com.mitchellh.ghostty/`           |
-| `tmux`     | Installs TPM (if missing) and symlinks `tmux.conf` → `~/.tmux.conf`                            |
-| `nvim`     | Symlinks the whole `nvim/` dir → `~/.config/nvim`                                             |
+| `nvim`     | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                     |
 | `vale`     | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir           |
 | `brewauto` | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly              |
 
@@ -116,7 +116,7 @@ just enough LSP for the languages used in `bin/` (Lua, Python, Bash).
 ### Layout
 
 ```
-nvim/
+writing/nvim/
 ├── init.lua                 # loads the modules below
 ├── lazy-lock.json           # pinned plugin commits (committed for reproducibility)
 └── lua/
@@ -247,7 +247,7 @@ twice to send a literal `Ctrl-a` to the underlying program.
 
 ## Ghostty
 
-The terminal config lives at `ghostty/config` and is symlinked into
+The terminal config lives at `shell/ghostty/config` and is symlinked into
 Application Support.
 
 | Setting                        | Value                          | Notes                                          |
@@ -386,7 +386,7 @@ picker.
 | `gus`  | `git restore --staged` (unstage)                        |
 | `glst` | `git log -1 HEAD` (show last commit)                    |
 
-### Functions (`fish/functions/`)
+### Functions (`shell/fish/functions/`)
 
 Autoloaded — call them like commands.
 
@@ -445,19 +445,19 @@ This setup is tuned for academic / long-form writing in Markdown.
   style (repetition, spelling, wordiness). No `vale sync` is needed unless you
   add external packages (proselint, write-good, Microsoft, etc.). A per-project
   `.vale.ini` placed in a repo overrides the global one.
-- **Templates** in `templates/`:
+- **Templates** in `writing/pandoc/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
     `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
     ```sh
-    cp ~/.dotfiles/templates/metadata.yaml .
+    cp ~/.dotfiles/writing/pandoc/metadata.yaml .
     ```
   - `chicago-notes-bibliography-17th-edition.csl` — CSL style file referenced
-    automatically by `newdoc` (hardcoded to `~/.dotfiles/templates/`). Pandoc
+    automatically by `newdoc` (hardcoded to `~/.dotfiles/writing/pandoc/`). Pandoc
     exports via `<leader>ph`/`<leader>pp` will resolve it from there.
   - `vale.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
     project root to override the global `~/.vale.ini`:
     ```sh
-    cp ~/.dotfiles/templates/vale.ini .
+    cp ~/.dotfiles/writing/vale/vale-project.ini .
     ```
 - **Export** with `<leader>ph` (HTML) or `<leader>pp` (PDF). Both:
   - run `pandoc --filter pandoc-crossref --citeproc` (cross-references resolve
@@ -482,7 +482,7 @@ tlmgr install \
 
 ## Bin scripts
 
-On `PATH` via `fish/conf.d/env.fish`. The Python scripts use
+On `PATH` via `shell/fish/conf.d/env.fish`. The Python scripts use
 [`uv`](https://docs.astral.sh/uv/)'s inline (PEP 723) dependencies — no venv to
 manage.
 
@@ -515,15 +515,15 @@ launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
 
 ## SSH / GPG
 
-Installed by `make auth`.
+Installed by `make security`.
 
-- **SSH** (`general/ssh-config`): dedicated key per host (`id_github`,
+- **SSH** (`security/ssh-config`): dedicated key per host (`id_github`,
   `id_codeberg`), modern crypto only (curve25519, chacha20-poly1305 / AES-GCM),
   `IdentitiesOnly`, agent + Keychain integration, strict host-key checking,
   connection multiplexing for Codeberg (`ControlPath ~/.ssh/control/%C`,
   persisted 10m), no agent/X11 forwarding. Includes a `github-443` fallback
   host alias for networks that block port 22.
-- **GPG** (`general/gpg.conf`, `gpg-agent.conf`, `dirmngr.conf`, `common.conf`):
+- **GPG** (`security/gpg.conf`, `gpg-agent.conf`, `dirmngr.conf`, `common.conf`):
   hardened algorithm preferences (AES-256 / SHA-512), strong S2K, `pinentry-mac`,
   `import-minimal`/`export-minimal`, `no-allow-loopback-pinentry`, `use-keyboxd`
   (`common.conf`), privacy-conscious keyserver/dirmngr defaults (LDAP disabled).
@@ -543,14 +543,18 @@ Installed by `make auth`.
 ├── Makefile              # symlink/install targets
 ├── README.md
 ├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup)
-├── fish/                 # config.fish, conf.d, functions
-├── general/              # ssh, gpg, dirmngr, tmux, vale configs
-├── ghostty/              # terminal config
-├── git/                  # gitconfig, gitignore
-├── homebrew/             # Brewfile
-├── launchd/              # LaunchAgent plist templates
-├── nvim/                 # Neovim config (see Neovim section)
-└── templates/            # Pandoc metadata + project Vale config
+├── security/             # ssh, gpg, dirmngr, firefox configs
+├── git/                  # gitconfig, gitignore, lazygit.yml
+├── homebrew/             # Brewfile + LaunchAgent plist templates
+├── shell/                # all terminal/shell environment configs
+│   ├── bat/              # bat pager config
+│   ├── fish/             # config.fish, conf.d, functions
+│   ├── ghostty/          # terminal emulator config
+│   └── tmux.conf         # tmux config
+└── writing/              # editor, Pandoc templates, and Vale configs
+    ├── nvim/             # Neovim config (see Neovim section)
+    ├── pandoc/           # metadata.yaml, CSL, reference.docx
+    └── vale/             # global vale.ini + vale-project.ini template
 ```
 
 ---

@@ -25,7 +25,7 @@ jobs:
 
       - name: fish syntax check
         run: |
-          for f in fish/config.fish fish/conf.d/*.fish fish/functions/*.fish; do
+          for f in shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish; do
             fish --no-execute "$f" || exit 1
           done
 
