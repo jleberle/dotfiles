@@ -5,6 +5,42 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-08 — Repo restructure, bat and lazygit configs, Firefox user.js wiring
+
+### Added
+- `shell/bat/config`: Nord theme, `numbers,changes,header-filename` style, syntax
+  mappings for `.fish`, `Brewfile`, and `.env*` files
+- `git/lazygit.yml`: Nord theme, delta pager integration (`--paging=never`), nvim
+  editor, NerdFonts v3 icons
+- `make firefox`: detects the default Firefox profile via `installs.ini` (profile
+  string varies per machine) and symlinks `security/user.js` into it; `make doctor`
+  checks the symlink when Firefox has been launched
+
+### Changed
+- **Repo layout** reorganised into six top-level directories:
+  - `fish/`, `ghostty/` → `shell/` (also absorbs `tmux.conf` from `general/` and new `bat/`)
+  - `general/` → `security/` (SSH, GPG) + `writing/vale/` (Vale configs)
+  - `templates/` → `writing/pandoc/` (Pandoc templates, CSL, reference.docx)
+  - `nvim/` → `writing/nvim/`
+  - `launchd/` → `homebrew/` (alongside Brewfile)
+  - `lazygit/config.yml` → `git/lazygit.yml` (flattened into `git/`)
+  - `templates/user.js` → `security/user.js`
+- **Makefile** targets reduced from 12 → 9:
+  - `git` absorbs lazygit symlinking
+  - `shell` replaces `fish`, `ghostty`, `tmux` (adds `bat`)
+  - `auth` renamed to `security`
+  - `firefox` added (new)
+  - Individual `ghostty`, `tmux`, `fish` targets removed
+- `make security`: `gpg-agent.conf` now written directly to `~/.gnupg/gpg-agent.conf`
+  via `sed` substitution (same pattern as `make vale`) — no intermediate generated
+  file in the repo, no symlink for that file
+- `writing/vale/vale.ini`: fixed stale comment that said `vale sync` was not required
+  (it is — four external packages are listed)
+- `security/gpg-agent.conf.tmpl`: updated comment to reference `make security` and
+  correct destination path
+
+---
+
 ## 2026-06-06 — GPG hardening, bat pager, Tor Browser, starship.toml removal
 
 ### Added
