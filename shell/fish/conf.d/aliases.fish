@@ -7,6 +7,7 @@
 
 alias v 'nvim'
 alias vim 'nvim'
+alias mutt 'neomutt'
 alias cat 'bat'
 
 # Eza
