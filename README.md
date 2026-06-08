@@ -46,7 +46,10 @@ make apps
 # 4. Symlink all configs and install scheduled Homebrew jobs
 make install
 
-# 5. Symlink Firefox user.js (requires Firefox launched at least once first)
+# 5. Apply macOS system defaults (keyboard repeat, Finder, Dock, screenshots, etc.)
+make macos
+
+# 6. Symlink Firefox user.js (requires Firefox launched at least once first)
 make firefox
 ```
 
@@ -59,7 +62,7 @@ Then finish the per-app setup:
 | tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
 | Neovim    | launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
 | BasicTeX  | run `make latex` to install the required `tlmgr` packages for PDF export |
-| macOS     | run `make macos` to apply system defaults (keyboard repeat, Finder, Dock, etc.); logout to fully apply keyboard changes |
+| macOS     | logout and back in for keyboard repeat changes to take full effect |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
 > `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
