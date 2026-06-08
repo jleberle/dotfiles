@@ -143,6 +143,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, and GPG key                              |
+| `clean`            | Removes stale directories left over from old repo layouts (`fish/`, `general/`)                    |
 
 ---
 

@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos macos-check doctor brew-check tools-check
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos macos-check doctor brew-check tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -219,6 +219,17 @@ vale :
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/vale/vale.ini > $(HOME)/.vale.ini
 	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
 	vale sync
+clean :
+	@echo "Removing stale artifacts from old repo layouts..."
+	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
+	@[ -d $(HOME)/.dotfiles/fish ] && \
+	    echo "Removing stale fish/ at repo root" && \
+	    rm -rf $(HOME)/.dotfiles/fish || true
+	@# general/ — renamed to security/ (2026-06-08); gpg-agent.conf was gitignored
+	@[ -d $(HOME)/.dotfiles/general ] && \
+	    echo "Removing stale general/ at repo root" && \
+	    rm -rf $(HOME)/.dotfiles/general || true
+	@echo "Done."
 brew-check :
 	@echo "Checking Brewfile packages..."
 	@brew bundle check --file=$(HOME)/.dotfiles/homebrew/brewfile --no-upgrade || \
