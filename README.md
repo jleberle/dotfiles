@@ -517,8 +517,12 @@ key and `gpg.conf` managed by `make security`. Encrypted replies are
 automatically encrypted; signed messages are automatically verified. Toggle
 signing/encryption per message with `p` in the compose menu.
 
-**`mutt` alias** — the fish function `mutt` is an alias for `neomutt`,
+**`mutt` alias** — the fish alias `mutt` maps to `neomutt`,
 so both `mutt` and `neomutt` launch the client.
+
+**URL navigation** — `Ctrl-U` in the pager pipes the message through `urlscan`,
+showing a numbered list of all URLs. Navigate with `j`/`k`, press `Enter` to
+open in the browser. Requires `urlscan` (included in the Brewfile).
 
 ---
 
