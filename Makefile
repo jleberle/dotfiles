@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox apps brewauto nvim vale doctor
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale doctor
 
 default :
 	@echo "There is no default for your own safety."
@@ -73,8 +73,16 @@ firefox :
 	@PROFILE=$$(awk -F= '/^Default=/{print $$2; exit}' \
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null) && \
 	[ -n "$$PROFILE" ] || { echo "ERROR: Firefox profile not found — launch Firefox first"; exit 1; } && \
-	echo "Symlinking user.js → $$PROFILE" && \
-	ln -sf $(HOME)/.dotfiles/security/user.js "$(FIREFOX_DIR)/$$PROFILE/user.js"
+	echo "Writing user.js → $$PROFILE (Betterfox + overrides)" && \
+	cat $(HOME)/.dotfiles/security/betterfox/user.js \
+	    $(HOME)/.dotfiles/security/user-overrides.js \
+	    > "$(FIREFOX_DIR)/$$PROFILE/user.js"
+
+betterfox-update :
+	@echo "Updating Betterfox submodule to latest upstream..."
+	git submodule update --remote security/betterfox
+	@echo "Done. Review changes with: git diff security/betterfox"
+	@echo "Then re-run 'make firefox' to rebuild the profile user.js."
 apps :
 	@command -v brew >/dev/null 2>&1 || { \
 		echo "Homebrew not found. Installing..."; \
@@ -122,6 +130,6 @@ doctor :
 	@FFPROFILE=$$(awk -F= '/^Default=/{print $$2; exit}' \
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null); \
 	[ -z "$$FFPROFILE" ] || \
-	test -L "$(FIREFOX_DIR)/$$FFPROFILE/user.js" || \
-	echo "WARNING: Firefox user.js not symlinked (run: make firefox)"
+	test -f "$(FIREFOX_DIR)/$$FFPROFILE/user.js" || \
+	echo "WARNING: Firefox user.js not written (run: make firefox)"
 	@echo "Done."

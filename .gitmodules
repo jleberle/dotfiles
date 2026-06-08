@@ -1,0 +1,3 @@
+[submodule "security/betterfox"]
+	path = security/betterfox
+	url = https://github.com/yokoffing/Betterfox.git

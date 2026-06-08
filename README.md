@@ -94,7 +94,8 @@ just prints a warning) so nothing destructive happens by accident.
 | `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config           |
 | `shell`    | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                 |
 | `security` | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
-| `firefox`  | Detects the default Firefox profile via `installs.ini` and symlinks `user.js` into it          |
+| `firefox`  | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) into it |
+| `betterfox-update` | Pulls latest Betterfox upstream into the submodule; re-run `make firefox` afterwards |
 | `apps`     | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)            |
 | `nvim`     | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                     |
 | `vale`     | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir           |
@@ -514,6 +515,11 @@ launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
 
 Installed by `make security`.
 
+- **Firefox** (`security/betterfox/` submodule + `security/user-overrides.js`): `make firefox`
+  concatenates both into a single `user.js` written to the active Firefox profile.
+  Personal overrides (Smoothfox scroll tuning, DoH/NextDNS, shutdown sanitizing, etc.) live in
+  `user-overrides.js` — Betterfox itself is never edited. To update Betterfox: `make betterfox-update`,
+  review the diff, then `make firefox`.
 - **SSH** (`security/ssh-config`): dedicated key per host (`id_github`,
   `id_codeberg`), modern crypto only (curve25519, chacha20-poly1305 / AES-GCM),
   `IdentitiesOnly`, agent + Keychain integration, strict host-key checking,
@@ -541,6 +547,8 @@ Installed by `make security`.
 ├── README.md
 ├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup)
 ├── security/             # ssh, gpg, dirmngr, firefox configs
+│   ├── betterfox/        # Betterfox submodule (upstream user.js — never edited)
+│   └── user-overrides.js # personal Firefox prefs appended on top of Betterfox
 ├── git/                  # gitconfig, gitignore, lazygit.yml
 ├── homebrew/             # Brewfile + LaunchAgent plist templates
 ├── shell/                # all terminal/shell environment configs
