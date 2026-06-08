@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell security firefox apps brewauto nvim vale doctor
+.PHONY: default install git shell chsh security firefox apps brewauto nvim vale doctor
 
 default :
 	@echo "There is no default for your own safety."
@@ -30,13 +30,19 @@ git :
 	mkdir -p "$(HOME)/Library/Application Support/lazygit"
 	ln -sf $(HOME)/.dotfiles/git/lazygit.yml "$(HOME)/Library/Application Support/lazygit/config.yml"
 	@command -v delta >/dev/null 2>&1 || echo "WARNING: delta not found — git diff/log will fail. Run: make apps"
+chsh :
+	@grep -qF "$(HOMEBREW_PREFIX)/bin/fish" /etc/shells || \
+	    { echo "Adding fish to /etc/shells"; echo "$(HOMEBREW_PREFIX)/bin/fish" | sudo tee -a /etc/shells; }
+	@dscl . -read /Users/$(USER) UserShell 2>/dev/null | grep -qF "$(HOMEBREW_PREFIX)/bin/fish" && \
+	    echo "fish is already the login shell" || \
+	    { echo "Setting fish as login shell" && \
+	      sudo dscl . -create /Users/$(USER) UserShell "$(HOMEBREW_PREFIX)/bin/fish" && \
+	      echo "Done — open a new terminal to start using fish"; }
 shell :
 	@echo "Symlinking fish config"
 	mkdir -p $(HOME)/.config
 	ln -sfn $(HOME)/.dotfiles/shell/fish $(HOME)/.config/fish
-	@echo "Config symlinked. To use fish as your login shell (optional):"
-	@echo "  echo $(HOMEBREW_PREFIX)/bin/fish | sudo tee -a /etc/shells"
-	@echo "  chsh -s $(HOMEBREW_PREFIX)/bin/fish"
+	@echo "Run 'make chsh' to set fish as your login shell (requires sudo)"
 	@echo "Symlinking Ghostty config"
 	mkdir -p "$(GHOSTTY_DIR)"
 	ln -sf $(HOME)/.dotfiles/shell/ghostty/config "$(GHOSTTY_DIR)/config"

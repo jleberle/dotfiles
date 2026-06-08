@@ -58,7 +58,7 @@ Then finish the per-app setup:
 | App       | One-time step                                                                 |
 |-----------|-------------------------------------------------------------------------------|
 | Firefox   | Launch Firefox once to create the profile, then run `make firefox`                    |
-| Fish      | Add fish to `/etc/shells`, `chsh -s /opt/homebrew/bin/fish`, then open a new terminal |
+| Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                       |
 | tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
 | Neovim    | launch `nvim`; `lazy.nvim` bootstraps and installs plugins automatically      |
 | Neovim    | run `:TSUpdate` once so Tree-sitter parsers finish compiling                  |
@@ -95,6 +95,7 @@ just prints a warning) so nothing destructive happens by accident.
 | Target     | What it does                                                                                 |
 |------------|----------------------------------------------------------------------------------------------|
 | `install`  | Runs `git shell security nvim vale brewauto` in order, then `doctor`                          |
+| `chsh`     | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)          |
 | `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config           |
 | `shell`    | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                 |
 | `security` | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
