@@ -60,9 +60,7 @@ Then finish the per-app setup:
 | Firefox   | Launch Firefox once to create the profile, then run `make firefox`                    |
 | Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                       |
 | tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
-| Neovim    | launch `nvim`; `lazy.nvim` bootstraps and installs plugins automatically      |
-| Neovim    | run `:TSUpdate` once so Tree-sitter parsers finish compiling                  |
-| Vale      | `make vale` already wrote `~/.vale.ini`; the built-in style needs no `sync`   |
+| Neovim    | launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
 | BasicTeX  | run the `tlmgr install` command in the [Prose & Pandoc](#prose--pandoc-workflow) section |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
@@ -456,7 +454,7 @@ This setup is tuned for academic / long-form writing in Markdown.
   - `chicago-notes-bibliography-17th-edition.csl` — CSL style file referenced
     automatically by `newdoc` (hardcoded to `~/.dotfiles/writing/pandoc/`). Pandoc
     exports via `<leader>ph`/`<leader>pp` will resolve it from there.
-  - `vale.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
+  - `vale-project.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
     project root to override the global `~/.vale.ini`:
     ```sh
     cp ~/.dotfiles/writing/vale/vale-project.ini .
