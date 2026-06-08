@@ -48,6 +48,7 @@ brew "pinentry-mac" # GPG passphrase prompt on macOS
 brew "qpdf" # PDF transformation (CV, syllabi PDF builds)
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
 brew "tmux" # terminal multiplexer (config general/tmux.conf)
+brew "urlscan" # extract and open URLs from emails (used by NeoMutt \Cu macro)
 brew "zoxide" # smarter cd via frecency (the `z` command)
 
 # GUI apps
