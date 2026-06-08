@@ -75,6 +75,7 @@ firefox :
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null) && \
 	[ -n "$$PROFILE" ] || { echo "ERROR: Firefox profile not found — launch Firefox first"; exit 1; } && \
 	[ -d "$(FIREFOX_DIR)/$$PROFILE" ] || { echo "ERROR: profile directory missing: $(FIREFOX_DIR)/$$PROFILE"; exit 1; } && \
+	[ -f "$(HOME)/.dotfiles/security/betterfox/user.js" ] || { echo "ERROR: Betterfox user.js not found — run: git submodule update --init --recursive"; exit 1; } && \
 	echo "Writing user.js → $$PROFILE (Betterfox + overrides)" && \
 	cat $(HOME)/.dotfiles/security/betterfox/user.js \
 	    $(HOME)/.dotfiles/security/user-overrides.js \
