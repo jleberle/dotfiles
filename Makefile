@@ -91,7 +91,7 @@ brewauto :
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
 nvim :
 	@echo "Symlinking nvim config"
-	ln -sf $(HOME)/.dotfiles/writing/nvim $(HOME)/.config/nvim
+	ln -sfn $(HOME)/.dotfiles/writing/nvim $(HOME)/.config/nvim
 vale :
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
 	mkdir -p $(HOME)/.local/share/vale/styles
