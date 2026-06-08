@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex doctor
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos doctor
 
 default :
 	@echo "There is no default for your own safety."
@@ -104,6 +104,43 @@ brewauto :
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
 	@echo "Installed. Logs accumulate in $(HOME)/.local/brew_update_logs.txt"
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
+macos :
+	@echo "Keyboard"
+	defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+	defaults write NSGlobalDomain KeyRepeat -int 2
+	defaults write NSGlobalDomain InitialKeyRepeat -int 15
+	@echo "Finder"
+	defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+	defaults write com.apple.finder ShowPathbar -bool true
+	defaults write com.apple.finder ShowStatusBar -bool true
+	defaults write com.apple.finder _FXSortFoldersFirst -bool true
+	defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+	defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+	defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+	defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+	@echo "Dock"
+	defaults write com.apple.dock autohide -bool true
+	defaults write com.apple.dock show-recents -bool false
+	defaults write com.apple.dock minimize-to-application -bool true
+	@echo "Screenshots"
+	mkdir -p $(HOME)/Desktop/Screenshots
+	defaults write com.apple.screencapture location -string "$(HOME)/Desktop/Screenshots"
+	defaults write com.apple.screencapture disable-shadow -bool true
+	@echo "System"
+	defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+	defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+	defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+	defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
+	defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+	defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+	defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+	defaults write com.apple.screensaver askForPassword -int 1
+	defaults write com.apple.screensaver askForPasswordDelay -int 0
+	@echo "Applying changes..."
+	killall Finder
+	killall Dock
+	killall SystemUIServer
+	@echo "Done. Some keyboard changes require a logout to take effect."
 latex :
 	@command -v tlmgr >/dev/null 2>&1 || { echo "ERROR: tlmgr not found — install BasicTeX first (make apps)"; exit 1; }
 	tlmgr install \

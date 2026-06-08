@@ -59,6 +59,7 @@ Then finish the per-app setup:
 | tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
 | Neovim    | launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
 | BasicTeX  | run `make latex` to install the required `tlmgr` packages for PDF export |
+| macOS     | run `make macos` to apply system defaults (keyboard repeat, Finder, Dock, etc.); logout to fully apply keyboard changes |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
 > `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
@@ -101,6 +102,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `vale`     | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir           |
 | `brewauto` | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly              |
 | `latex`    | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)   |
+| `macos`    | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)   |
 
 ---
 
