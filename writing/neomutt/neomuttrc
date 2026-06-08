@@ -1,0 +1,107 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# NeoMutt — ~/.config/neomutt/neomuttrc
+# Symlinked from ~/.dotfiles/writing/neomutt/neomuttrc by `make neomutt`
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Core behavior ──────────────────────────────────────────────────────────────
+set wait_key        = no     # don't pause after external commands
+set timeout         = 3      # seconds before re-checking for new mail while idle
+set mail_check      = 120    # poll interval in seconds
+set delete          = yes    # purge deleted messages without prompting
+set quit            = yes    # exit without confirmation
+set mark_old        = no     # keep unread messages unread between sessions
+set pipe_decode     = yes    # decode before piping to external commands
+set thorough_search = yes    # decode attachments before pattern-searching
+
+# ── Editor ─────────────────────────────────────────────────────────────────────
+set editor = "nvim +/^$ +nohlsearch"  # open at first blank line (body)
+
+# ── Paths ──────────────────────────────────────────────────────────────────────
+set header_cache     = ~/.cache/neomutt/headers
+set message_cachedir = ~/.cache/neomutt/messages
+set mailcap_path     = ~/.config/neomutt/mailcap
+
+# ── Index display ──────────────────────────────────────────────────────────────
+set date_format  = "%Y-%m-%d %H:%M"
+set index_format = "%2C  %Z  %-22.22F  %-60.60s  %> %D"
+set sort         = threads
+set sort_aux     = reverse-last-date-received
+set uncollapse_jump  = yes   # jump to first unread when uncollapsing
+set collapse_unread  = no    # don't collapse threads with unread messages
+
+# ── Pager ──────────────────────────────────────────────────────────────────────
+set pager_index_lines = 10   # show this many index lines above the pager
+set pager_context     = 3    # lines of context when paging
+set pager_stop        = yes  # don't advance to next message at bottom
+set menu_scroll       = yes
+set tilde             = yes  # fill empty lines with ~
+set markers           = no   # no + marker on wrapped lines
+
+# ── Composing ──────────────────────────────────────────────────────────────────
+set envelope_from = yes
+set sig_dashes    = yes
+set edit_headers  = yes      # show full headers when composing
+set fast_reply    = yes      # skip To/Subject prompt on reply
+set askcc         = no
+set fcc_attach    = yes      # save attachments with sent copies
+set forward_format = "Fwd: %s"
+set forward_decode = yes
+set forward_quote  = yes
+set mime_forward   = yes
+set attribution    = "On %d, %n wrote:"
+set reply_to       = yes     # use Reply-To header if present
+set reverse_name   = yes     # use matching identity when replying
+set include        = yes     # quote original message in reply
+
+# ── Sidebar ────────────────────────────────────────────────────────────────────
+set sidebar_visible       = yes
+set sidebar_width         = 24
+set sidebar_short_path    = yes
+set sidebar_next_new_wrap = yes
+set sidebar_format        = "%B%?F? [%F]?%* %?N?%N/?%S"
+
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CO sidebar-open
+
+# ── GPG / PGP ──────────────────────────────────────────────────────────────────
+source ~/.config/neomutt/gpg.rc
+
+# ── Colors ─────────────────────────────────────────────────────────────────────
+source ~/.config/neomutt/colors.rc
+
+# ── Keybindings ────────────────────────────────────────────────────────────────
+# Vim-style navigation
+bind index g        noop
+bind index gg       first-entry
+bind index G        last-entry
+bind index <tab>    sync-mailbox
+bind index <space>  collapse-thread
+
+bind pager j        next-line
+bind pager k        previous-line
+bind pager g        noop
+bind pager gg       top
+bind pager G        bottom
+bind pager <space>  next-page
+
+# Reply shortcuts
+bind index,pager r  reply
+bind index,pager R  group-reply
+bind index,pager L  list-reply
+
+# Mark all as read
+macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" \
+    "mark all messages as read"
+
+# Extract URLs (requires urlscan: brew install urlscan)
+macro index,pager \Cu "|urlscan<enter>" "extract URLs from message"
+
+# Open HTML in browser
+macro attach,compose \Ch "<pipe-entry>open -a Firefox<enter>" \
+    "open HTML attachment in Firefox"
+
+# ── Account configuration ───────────────────────────────────────────────────────
+# Per-account settings live in ~/.config/neomutt/accounts/local.rc (not tracked
+# by git). Copy ~/.dotfiles/writing/neomutt/accounts/example.rc there to start.
+source "~/.config/neomutt/accounts/local.rc"

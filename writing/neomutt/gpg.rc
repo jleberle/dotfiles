@@ -1,0 +1,28 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# NeoMutt — GPG / PGP configuration
+# Uses GPGME (the same gnupg setup managed by `make security`).
+# ──────────────────────────────────────────────────────────────────────────────
+
+set crypt_use_gpgme = yes           # use GPGME backend (prefers system gpg.conf)
+
+# Key selection — matches default-key in security/gpg.conf
+set pgp_default_key = "0xE0646B558C79DB58"
+
+# Automatic crypto behavior
+set crypt_autosign          = no    # don't sign every outgoing message by default
+set crypt_autoencrypt       = no    # don't encrypt every outgoing message
+set crypt_replyencrypt      = yes   # encrypt replies to encrypted messages
+set crypt_replysign         = yes   # sign replies to signed messages
+set crypt_replysignencrypted = yes  # sign replies to encrypted messages
+set crypt_verify_sig        = yes   # always verify incoming signatures
+
+# Compose menu defaults (toggle with p in compose)
+set crypt_opportunistic_encrypt = yes  # encrypt when all recipients have keys
+
+# Prefer PGP/MIME over inline PGP
+set pgp_use_gpg_agent = yes
+set pgp_auto_decode   = yes         # auto-decode PGP/MIME on open
+set pgp_show_unusable = no          # hide expired/revoked keys in key listing
+
+# Key timeout — ask for passphrase at most once per session
+set pgp_timeout = 3600

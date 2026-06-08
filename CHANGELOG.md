@@ -5,6 +5,28 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-08 — NeoMutt integration
+
+### Added
+- `writing/neomutt/` — NeoMutt configuration:
+  - `neomuttrc` — core config: threading, vim-style keybindings, sidebar,
+    index/pager layout, nvim as editor
+  - `gpg.rc` — GPGME-backed PGP using the same key as `make security`;
+    auto-encrypt/sign replies, verify all incoming signatures
+  - `colors.rc` — dark color scheme matching the Ghostty/nvim aesthetic
+  - `mailcap` — content handlers (HTML→Firefox, PDFs/images via macOS `open`)
+  - `accounts/example.rc` — account template using macOS Keychain for passwords
+- `make neomutt` — symlinks config files into `~/.config/neomutt/`, creates
+  cache dirs, stubs `accounts/local.rc` on first run with a reminder
+- `neomutt` added to `make install` dependency chain
+- `make doctor` check for neomuttrc symlink
+- `mutt` fish function — alias for `neomutt`
+- `neomutt` added to `homebrew/Brewfile` (alphabetical order)
+- README: NeoMutt subsection under Apps; Makefile Options table updated;
+  Quick Start per-app table updated
+
+---
+
 ## 2026-06-08 — Prepend brew update logs; README/Makefile doc update
 
 ### Changed

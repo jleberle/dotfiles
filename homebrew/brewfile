@@ -40,6 +40,7 @@ brew "imagemagick" # image conversion (website to-avif.sh)
 brew "lazygit" # terminal git UI (aliased to lg)
 brew "lychee" # fast link checker (markdown/prose)
 brew "mole" # deep clean and optimize macOS
+brew "neomutt" # terminal email client (config in writing/neomutt/)
 brew "neovim" # text editor (config in nvim/)
 brew "pandoc" # document converter (prose/Pandoc export workflow)
 brew "pandoc-crossref" # Pandoc filter for figure/table/equation cross-references

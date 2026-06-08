@@ -1,0 +1,33 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# NeoMutt account configuration template
+#
+# Copy this file to ~/.config/neomutt/accounts/local.rc and fill in your
+# details. That path is NOT tracked by git (credentials are sensitive).
+#
+# Passwords are pulled from the macOS Keychain via `security`. To add:
+#   security add-internet-password -s imap.example.com -a you@example.com -w
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Identity
+set realname = "Your Name"
+set from     = "you@example.com"
+
+# IMAP inbox
+set folder    = "imaps://imap.example.com/"
+set imap_user = "you@example.com"
+set imap_pass = `security find-internet-password -s imap.example.com -a you@example.com -w 2>/dev/null`
+
+# Default mailboxes
+set spoolfile = +INBOX
+set record    = +Sent
+set trash     = +Trash
+set postponed = +Drafts
+mailboxes =INBOX =Sent =Drafts =Trash =Archive
+
+# SMTP
+set smtp_url  = "smtps://you@example.com@smtp.example.com:465/"
+set smtp_pass = `security find-internet-password -s smtp.example.com -a you@example.com -w 2>/dev/null`
+
+# TLS
+set ssl_starttls  = yes
+set ssl_force_tls = yes

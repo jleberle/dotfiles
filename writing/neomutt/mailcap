@@ -1,0 +1,26 @@
+# mailcap — content-type handlers for NeoMutt
+# macOS: `open` dispatches to the default app for each type.
+
+# HTML — dump as text in the pager; `v` then Enter opens in Firefox
+text/html; open -a Firefox %s; needsterminal
+text/html; open -W %s; nametemplate=%s.html; copiousoutput
+
+# Documents
+application/pdf;                                                    open %s; needsterminal
+application/msword;                                                 open %s; needsterminal
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; open %s; needsterminal
+application/vnd.oasis.opendocument.text;                            open %s; needsterminal
+
+# Spreadsheets
+application/vnd.ms-excel;                                           open %s; needsterminal
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;  open %s; needsterminal
+
+# Images
+image/*; open %s; needsterminal
+
+# Audio / Video
+audio/*; open %s; needsterminal
+video/*; open %s; needsterminal
+
+# Calendar
+text/calendar; open %s; needsterminal

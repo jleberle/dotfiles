@@ -67,6 +67,7 @@ Then finish the per-app setup:
 | Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                             |
 | tmux      | Start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM                           |
 | Neovim    | Launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
+| NeoMutt   | Copy `writing/neomutt/accounts/example.rc` → `~/.config/neomutt/accounts/local.rc` and fill in account details |
 | BasicTeX  | Run `make latex` to install the required `tlmgr` packages for PDF export                   |
 | macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
 
@@ -140,7 +141,7 @@ just prints a warning) so nothing destructive happens by accident.
 
 | Target             | What it does                                                                                        |
 |--------------------|-----------------------------------------------------------------------------------------------------|
-| `install`          | Runs `git shell security nvim vale brewauto` in order, then `doctor`                                |
+| `install`          | Runs `git shell security nvim vale neomutt brewauto` in order, then `doctor`                        |
 | `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
 | `git`              | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config                |
 | `shell`            | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                       |
@@ -150,6 +151,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)                 |
 | `nvim`             | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                           |
 | `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir, runs `vale sync` |
+| `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs                         |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
 | `latex`            | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)          |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
@@ -490,6 +492,33 @@ most-recent commit.
 | `git lol`     | `log --graph --decorate --oneline --all`                         |
 | `git unstage` | `restore --staged`                                               |
 | `git discard` | `restore` (discard working-tree changes)                         |
+
+---
+
+### NeoMutt
+
+`make neomutt` creates `~/.config/neomutt/`, symlinks the four tracked config
+files (`neomuttrc`, `gpg.rc`, `colors.rc`, `mailcap`), and creates
+`~/.cache/neomutt/` for the header and message caches.
+
+**Account setup** (credentials are not tracked by git):
+
+1. Copy `writing/neomutt/accounts/example.rc` to
+   `~/.config/neomutt/accounts/local.rc`
+2. Fill in your `realname`, `from`, IMAP/SMTP host, and mailbox names
+3. Store passwords in the macOS Keychain so the config reads them at runtime:
+   ```sh
+   security add-internet-password -s imap.example.com -a you@example.com -w
+   security add-internet-password -s smtp.example.com -a you@example.com -w
+   ```
+
+**GPG/PGP integration** (`writing/neomutt/gpg.rc`) uses GPGME with the same
+key and `gpg.conf` managed by `make security`. Encrypted replies are
+automatically encrypted; signed messages are automatically verified. Toggle
+signing/encryption per message with `p` in the compose menu.
+
+**`mutt` alias** — the fish function `mutt` is an alias for `neomutt`,
+so both `mutt` and `neomutt` launch the client.
 
 ---
 

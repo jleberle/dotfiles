@@ -1,0 +1,65 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# NeoMutt — color scheme
+# Designed for dark terminal backgrounds (Ghostty default theme).
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Base
+color normal      default         default
+color error       red             default
+color tilde       brightblack     default
+color message     cyan            default
+color markers     red             default
+color attachment  brightyellow    default
+color search      brightwhite     red
+
+# Status bar
+color status      brightyellow    color234
+
+# Index — message states
+color index       brightwhite     default "~N"   # new
+color index       yellow          default "~F"   # flagged
+color index       red             default "~D"   # deleted
+color index       green           default "~Q"   # replied to
+color index       brightcyan      default "~T"   # tagged
+
+# Index — crypto
+color index       brightgreen     default "~g"   # PGP signed
+color index       brightgreen     default "~G"   # PGP encrypted
+
+# Threading
+color tree        red             default
+
+# Pager — quoted text levels
+color quoted      green           default
+color quoted1     cyan            default
+color quoted2     yellow          default
+color quoted3     magenta         default
+color quoted4     brightblue      default
+
+# Pager — signature block
+color signature   brightblack     default
+
+# Headers
+color hdrdefault  cyan            default
+color header      brightgreen     default "^(From|To|Cc|Bcc):"
+color header      brightblue      default "^Subject:"
+color header      cyan            default "^Date:"
+color header      yellow          default "^X-Spam"
+
+# Selected / highlighted row
+color indicator   default         color238
+
+# Sidebar
+color sidebar_new         brightwhite  default
+color sidebar_flagged     yellow       default
+color sidebar_highlight   default      color238
+color sidebar_divider     brightblack  default
+
+# Body — URLs and email addresses
+color body  brightblue  default  "(https?|ftp)://[[:alnum:]/_:;?&=.#@%~,!+-]+"
+color body  brightblue  default  "[[:alnum:].+-]+@[[:alnum:]_-]+\\.[[:alnum:].]+"
+
+# Body — PGP blocks
+color body  brightgreen  default  "^-----BEGIN PGP.*"
+color body  brightgreen  default  "^-----END PGP.*"
+color body  green        default  "^gpg: "

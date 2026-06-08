@@ -11,12 +11,12 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos macos-check doctor brew-check tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt latex macos macos-check doctor brew-check tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
 
-install : git shell security nvim vale brewauto
+install : git shell security nvim vale neomutt brewauto
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
 	@echo "Run 'make latex' to install LaTeX packages. Will load slowly"
@@ -226,6 +226,20 @@ vale :
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/vale/vale.ini > $(HOME)/.vale.ini
 	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
 	vale sync
+neomutt :
+	@echo "Setting up NeoMutt"
+	mkdir -p $(HOME)/.config/neomutt/accounts
+	mkdir -p $(HOME)/.cache/neomutt/headers
+	mkdir -p $(HOME)/.cache/neomutt/messages
+	ln -sf $(HOME)/.dotfiles/writing/neomutt/neomuttrc $(HOME)/.config/neomutt/neomuttrc
+	ln -sf $(HOME)/.dotfiles/writing/neomutt/gpg.rc    $(HOME)/.config/neomutt/gpg.rc
+	ln -sf $(HOME)/.dotfiles/writing/neomutt/colors.rc $(HOME)/.config/neomutt/colors.rc
+	ln -sf $(HOME)/.dotfiles/writing/neomutt/mailcap   $(HOME)/.config/neomutt/mailcap
+	@[ -f "$(HOME)/.config/neomutt/accounts/local.rc" ] || \
+	    { printf '# NeoMutt account config — fill in your details.\n# See ~/.dotfiles/writing/neomutt/accounts/example.rc\n' \
+	        > "$(HOME)/.config/neomutt/accounts/local.rc"; \
+	      echo "REMINDER: edit ~/.config/neomutt/accounts/local.rc with your account details"; }
+	@echo "NeoMutt configured."
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
@@ -269,6 +283,7 @@ doctor :
 	@if [ -L "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf is a broken symlink (run: make security)"; elif [ ! -f "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf not written (run: make security)"; fi
 	@test -L $(HOME)/.gnupg/common.conf       || echo "WARNING: common.conf not symlinked (run: make security)"
 	@test -L $(HOME)/.config/nvim             || echo "WARNING: nvim config not symlinked (run: make nvim)"
+	@test -L $(HOME)/.config/neomutt/neomuttrc || echo "WARNING: neomuttrc not symlinked (run: make neomutt)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
 	@test -d $(HOME)/.local/share/vale/styles && \
 	    ls $(HOME)/.local/share/vale/styles | grep -q . || \
