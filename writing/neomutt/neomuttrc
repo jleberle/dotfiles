@@ -33,7 +33,7 @@ set collapse_unread  = no    # don't collapse threads with unread messages
 # %f  = mailbox name   %m = total   %n = new   %F = flagged   %d = deleted
 # %s  = sort method    %P = position percentage   %> = right-align remainder
 set status_chars  = " *%A"
-set status_format = "  %f%?r? [RO]?  %?n?%n new · ?%m messages%?F? · %F flagged?%?d? · %d deleted?  %>  %s · %P  "
+set status_format = "  %f  %?n?%n new · ?%m messages%?F? · %F flagged?%?d? · %d deleted?  %>  %s · %P  "
 set pager_format  = "  %n · %s  %>  %C / %m · %P  "
 
 # ── Pager ──────────────────────────────────────────────────────────────────────
