@@ -64,6 +64,10 @@ bind index,pager \CP sidebar-prev
 bind index,pager \CN sidebar-next
 bind index,pager \CO sidebar-open
 
+# ── MIME / HTML ────────────────────────────────────────────────────────────────
+auto_view text/html                   # render HTML inline via mailcap copiousoutput
+alternative_order text/plain text/enriched text/html  # prefer plain text when available
+
 # ── GPG / PGP ──────────────────────────────────────────────────────────────────
 source ~/.config/neomutt/gpg.rc
 
