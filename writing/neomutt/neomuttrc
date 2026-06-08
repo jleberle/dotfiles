@@ -69,7 +69,7 @@ set sidebar_format        = "%B%?F? [%F]?%* %?N?%N/?%S"
 
 bind index,pager \CP sidebar-prev
 bind index,pager \CN sidebar-next
-bind index,pager \CO sidebar-open
+bind index,pager B  sidebar-open
 
 # ── MIME / HTML ────────────────────────────────────────────────────────────────
 auto_view text/html                   # render HTML inline via mailcap copiousoutput
