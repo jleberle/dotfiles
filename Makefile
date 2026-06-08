@@ -61,6 +61,7 @@ security :
 	@echo "Symlinking SSH Configurations"
 	ln -sf $(HOME)/.dotfiles/security/ssh-config $(HOME)/.ssh/config
 	@echo "Creating GPG home directory"
+	@[ ! -L "$(HOME)/.gnupg" ] || { echo "Removing broken .gnupg symlink"; rm "$(HOME)/.gnupg"; }
 	mkdir -p $(HOME)/.gnupg
 	chmod 700 $(HOME)/.gnupg
 	@echo "Symlinking GPG Files"
