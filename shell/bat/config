@@ -1,0 +1,6 @@
+--theme=Nord
+--style=numbers,changes,header-filename
+--italic-text=always
+--map-syntax "*.fish:Fish"
+--map-syntax "Brewfile:Ruby"
+--map-syntax ".env*:DotENV"

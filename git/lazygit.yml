@@ -1,0 +1,36 @@
+gui:
+  nerdFontsVersion: "3"
+  commitLength:
+    show: true
+  showRandomTip: false
+  theme:
+    activeBorderColor:
+      - '#88C0D0'
+      - bold
+    inactiveBorderColor:
+      - '#4C566A'
+    optionsTextColor:
+      - '#81A1C1'
+    selectedLineBgColor:
+      - '#3B4252'
+    selectedRangeBgColor:
+      - '#434C5E'
+    cherryPickedCommitBgColor:
+      - '#5E81AC'
+      - bold
+    cherryPickedCommitFgColor:
+      - '#ECEFF4'
+    unstagedChangesColor:
+      - '#BF616A'
+    defaultFgColor:
+      - '#D8DEE9'
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never
+
+os:
+  edit: "nvim {{filename}}"
+  editAtLine: "nvim +{{line}} {{filename}}"
+  editAtLineAndWait: "nvim +{{line}} {{filename}}"
