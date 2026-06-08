@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos doctor
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos macos-check doctor
 
 default :
 	@echo "There is no default for your own safety."
@@ -141,6 +141,65 @@ macos :
 	killall Dock
 	killall SystemUIServer
 	@echo "Done. Some keyboard changes require a logout to take effect."
+macos-check :
+	@echo "Checking macOS defaults..."
+	@echo "  Keyboard"
+	@VAL=$$(defaults read NSGlobalDomain ApplePressAndHoldEnabled 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: press-and-hold not disabled (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain KeyRepeat 2>/dev/null); \
+	[ "$$VAL" = "2" ] || echo "WARNING: KeyRepeat not set to 2 (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain InitialKeyRepeat 2>/dev/null); \
+	[ "$$VAL" = "15" ] || echo "WARNING: InitialKeyRepeat not set to 15 (run: make macos)"
+	@echo "  Finder"
+	@VAL=$$(defaults read NSGlobalDomain AppleShowAllExtensions 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: show all extensions not enabled (run: make macos)"
+	@VAL=$$(defaults read com.apple.finder ShowPathbar 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: Finder path bar not shown (run: make macos)"
+	@VAL=$$(defaults read com.apple.finder ShowStatusBar 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: Finder status bar not shown (run: make macos)"
+	@VAL=$$(defaults read com.apple.finder _FXSortFoldersFirst 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: Finder folders not sorted first (run: make macos)"
+	@VAL=$$(defaults read com.apple.finder FXDefaultSearchScope 2>/dev/null); \
+	[ "$$VAL" = "SCcf" ] || echo "WARNING: Finder search scope not set to current folder (run: make macos)"
+	@VAL=$$(defaults read com.apple.finder FXEnableExtensionChangeWarning 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: Finder extension change warning not disabled (run: make macos)"
+	@VAL=$$(defaults read com.apple.desktopservices DSDontWriteNetworkStores 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: .DS_Store on network volumes not disabled (run: make macos)"
+	@VAL=$$(defaults read com.apple.desktopservices DSDontWriteUSBStores 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: .DS_Store on USB volumes not disabled (run: make macos)"
+	@echo "  Dock"
+	@VAL=$$(defaults read com.apple.dock autohide 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: Dock autohide not enabled (run: make macos)"
+	@VAL=$$(defaults read com.apple.dock show-recents 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: Dock recent apps not hidden (run: make macos)"
+	@VAL=$$(defaults read com.apple.dock minimize-to-application 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: Dock minimize-to-app not enabled (run: make macos)"
+	@echo "  Screenshots"
+	@test -d $(HOME)/Desktop/Screenshots || echo "WARNING: Screenshots folder missing (run: make macos)"
+	@VAL=$$(defaults read com.apple.screencapture location 2>/dev/null); \
+	[ "$$VAL" = "$(HOME)/Desktop/Screenshots" ] || echo "WARNING: screenshot location not set (run: make macos)"
+	@VAL=$$(defaults read com.apple.screencapture disable-shadow 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: screenshot shadow not disabled (run: make macos)"
+	@echo "  System"
+	@VAL=$$(defaults read NSGlobalDomain NSNavPanelExpandedStateForSaveMode 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: save panel not expanded by default (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: save panel (2) not expanded by default (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain PMPrintingExpandedStateForPrint 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: print panel not expanded by default (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain PMPrintingExpandedStateForPrint2 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: print panel (2) not expanded by default (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain NSDocumentSaveNewDocumentsToCloud 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: new documents saving to iCloud not disabled (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: smart quotes not disabled (run: make macos)"
+	@VAL=$$(defaults read NSGlobalDomain NSAutomaticDashSubstitutionEnabled 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: smart dashes not disabled (run: make macos)"
+	@VAL=$$(defaults read com.apple.screensaver askForPassword 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: screensaver password not required (run: make macos)"
+	@VAL=$$(defaults read com.apple.screensaver askForPasswordDelay 2>/dev/null); \
+	[ "$$VAL" = "0" ] || echo "WARNING: screensaver password delay not set to 0 (run: make macos)"
+	@echo "Done."
 latex :
 	@command -v tlmgr >/dev/null 2>&1 || { echo "ERROR: tlmgr not found — install BasicTeX first (make apps)"; exit 1; }
 	tlmgr install \

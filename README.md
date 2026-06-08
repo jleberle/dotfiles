@@ -106,6 +106,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `brewauto` | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly              |
 | `latex`    | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)   |
 | `macos`    | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)   |
+| `macos-check` | Reads every key set by `make macos` and warns on any that are missing or wrong value — useful after a macOS upgrade |
 
 ---
 
