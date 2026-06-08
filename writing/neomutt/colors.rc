@@ -1,65 +1,69 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# NeoMutt — color scheme
-# Designed for dark terminal backgrounds (Ghostty default theme).
+# NeoMutt — Nord color scheme
+#
+# Relies on Ghostty's Nord terminal palette so color0–15 map to exact Nord
+# values. Named Nord slots for reference:
+#   Polar Night  : color0=#2E3440  color1=#3B4252  color2=#434C5E  color3=#4C566A
+#   Snow Storm   : color4=#D8DEE9  color5=#E5E9F0  color6=#ECEFF4
+#   Frost        : color7=#8FBCBB  color8=#88C0D0  color9=#81A1C1  color10=#5E81AC
+#   Aurora       : color11=#BF616A color12=#D08770 color13=#EBCB8B
+#                  color14=#A3BE8C color15=#B48EAD
 # ──────────────────────────────────────────────────────────────────────────────
 
-# Base
-color normal      default         default
-color error       red             default
-color tilde       brightblack     default
-color message     cyan            default
-color markers     red             default
-color attachment  brightyellow    default
-color search      brightwhite     red
+# ── Chrome (bars and UI) ───────────────────────────────────────────────────────
+# Status bar (top + bottom): Frost blue text on Polar Night 2
+color status    color8  color1   # #88C0D0 on #3B4252
+color indicator color6  color2   # Snow Storm #ECEFF4 on Polar Night #434C5E (selected row)
+color sidebar_divider     color3  default   # #4C566A
+color sidebar_highlight   color6  color2    # Snow Storm on Polar Night 2
+color sidebar_new         color8  default   # Frost cyan
+color sidebar_flagged     color13 default   # Aurora yellow
 
-# Status bar
-color status      brightyellow    color234
+# ── Base ───────────────────────────────────────────────────────────────────────
+color normal    color4  default   # Snow Storm #D8DEE9 on terminal bg
+color error     color11 default   # Aurora red
+color message   color8  default   # Frost cyan
+color tilde     color3  default   # Polar Night 3 (empty line fill)
+color markers   color11 default   # Aurora red (line-wrap marker)
+color search    color0  color13   # Polar Night on Aurora yellow (search highlight)
+color attachment color13 default  # Aurora yellow
 
-# Index — message states
-color index       brightwhite     default "~N"   # new
-color index       yellow          default "~F"   # flagged
-color index       red             default "~D"   # deleted
-color index       green           default "~Q"   # replied to
-color index       brightcyan      default "~T"   # tagged
+# ── Index — message states ─────────────────────────────────────────────────────
+color index     color6  default   "~N"   # new      — Snow Storm bright
+color index     color13 default   "~F"   # flagged  — Aurora yellow
+color index     color11 default   "~D"   # deleted  — Aurora red
+color index     color14 default   "~Q"   # replied  — Aurora green
+color index     color8  default   "~T"   # tagged   — Frost cyan
 
-# Index — crypto
-color index       brightgreen     default "~g"   # PGP signed
-color index       brightgreen     default "~G"   # PGP encrypted
+# ── Index — crypto ─────────────────────────────────────────────────────────────
+color index     color14 default   "~g"   # PGP signed    — Aurora green
+color index     color14 default   "~G"   # PGP encrypted — Aurora green
 
-# Threading
-color tree        red             default
+# ── Threading tree ─────────────────────────────────────────────────────────────
+color tree      color9  default   # Frost blue #81A1C1
 
-# Pager — quoted text levels
-color quoted      green           default
-color quoted1     cyan            default
-color quoted2     yellow          default
-color quoted3     magenta         default
-color quoted4     brightblue      default
+# ── Pager — quoted levels ──────────────────────────────────────────────────────
+color quoted    color14 default   # Aurora green
+color quoted1   color8  default   # Frost cyan
+color quoted2   color13 default   # Aurora yellow
+color quoted3   color15 default   # Aurora purple
+color quoted4   color9  default   # Frost blue
 
-# Pager — signature block
-color signature   brightblack     default
+# ── Pager — signature ──────────────────────────────────────────────────────────
+color signature color3  default   # Polar Night 3 (muted)
 
-# Headers
-color hdrdefault  cyan            default
-color header      brightgreen     default "^(From|To|Cc|Bcc):"
-color header      brightblue      default "^Subject:"
-color header      cyan            default "^Date:"
-color header      yellow          default "^X-Spam"
+# ── Headers ────────────────────────────────────────────────────────────────────
+color hdrdefault  color9  default   # Frost blue
+color header      color8  default   "^(From|To|Cc|Bcc):"   # Frost cyan
+color header      color7  default   "^Subject:"             # Frost teal
+color header      color3  default   "^Date:"                # Polar Night 3 (muted)
+color header      color11 default   "^X-Spam"               # Aurora red
 
-# Selected / highlighted row
-color indicator   default         color238
+# ── Body — URLs and addresses ──────────────────────────────────────────────────
+color body  color8  default  "(https?|ftp)://[[:alnum:]/_:;?&=.#@%~,!+-]+"
+color body  color8  default  "[[:alnum:].+-]+@[[:alnum:]_-]+\\.[[:alnum:].]+"
 
-# Sidebar
-color sidebar_new         brightwhite  default
-color sidebar_flagged     yellow       default
-color sidebar_highlight   default      color238
-color sidebar_divider     brightblack  default
-
-# Body — URLs and email addresses
-color body  brightblue  default  "(https?|ftp)://[[:alnum:]/_:;?&=.#@%~,!+-]+"
-color body  brightblue  default  "[[:alnum:].+-]+@[[:alnum:]_-]+\\.[[:alnum:].]+"
-
-# Body — PGP blocks
-color body  brightgreen  default  "^-----BEGIN PGP.*"
-color body  brightgreen  default  "^-----END PGP.*"
-color body  green        default  "^gpg: "
+# ── Body — PGP blocks ──────────────────────────────────────────────────────────
+color body  color14 default  "^-----BEGIN PGP.*"
+color body  color14 default  "^-----END PGP.*"
+color body  color14 default  "^gpg: "
