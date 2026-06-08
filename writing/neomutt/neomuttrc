@@ -29,6 +29,13 @@ set sort_aux     = reverse-last-date-received
 set uncollapse_jump  = yes   # jump to first unread when uncollapsing
 set collapse_unread  = no    # don't collapse threads with unread messages
 
+# ── Status bar ─────────────────────────────────────────────────────────────────
+# %f  = mailbox name   %m = total   %n = new   %F = flagged   %d = deleted
+# %s  = sort method    %P = position percentage   %> = right-align remainder
+set status_chars  = " *%A"
+set status_format = "  %f%?r? [RO]?  %?n?%n new · ?%m messages%?F? · %F flagged?%?d? · %d deleted?  %>  %s · %P  "
+set pager_format  = "  %n · %s  %>  %C / %m · %P  "
+
 # ── Pager ──────────────────────────────────────────────────────────────────────
 set pager_index_lines = 10   # show this many index lines above the pager
 set pager_context     = 3    # lines of context when paging
