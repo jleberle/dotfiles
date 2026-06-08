@@ -74,10 +74,12 @@ firefox :
 	@PROFILE=$$(awk -F= '/^Default=/{print $$2; exit}' \
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null) && \
 	[ -n "$$PROFILE" ] || { echo "ERROR: Firefox profile not found — launch Firefox first"; exit 1; } && \
+	[ -d "$(FIREFOX_DIR)/$$PROFILE" ] || { echo "ERROR: profile directory missing: $(FIREFOX_DIR)/$$PROFILE"; exit 1; } && \
 	echo "Writing user.js → $$PROFILE (Betterfox + overrides)" && \
 	cat $(HOME)/.dotfiles/security/betterfox/user.js \
 	    $(HOME)/.dotfiles/security/user-overrides.js \
-	    > "$(FIREFOX_DIR)/$$PROFILE/user.js"
+	    > "$(FIREFOX_DIR)/$$PROFILE/user.js" && \
+	[ ! -f $(HOME)/.dotfiles/security/user.js ] || { echo "Removing stale security/user.js from repo directory"; rm $(HOME)/.dotfiles/security/user.js; }
 
 betterfox-update :
 	@echo "Updating Betterfox submodule to latest upstream..."
