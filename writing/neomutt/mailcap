@@ -3,7 +3,7 @@
 
 # HTML — render inline as text (auto_view picks the copiousoutput entry);
 # press \Ch from the pager to open in Firefox instead.
-text/html; textutil -stdin -format html -convert txt -stdout; copiousoutput
+text/html; w3m -I %{charset} -T text/html -dump %s; copiousoutput
 text/html; open -a Firefox %s; needsterminal
 
 # Documents

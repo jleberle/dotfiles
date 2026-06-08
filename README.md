@@ -524,6 +524,10 @@ so both `mutt` and `neomutt` launch the client.
 showing a numbered list of all URLs. Navigate with `j`/`k`, press `Enter` to
 open in the browser. Requires `urlscan` (included in the Brewfile).
 
+**HTML rendering** — HTML emails render inline via `w3m`, preserving tables
+and formatting. Press `\Ch` to open in Firefox instead. Requires `w3m`
+(included in the Brewfile).
+
 ---
 
 ## Prose and Pandoc
