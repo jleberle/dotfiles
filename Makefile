@@ -18,7 +18,8 @@ default :
 
 install : git shell security nvim vale brewauto
 	@echo ""
-	@echo "Done. Run 'make firefox' after launching Firefox once."
+	@echo "Run 'make firefox' after launching Firefox once."
+	@echo "Run 'make latex' to install LaTeX packages. Will load slowly"
 	@echo ""
 	@$(MAKE) doctor
 
