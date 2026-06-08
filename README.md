@@ -52,7 +52,10 @@ make install
 # 5. Apply macOS system defaults (keyboard repeat, Finder, Dock, screenshots, etc.)
 make macos
 
-# 6. Write Firefox user.js (requires Firefox launched at least once first)
+# 6. Set fish as the login shell (requires sudo; open a new terminal afterwards)
+make chsh
+
+# 7. Write Firefox user.js (requires Firefox launched at least once first)
 make firefox
 ```
 
@@ -117,6 +120,17 @@ Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `lazygit`,
 `lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
 and `prettier` are all on `PATH`.
 
+### Maintenance
+
+```sh
+make clean
+```
+
+Removes stale directories left over from old repo layouts (`fish/` and
+`general/` at the repo root) that git pull does not clean up automatically.
+Run this once on any machine that had the repo checked out before the
+2026-06-08 restructure.
+
 ---
 
 ## Makefile Options
@@ -135,7 +149,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `betterfox-update` | Pulls latest Betterfox upstream into the submodule; re-run `make firefox` afterwards               |
 | `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)                 |
 | `nvim`             | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                           |
-| `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir                |
+| `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir, runs `vale sync` |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
 | `latex`            | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)          |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
@@ -485,11 +499,10 @@ This setup is tuned for academic / long-form writing in Markdown.
 
 - **Live rendering** in Neovim via `render-markdown.nvim` (LaTeX module
   disabled — no `latex` parser installed).
-- **Linting** via `vale`. `make vale` installs a global `~/.vale.ini` with an
-  absolute `StylesPath` (`~/.local/share/vale/styles`) and the built-in `Vale`
-  style (repetition, spelling, wordiness). No `vale sync` is needed unless you
-  add external packages (proselint, write-good, Microsoft, etc.). A per-project
-  `.vale.ini` placed in a repo overrides the global one.
+- **Linting** via `vale`. `make vale` writes a global `~/.vale.ini` with an
+  absolute `StylesPath` (`~/.local/share/vale/styles`) and runs `vale sync` to
+  download the configured packages: `proselint`, `write-good`, `Readability`,
+  and `alex`. A per-project `.vale.ini` placed in a repo overrides the global one.
 - **Templates** in `writing/pandoc/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
     `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
@@ -563,7 +576,7 @@ Installed by `make security`.
   connection multiplexing for Codeberg (`ControlPath ~/.ssh/control/%C`,
   persisted 10m), no agent/X11 forwarding. Includes a `github-443` fallback
   host alias for networks that block port 22.
-- **GPG** (`security/gpg.conf`, `gpg-agent.conf`, `dirmngr.conf`, `common.conf`):
+- **GPG** (`security/gpg.conf`, `gpg-agent.conf.tmpl`, `dirmngr.conf`, `common.conf`):
   hardened algorithm preferences (AES-256 / SHA-512), strong S2K, `pinentry-mac`,
   `import-minimal`/`export-minimal`, `no-allow-loopback-pinentry`, `use-keyboxd`
   (`common.conf`), privacy-conscious keyserver/dirmngr defaults (LDAP disabled).

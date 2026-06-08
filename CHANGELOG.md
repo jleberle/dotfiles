@@ -5,6 +5,32 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-08 — README reorganization, check system, stale artifact cleanup
+
+### Added
+- `make clean`: removes stale `fish/` and `general/` directories left over
+  from the 2026-06-08 repo restructure on machines that had the repo checked
+  out beforehand — git pull does not remove untracked/gitignored directories
+- `make dots` fish function: run any dotfiles make target from any directory
+- README reorganized into: Quick Start → Check System → Makefile Options →
+  Apps (Ghostty, Fish, Neovim, tmux, Git) → Prose and Pandoc →
+  Scripting (Bin, Launchd) → Security → Repository Layout → Credits
+- Check System is now a dedicated README section covering `doctor`,
+  `macos-check`, `brew-check`, `tools-check`, and `clean`
+
+### Fixed
+- Quick Start numbered steps now include `make chsh` (was only in the
+  per-app table, missing from the sequence)
+- Makefile Options `vale` row now mentions `vale sync`
+- Prose and Pandoc section: corrected stale claim that "No `vale sync` is
+  needed" and "built-in Vale style only" — the config lists four external
+  packages and `make vale` always runs `vale sync`
+- Security section: `gpg-agent.conf` corrected to `gpg-agent.conf.tmpl`
+- `.gitignore`: removed stale `general/gpg-agent.conf` entry (path no longer
+  exists after `general/` was renamed to `security/`)
+
+---
+
 ## 2026-06-08 — New machine automation, Betterfox submodule, macOS defaults
 
 ### Added
