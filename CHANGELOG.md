@@ -5,6 +5,25 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-08 — NeoMutt integration (refined)
+
+### Changed
+- `colors.rc` — fixed incorrect Nord ANSI palette mapping (color1=Aurora red,
+  not Polar Night); indicator is now Snow Storm on Polar Night 3 (readable);
+  status bar is Frost cyan on Polar Night 1
+- `mutt` alias moved from a standalone function file to `conf.d/aliases.fish`
+  alongside `alias vim 'nvim'` where it belongs
+- `mailcap` — HTML emails now render inline via macOS `textutil` (`auto_view`);
+  press `\Ch` to open in Firefox instead
+- `neomuttrc` — added `auto_view text/html`, `alternative_order` (prefer plain
+  text), clean `status_format`/`pager_format` with left/right layout, removed
+  spurious `[RO]` flag, rebound `sidebar-open` from `Ctrl-O` to `B`
+- `accounts/example.rc` — updated to document Apple Mail Keychain conflict
+  (Apple Mail stores iCloud OAuth tokens under the same server keys, causing
+  `security find-internet-password` to return a hex token); direct password
+  with `chmod 600` documented as the reliable approach; `%40` encoding for `@`
+  in `smtp_url`; iCloud-specific settings added
+
 ## 2026-06-08 — NeoMutt integration
 
 ### Added
@@ -20,7 +39,7 @@ individual commit — the git log has the full detail.
   cache dirs, stubs `accounts/local.rc` on first run with a reminder
 - `neomutt` added to `make install` dependency chain
 - `make doctor` check for neomuttrc symlink
-- `mutt` fish function — alias for `neomutt`
+- `mutt` alias for `neomutt` in `conf.d/aliases.fish`
 - `neomutt` added to `homebrew/Brewfile` (alphabetical order)
 - README: NeoMutt subsection under Apps; Makefile Options table updated;
   Quick Start per-app table updated
