@@ -37,7 +37,7 @@ wired to work together.
 xcode-select --install
 
 # 2. Clone this repo to the expected location (~/.dotfiles is hard-coded in the Makefile)
-git clone https://codeberg.org/<you>/dotfiles.git ~/.dotfiles
+git clone --recurse-submodules https://codeberg.org/<you>/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
 # 3. Install Homebrew (if needed) and all apps, CLIs, fonts (Brewfile)
