@@ -69,7 +69,7 @@ Then finish the per-app setup:
 
 ### Verify your setup
 
-Run `make doctor` at any time to check that all symlinks are in place:
+Run `make doctor` at any time to check symlinks, SSH keys, login shell, TPM, vale styles, and GPG key:
 
 ```sh
 make doctor
@@ -107,6 +107,8 @@ just prints a warning) so nothing destructive happens by accident.
 | `latex`    | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)   |
 | `macos`    | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)   |
 | `macos-check` | Reads every key set by `make macos` and warns on any that are missing or wrong value — useful after a macOS upgrade |
+| `brew-check`  | Runs `brew bundle check` to verify every Brewfile package is installed                                              |
+| `tools-check` | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters                      |
 
 ---
 

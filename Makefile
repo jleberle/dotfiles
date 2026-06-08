@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos macos-check doctor
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale latex macos macos-check doctor brew-check tools-check
 
 default :
 	@echo "There is no default for your own safety."
@@ -217,6 +217,24 @@ vale :
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/vale/vale.ini > $(HOME)/.vale.ini
 	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
 	vale sync
+brew-check :
+	@echo "Checking Brewfile packages..."
+	@brew bundle check --file=$(HOME)/.dotfiles/homebrew/brewfile --no-upgrade || \
+	    echo "Run 'make apps' to install missing packages."
+tools-check :
+	@echo "Checking tools..."
+	@command -v delta      >/dev/null 2>&1 || echo "WARNING: delta not found (run: make apps)"
+	@command -v vale       >/dev/null 2>&1 || echo "WARNING: vale not found (run: make apps)"
+	@command -v pandoc     >/dev/null 2>&1 || echo "WARNING: pandoc not found (run: make apps)"
+	@command -v pandoc-crossref >/dev/null 2>&1 || echo "WARNING: pandoc-crossref not found (run: make apps)"
+	@command -v lazygit    >/dev/null 2>&1 || echo "WARNING: lazygit not found (run: make apps)"
+	@command -v lua-language-server >/dev/null 2>&1 || echo "WARNING: lua-language-server not found (run: make apps)"
+	@command -v pyright    >/dev/null 2>&1 || echo "WARNING: pyright not found (run: make apps)"
+	@command -v bash-language-server >/dev/null 2>&1 || echo "WARNING: bash-language-server not found (run: make apps)"
+	@command -v stylua     >/dev/null 2>&1 || echo "WARNING: stylua not found (run: make apps)"
+	@command -v black      >/dev/null 2>&1 || echo "WARNING: black not found (run: make apps)"
+	@command -v prettier   >/dev/null 2>&1 || echo "WARNING: prettier not found (run: make apps)"
+	@echo "Done."
 doctor :
 	@echo "Checking symlinks..."
 	@test -L $(HOME)/.gitconfig                || echo "WARNING: .gitconfig not symlinked (run: make git)"
@@ -232,9 +250,22 @@ doctor :
 	@test -L $(HOME)/.gnupg/common.conf       || echo "WARNING: common.conf not symlinked (run: make security)"
 	@test -L $(HOME)/.config/nvim             || echo "WARNING: nvim config not symlinked (run: make nvim)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
+	@test -d $(HOME)/.local/share/vale/styles && \
+	    ls $(HOME)/.local/share/vale/styles | grep -q . || \
+	    echo "WARNING: vale styles directory empty (run: make vale)"
 	@FFPROFILE=$$(awk -F= '/^Default=/{print $$2; exit}' \
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null); \
 	[ -z "$$FFPROFILE" ] || \
 	test -f "$(FIREFOX_DIR)/$$FFPROFILE/user.js" || \
 	echo "WARNING: Firefox user.js not written (run: make firefox)"
+	@echo "Checking SSH keys..."
+	@test -f $(HOME)/.ssh/id_github           || echo "WARNING: ~/.ssh/id_github not found — generate or copy your key"
+	@test -f $(HOME)/.ssh/id_codeberg        || echo "WARNING: ~/.ssh/id_codeberg not found — generate or copy your key"
+	@echo "Checking shell..."
+	@dscl . -read /Users/$(USER) UserShell 2>/dev/null | grep -qF "$(HOMEBREW_PREFIX)/bin/fish" || \
+	    echo "WARNING: fish is not the login shell (run: make chsh)"
+	@test -d $(HOME)/.tmux/plugins/tpm       || echo "WARNING: TPM not cloned (run: make shell)"
+	@echo "Checking GPG..."
+	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
+	    echo "WARNING: no GPG secret key found — import your key"
 	@echo "Done."
