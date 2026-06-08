@@ -14,23 +14,26 @@ wired to work together.
 
 ## Table of Contents
 
-- [Quick Start (new machine)](#quick-start-new-machine)
-- [Makefile targets](#makefile-targets)
-- [Neovim](#neovim)
-- [tmux](#tmux)
-- [Ghostty](#ghostty)
-- [Fish](#fish)
-- [Git](#git)
-- [Prose & Pandoc workflow](#prose--pandoc-workflow)
-- [Bin scripts](#bin-scripts)
-- [Launchd (scheduled jobs)](#launchd-scheduled-jobs)
-- [SSH / GPG](#ssh--gpg)
-- [Repository layout](#repository-layout)
+- [Quick Start](#quick-start)
+- [Check System](#check-system)
+- [Makefile Options](#makefile-options)
+- [Apps](#apps)
+  - [Ghostty](#ghostty)
+  - [Fish](#fish)
+  - [Neovim](#neovim)
+  - [tmux](#tmux)
+  - [Git](#git)
+- [Prose and Pandoc](#prose-and-pandoc)
+- [Scripting](#scripting)
+  - [Bin](#bin)
+  - [Launchd](#launchd)
+- [Security](#security)
+- [Repository Layout](#repository-layout)
 - [Credits](#credits)
 
 ---
 
-## Quick Start (new machine)
+## Quick Start
 
 ```sh
 # 1. Install the Xcode command-line tools (gives you git)
@@ -49,231 +52,124 @@ make install
 # 5. Apply macOS system defaults (keyboard repeat, Finder, Dock, screenshots, etc.)
 make macos
 
-# 6. Symlink Firefox user.js (requires Firefox launched at least once first)
+# 6. Write Firefox user.js (requires Firefox launched at least once first)
 make firefox
 ```
 
 Then finish the per-app setup:
 
-| App       | One-time step                                                                 |
-|-----------|-------------------------------------------------------------------------------|
-| Firefox   | Launch Firefox once to create the profile, then run `make firefox`                    |
-| Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                       |
-| tmux      | start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM              |
-| Neovim    | launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
-| BasicTeX  | run `make latex` to install the required `tlmgr` packages for PDF export |
-| macOS     | logout and back in for keyboard repeat changes to take full effect |
+| App       | One-time step                                                                               |
+|-----------|---------------------------------------------------------------------------------------------|
+| Firefox   | Launch Firefox once to create the profile, then run `make firefox`                          |
+| Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                             |
+| tmux      | Start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM                           |
+| Neovim    | Launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
+| BasicTeX  | Run `make latex` to install the required `tlmgr` packages for PDF export                   |
+| macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
 > `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
 
-### Verify your setup
+---
 
-Run `make doctor` at any time to check symlinks, SSH keys, login shell, TPM, vale styles, and GPG key:
+## Check System
+
+All check targets print `WARNING: ... (run: make <target>)` for anything
+missing or misconfigured. Use `dots <target>` to run from outside the
+dotfiles directory (see [Fish → Functions](#fish)).
+
+### Symlinks, keys, and shell
 
 ```sh
 make doctor
 ```
 
-Each missing symlink prints a `WARNING` with the exact `make` target to fix it.
-To spot-check key tools are on `PATH`:
+Checks every symlink created by `make install`, plus: SSH keys exist
+(`id_github`, `id_codeberg`), fish is set as the login shell, TPM is cloned,
+vale styles directory is populated, and a GPG secret key is present.
+
+### macOS defaults
 
 ```sh
-nvim --version   # should be ≥ 0.10
-fish --version
-delta --version
+make macos-check
 ```
+
+Reads every key set by `make macos` and warns on any that are missing or set
+to the wrong value. Run this after a macOS version upgrade to catch keys Apple
+silently removed or changed.
+
+### Brewfile packages
+
+```sh
+make brew-check
+```
+
+Runs `brew bundle check` to verify every package in the Brewfile is installed.
+Fast way to spot drift after `brew cleanup` or a fresh clone.
+
+### Tool binaries
+
+```sh
+make tools-check
+```
+
+Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `lazygit`,
+`lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
+and `prettier` are all on `PATH`.
 
 ---
 
-## Makefile targets
+## Makefile Options
 
 Run `make <target>`. There is intentionally **no default** target (`make` alone
 just prints a warning) so nothing destructive happens by accident.
 
-| Target     | What it does                                                                                 |
-|------------|----------------------------------------------------------------------------------------------|
-| `install`  | Runs `git shell security nvim vale brewauto` in order, then `doctor`                          |
-| `chsh`     | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)          |
-| `git`      | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config           |
-| `shell`    | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                 |
-| `security` | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms    |
-| `firefox`  | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) into it |
-| `betterfox-update` | Pulls latest Betterfox upstream into the submodule; re-run `make firefox` afterwards |
-| `apps`     | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)            |
-| `nvim`     | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                     |
-| `vale`     | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir           |
-| `brewauto` | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly              |
-| `latex`    | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)   |
-| `macos`    | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)   |
-| `macos-check` | Reads every key set by `make macos` and warns on any that are missing or wrong value — useful after a macOS upgrade |
-| `brew-check`  | Runs `brew bundle check` to verify every Brewfile package is installed                                              |
-| `tools-check` | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters                      |
+| Target             | What it does                                                                                        |
+|--------------------|-----------------------------------------------------------------------------------------------------|
+| `install`          | Runs `git shell security nvim vale brewauto` in order, then `doctor`                                |
+| `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
+| `git`              | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config                |
+| `shell`            | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                       |
+| `security`         | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms          |
+| `firefox`          | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) |
+| `betterfox-update` | Pulls latest Betterfox upstream into the submodule; re-run `make firefox` afterwards               |
+| `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)                 |
+| `nvim`             | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                           |
+| `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir                |
+| `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
+| `latex`            | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)          |
+| `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
+| `macos-check`      | Reads every key set by `make macos` and warns on any that are missing or wrong value                |
+| `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
+| `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
+| `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, and GPG key                              |
 
 ---
 
-## Neovim
+## Apps
 
-A lean, **prose-first** Neovim config built on `lazy.nvim`. The emphasis is
-fast startup (almost everything is lazy-loaded), Markdown/Pandoc authoring, and
-just enough LSP for the languages used in `bin/` (Lua, Python, Bash).
-
-**Leader key:** `,` (comma)
-
-### Layout
-
-```
-writing/nvim/
-├── init.lua                 # loads the modules below
-├── lazy-lock.json           # pinned plugin commits (committed for reproducibility)
-└── lua/
-    ├── config/
-    │   ├── options.lua      # editor options
-    │   ├── keymaps.lua      # global key mappings
-    │   ├── autocmds.lua     # filetype + focus autocommands
-    │   └── lazy.lua         # bootstraps lazy.nvim
-    └── plugins/
-        ├── ui.lua           # nord theme + lualine
-        ├── editor.lua       # oil, telescope, treesitter, gitsigns
-        ├── completion.lua   # nvim-cmp
-        ├── lsp.lua          # lspconfig + conform (formatting)
-        ├── linting.lua      # nvim-lint (vale)
-        ├── markdown.lua     # render-markdown
-        └── writing.lua      # zen-mode, twilight, mini.nvim
-```
-
-### Key mappings
-
-| Keys          | Mode   | Action                                              |
-|---------------|--------|-----------------------------------------------------|
-| `<leader>w`   | Normal | Write (save) the buffer                             |
-| `<leader>q`   | Normal | Quit the window                                     |
-| `<leader>ff`  | Normal | Telescope **f**ind **f**iles                        |
-| `<leader>fg`  | Normal | Telescope live **g**rep                             |
-| `<leader>fb`  | Normal | Telescope **b**uffers                               |
-| `<leader>z`   | Normal | Toggle **Zen mode** (distraction-free writing)      |
-| `-`           | Normal | Open **Oil** file browser in the current dir        |
-| `<leader>cf`  | Normal | **C**onform **f**ormat the buffer                   |
-| `<leader>ph`  | Normal | **P**andoc export → **H**TML (citeproc + crossref)  |
-| `<leader>pp`  | Normal | **P**andoc export → **P**DF (citeproc + crossref)   |
-| `<CR>`        | Insert | Confirm the selected completion item                |
-
-**From `mini.nvim` (defaults):**
-
-| Keys           | Action                                                        |
-|----------------|---------------------------------------------------------------|
-| `gcc`          | Toggle comment on the current line                            |
-| `gc` + motion  | Toggle comment over a motion / visual selection               |
-| `sa` + motion  | **S**urround **a**dd (e.g. `saiw"` wraps a word in quotes)     |
-| `sd`           | **S**urround **d**elete (`sd"`)                               |
-| `sr`           | **S**urround **r**eplace (`sr"'`)                             |
-| (auto)         | `mini.pairs` auto-closes brackets/quotes                      |
-
-### Notable options (`options.lua`)
-
-| Option                         | Value             | Why                                              |
-|--------------------------------|-------------------|--------------------------------------------------|
-| `clipboard`                    | `unnamedplus`     | Yanks sync with the macOS clipboard / `pbpaste`  |
-| `wrap` + `linebreak`           | on                | Soft-wrap prose at word boundaries               |
-| `textwidth` / `colorcolumn`    | `80` / `81`       | Visual guide for prose width                     |
-| `spell` (per-filetype)         | on for md/text    | Spell-check prose only, not code                 |
-| `conceallevel`                 | `2` (md)          | Lets `render-markdown` hide syntax markers       |
-| `undofile`                     | on                | Persistent undo across sessions                  |
-| `updatetime` / `timeoutlen`    | `250` / `300` ms  | Snappy diagnostics + which-key-style timing      |
-| `ignorecase` + `smartcase`     | on                | Case-insensitive search until you type a capital |
-
-### Plugins
-
-- **Theme/UI:** `gbprod/nord.nvim`, `lualine` (globalstatus).
-- **Navigation:** `telescope` (lazy on `:Telescope`), `oil` (`-`), `gitsigns`.
-- **Syntax:** `nvim-treesitter` (**`main` branch** — parsers install via
-  `:TSInstall`/`:TSUpdate`; highlighting starts per-filetype).
-- **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`
-  (`pairs`, `comment`, `surround`).
-- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls` (loads only for
-  those filetypes).
-- **Completion:** `nvim-cmp` (lsp + buffer + path sources) using the built-in
-  `vim.snippet` expander; loads on `InsertEnter`.
-- **Formatting:** `conform.nvim` — `stylua` (Lua), `black` (Python),
-  `prettier` (Markdown). Trigger with `<leader>cf`.
-- **Linting:** `nvim-lint` runs `vale` on Markdown (read/save) — see
-  [Prose & Pandoc](#prose--pandoc-workflow).
-
-> **Plugin pins:** `lazy-lock.json` is committed so every machine gets the same
-> plugin versions. To update all plugins to their latest commits, run `:Lazy update`
-> inside Neovim, then commit the resulting `lazy-lock.json` change.
-
-> All LSP servers, formatters, and linters are installed by the Brewfile
-> (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`,
-> `black`, `prettier`, `vale`) — there is no Mason layer.
-
----
-
-## tmux
-
-**Prefix:** `Ctrl-a` (remapped from the default `Ctrl-b`). Press `Ctrl-a`
-twice to send a literal `Ctrl-a` to the underlying program.
-
-### Key bindings
-
-| Keys (after prefix unless noted) | Action                                            |
-|----------------------------------|---------------------------------------------------|
-| `-`                              | Split into top/bottom panes (in current dir)      |
-| `_`                              | Split into left/right panes (in current dir)      |
-| `h` / `j` / `k` / `l`            | Move between panes (Vim directions)               |
-| `H` / `J` / `K` / `L`            | Resize the pane by 5 cells (repeatable)           |
-| `c`                              | New window in the current directory               |
-| `Tab`                            | Jump to the last (previous) window                |
-| `z`                              | Zoom / unzoom the current pane                    |
-| `r`                              | Reload `~/.tmux.conf`                              |
-| `I`                              | (TPM) install plugins                             |
-| `Option-h` / `Option-l`          | **No prefix** — previous / next window            |
-
-**Copy mode (Vi keys):** enter with `Ctrl-a [`.
-
-| Keys              | Action                                       |
-|-------------------|----------------------------------------------|
-| `v`               | Begin selection                              |
-| `y`               | Copy selection → macOS clipboard (`pbcopy`)  |
-| mouse drag        | Copy on release → clipboard                  |
-
-### Behavior & options
-
-- **Mouse** support on; **256-color + true color** via `tmux-256color`.
-- `escape-time 0` and `focus-events on` for responsive Neovim integration
-  (the Neovim config calls `checktime` on focus to auto-reload changed files).
-- Windows/panes are **1-indexed** and **renumber** when one closes.
-- `history-limit` is 100,000 lines.
-- `terminal-features` passes **RGB true color**, **colored underlines**
-  (undercurl diagnostics in Neovim), and **cursor-shape** changes through
-  (block in normal, beam in insert).
-- **Plugins** (via TPM): `tpm`, `arcticicestudio/nord-tmux`. The status line
-  is composed from Nord modules (session on the left, date/time on the right).
-
----
-
-## Ghostty
+### Ghostty
 
 The terminal config lives at `shell/ghostty/config` and is symlinked into
 Application Support.
 
-| Setting                        | Value                          | Notes                                          |
-|--------------------------------|--------------------------------|------------------------------------------------|
-| `theme`                        | Nord                           | Matches Neovim, tmux, bat, fzf                 |
-| `font-family` / `font-size`    | JetBrainsMono Nerd Font / 15   | Nerd Font for icons in `eza`, lualine, etc.    |
-| `background-opacity` / blur    | `0.93` / `18`                  | Subtle translucency                            |
-| `copy-on-select`               | `clipboard`                    | Selecting text copies it                       |
-| `macos-option-as-alt`          | `true`                         | Makes `Option` send `Alt` for tmux `M-h`/`M-l` |
-| `mouse-hide-while-typing`      | `true`                         | —                                              |
-| `cursor-style-blink`           | `false`                        | Steady cursor                                  |
-| `window-save-state`            | `always`                       | Restores layout/working dirs after restart     |
-| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Neovim             |
+| Setting                        | Value                          | Notes                                           |
+|--------------------------------|--------------------------------|-------------------------------------------------|
+| `theme`                        | Nord                           | Matches Neovim, tmux, bat, fzf                  |
+| `font-family` / `font-size`    | JetBrainsMono Nerd Font / 15   | Nerd Font for icons in `eza`, lualine, etc.     |
+| `background-opacity` / blur    | `0.93` / `18`                  | Subtle translucency                             |
+| `copy-on-select`               | `clipboard`                    | Selecting text copies it                        |
+| `macos-option-as-alt`          | `true`                         | Makes `Option` send `Alt` for tmux `M-h`/`M-l`  |
+| `mouse-hide-while-typing`      | `true`                         | —                                               |
+| `cursor-style-blink`           | `false`                        | Steady cursor                                   |
+| `window-save-state`            | `always`                       | Restores layout/working dirs after restart      |
+| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Neovim |
 
 > Reload Ghostty config with **`Cmd-Shift-,`**.
 
 ---
 
-## Fish
+### Fish
 
 Configured for speed: external tool initializations (`fzf`, `zoxide`) are
 **cached to disk** and only regenerated when the binary is newer than the
@@ -294,7 +190,7 @@ built into fish, so there are no shell plugins to source or `compinit` to run.
   git branch (Nord yellow), git status indicators (Nord blue), prompt character
   (green ❯ on success, red on error). No external dependency.
 
-### Shell behavior
+#### Shell behavior
 
 - **History:** **shared** across sessions, de-duplicated, and effectively
   unbounded — all by default (no `HISTSIZE`/`SHARE_HISTORY` to configure).
@@ -306,22 +202,22 @@ built into fish, so there are no shell plugins to source or `compinit` to run.
 - **Gaps vs zsh:** fish has no `AUTO_CD` (use `cd`, or zoxide's `z`), no
   `NO_CLOBBER` (`>` overwrites — use `>>`), and no `HIST_IGNORE_SPACE`.
 
-### Keybindings
+#### Keybindings
 
 | Keys                       | Action                                            |
 |----------------------------|---------------------------------------------------|
 | `Ctrl-←` / `Ctrl-→`        | Move by word                                      |
 | `↑` / `↓`                  | History search seeded by what you've typed        |
-| `Ctrl-R`                   | fzf fuzzy history search                           |
-| `Ctrl-T`                   | fzf file picker (uses `fd`, `bat` preview)         |
-| `Alt-C`                    | fzf `cd` into a subdirectory (`eza` tree preview)  |
+| `Ctrl-R`                   | fzf fuzzy history search                          |
+| `Ctrl-T`                   | fzf file picker (uses `fd`, `bat` preview)        |
+| `Alt-C`                    | fzf `cd` into a subdirectory (`eza` tree preview) |
 
-### zoxide
+#### zoxide
 
 `z <partial>` jumps to a frecency-ranked directory; `zi` opens an interactive
 picker.
 
-### Aliases
+#### Aliases
 
 **Editor & files**
 
@@ -341,12 +237,12 @@ picker.
 
 **Safety & navigation**
 
-| Alias                | Expands to                              |
-|----------------------|-----------------------------------------|
+| Alias                | Expands to                               |
+|----------------------|------------------------------------------|
 | `cp` / `mv`          | `cp -i` / `mv -i` (prompt before clobber)|
 | `..` / `...` / `....`| `cd ..` / `cd ../..` / `cd ../../..`     |
-| `reload`             | `exec fish`                             |
-| `paths`              | Print `$PATH` one entry per line        |
+| `reload`             | `exec fish`                              |
+| `paths`              | Print `$PATH` one entry per line         |
 
 **Clipboard & keys**
 
@@ -359,17 +255,17 @@ picker.
 
 **System / network / housekeeping**
 
-| Alias        | Purpose                                                  |
-|--------------|----------------------------------------------------------|
-| `myip`       | Public IP via `ifconfig.me`                              |
-| `ports`      | Listening TCP ports (`lsof`)                             |
-| `network`    | `networkQuality` speed test                              |
-| `disk`       | `df -h` — free/used space per mount                      |
-| `usage`      | `du -sh -- *` — directory sizes in cwd (pairs with `biggest`) |
-| `brewup`     | `brew update && upgrade && cleanup`                      |
-| `flushdns`   | Flush the macOS DNS cache                                |
-| `cleands`    | Delete `.DS_Store` files under the current tree          |
-| `showfiles` / `hidefiles` | Toggle hidden files in Finder               |
+| Alias                     | Purpose                                                       |
+|---------------------------|---------------------------------------------------------------|
+| `myip`                    | Public IP via `ifconfig.me`                                   |
+| `ports`                   | Listening TCP ports (`lsof`)                                  |
+| `network`                 | `networkQuality` speed test                                   |
+| `disk`                    | `df -h` — free/used space per mount                           |
+| `usage`                   | `du -sh -- *` — directory sizes in cwd (pairs with `biggest`) |
+| `brewup`                  | `brew update && upgrade && cleanup`                           |
+| `flushdns`                | Flush the macOS DNS cache                                     |
+| `cleands`                 | Delete `.DS_Store` files under the current tree               |
+| `showfiles` / `hidefiles` | Toggle hidden files in Finder                                 |
 
 **Git**
 
@@ -393,29 +289,169 @@ picker.
 | `gus`  | `git restore --staged` (unstage)                        |
 | `glst` | `git log -1 HEAD` (show last commit)                    |
 
-### Functions (`shell/fish/functions/`)
+#### Functions (`shell/fish/functions/`)
 
 Autoloaded — call them like commands.
 
-| Function                | Usage / behavior                                                          |
-|-------------------------|---------------------------------------------------------------------------|
+| Function                | Usage / behavior                                                                      |
+|-------------------------|---------------------------------------------------------------------------------------|
 | `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
-| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)        |
-| `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim |
-| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                      |
-| `cdf`                   | `cd` to the directory open in the front Finder window                     |
-| `fn <text>`             | List files whose name contains `<text>` (recursive glob)                  |
-| `fuck`                  | Re-run the previous command under `sudo`                                  |
-| `gpg-master-import`     | Import the offline GPG master key from USB for editing                    |
-| `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only              |
-| `mkd <dir>`             | `mkdir -p` then `cd` into it                                              |
-| `o [paths]`             | `open` the current dir (no args) or the given paths                       |
-| `pman <cmd>`            | Open a man page rendered as a PDF in Preview                              |
-| `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)           |
+| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
+| `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim             |
+| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
+| `cdf`                   | `cd` to the directory open in the front Finder window                                 |
+| `fn <text>`             | List files whose name contains `<text>` (recursive glob)                              |
+| `fuck`                  | Re-run the previous command under `sudo`                                              |
+| `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |
+| `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only                          |
+| `mkd <dir>`             | `mkdir -p` then `cd` into it                                                          |
+| `o [paths]`             | `open` the current dir (no args) or the given paths                                   |
+| `pman <cmd>`            | Open a man page rendered as a PDF in Preview                                          |
+| `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)                       |
 
 ---
 
-## Git
+### Neovim
+
+A lean, **prose-first** Neovim config built on `lazy.nvim`. The emphasis is
+fast startup (almost everything is lazy-loaded), Markdown/Pandoc authoring, and
+just enough LSP for the languages used in `bin/` (Lua, Python, Bash).
+
+**Leader key:** `,` (comma)
+
+#### Layout
+
+```
+writing/nvim/
+├── init.lua                 # loads the modules below
+├── lazy-lock.json           # pinned plugin commits (committed for reproducibility)
+└── lua/
+    ├── config/
+    │   ├── options.lua      # editor options
+    │   ├── keymaps.lua      # global key mappings
+    │   ├── autocmds.lua     # filetype + focus autocommands
+    │   └── lazy.lua         # bootstraps lazy.nvim
+    └── plugins/
+        ├── ui.lua           # nord theme + lualine
+        ├── editor.lua       # oil, telescope, treesitter, gitsigns
+        ├── completion.lua   # nvim-cmp
+        ├── lsp.lua          # lspconfig + conform (formatting)
+        ├── linting.lua      # nvim-lint (vale)
+        ├── markdown.lua     # render-markdown
+        └── writing.lua      # zen-mode, twilight, mini.nvim
+```
+
+#### Key mappings
+
+| Keys          | Mode   | Action                                              |
+|---------------|--------|-----------------------------------------------------|
+| `<leader>w`   | Normal | Write (save) the buffer                             |
+| `<leader>q`   | Normal | Quit the window                                     |
+| `<leader>ff`  | Normal | Telescope **f**ind **f**iles                        |
+| `<leader>fg`  | Normal | Telescope live **g**rep                             |
+| `<leader>fb`  | Normal | Telescope **b**uffers                               |
+| `<leader>z`   | Normal | Toggle **Zen mode** (distraction-free writing)      |
+| `-`           | Normal | Open **Oil** file browser in the current dir        |
+| `<leader>cf`  | Normal | **C**onform **f**ormat the buffer                   |
+| `<leader>ph`  | Normal | **P**andoc export → **H**TML (citeproc + crossref)  |
+| `<leader>pp`  | Normal | **P**andoc export → **P**DF (citeproc + crossref)   |
+| `<CR>`        | Insert | Confirm the selected completion item                |
+
+**From `mini.nvim` (defaults):**
+
+| Keys           | Action                                                        |
+|----------------|---------------------------------------------------------------|
+| `gcc`          | Toggle comment on the current line                            |
+| `gc` + motion  | Toggle comment over a motion / visual selection               |
+| `sa` + motion  | **S**urround **a**dd (e.g. `saiw"` wraps a word in quotes)    |
+| `sd`           | **S**urround **d**elete (`sd"`)                               |
+| `sr`           | **S**urround **r**eplace (`sr"'`)                             |
+| (auto)         | `mini.pairs` auto-closes brackets/quotes                      |
+
+#### Notable options (`options.lua`)
+
+| Option                         | Value             | Why                                              |
+|--------------------------------|-------------------|--------------------------------------------------|
+| `clipboard`                    | `unnamedplus`     | Yanks sync with the macOS clipboard / `pbpaste`  |
+| `wrap` + `linebreak`           | on                | Soft-wrap prose at word boundaries               |
+| `textwidth` / `colorcolumn`    | `80` / `81`       | Visual guide for prose width                     |
+| `spell` (per-filetype)         | on for md/text    | Spell-check prose only, not code                 |
+| `conceallevel`                 | `2` (md)          | Lets `render-markdown` hide syntax markers       |
+| `undofile`                     | on                | Persistent undo across sessions                  |
+| `updatetime` / `timeoutlen`    | `250` / `300` ms  | Snappy diagnostics + which-key-style timing      |
+| `ignorecase` + `smartcase`     | on                | Case-insensitive search until you type a capital |
+
+#### Plugins
+
+- **Theme/UI:** `gbprod/nord.nvim`, `lualine` (globalstatus).
+- **Navigation:** `telescope` (lazy on `:Telescope`), `oil` (`-`), `gitsigns`.
+- **Syntax:** `nvim-treesitter` (**`main` branch** — parsers install
+  automatically on first launch; highlighting starts per-filetype).
+- **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`
+  (`pairs`, `comment`, `surround`).
+- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls` (loads only for
+  those filetypes).
+- **Completion:** `nvim-cmp` (lsp + buffer + path sources) using the built-in
+  `vim.snippet` expander; loads on `InsertEnter`.
+- **Formatting:** `conform.nvim` — `stylua` (Lua), `black` (Python),
+  `prettier` (Markdown). Trigger with `<leader>cf`.
+- **Linting:** `nvim-lint` runs `vale` on Markdown (read/save) — see
+  [Prose and Pandoc](#prose-and-pandoc).
+
+> **Plugin pins:** `lazy-lock.json` is committed so every machine gets the same
+> plugin versions. To update all plugins to their latest commits, run `:Lazy update`
+> inside Neovim, then commit the resulting `lazy-lock.json` change.
+
+> All LSP servers, formatters, and linters are installed by the Brewfile
+> (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`,
+> `black`, `prettier`, `vale`) — there is no Mason layer.
+
+---
+
+### tmux
+
+**Prefix:** `Ctrl-a` (remapped from the default `Ctrl-b`). Press `Ctrl-a`
+twice to send a literal `Ctrl-a` to the underlying program.
+
+#### Key bindings
+
+| Keys (after prefix unless noted) | Action                                            |
+|----------------------------------|---------------------------------------------------|
+| `-`                              | Split into top/bottom panes (in current dir)      |
+| `_`                              | Split into left/right panes (in current dir)      |
+| `h` / `j` / `k` / `l`           | Move between panes (Vim directions)               |
+| `H` / `J` / `K` / `L`           | Resize the pane by 5 cells (repeatable)           |
+| `c`                              | New window in the current directory               |
+| `Tab`                            | Jump to the last (previous) window                |
+| `z`                              | Zoom / unzoom the current pane                    |
+| `r`                              | Reload `~/.tmux.conf`                             |
+| `I`                              | (TPM) install plugins                             |
+| `Option-h` / `Option-l`         | **No prefix** — previous / next window            |
+
+**Copy mode (Vi keys):** enter with `Ctrl-a [`.
+
+| Keys              | Action                                       |
+|-------------------|----------------------------------------------|
+| `v`               | Begin selection                              |
+| `y`               | Copy selection → macOS clipboard (`pbcopy`)  |
+| mouse drag        | Copy on release → clipboard                  |
+
+#### Behavior & options
+
+- **Mouse** support on; **256-color + true color** via `tmux-256color`.
+- `escape-time 0` and `focus-events on` for responsive Neovim integration
+  (the Neovim config calls `checktime` on focus to auto-reload changed files).
+- Windows/panes are **1-indexed** and **renumber** when one closes.
+- `history-limit` is 100,000 lines.
+- `terminal-features` passes **RGB true color**, **colored underlines**
+  (undercurl diagnostics in Neovim), and **cursor-shape** changes through
+  (block in normal, beam in insert).
+- **Plugins** (via TPM): `tpm`, `arcticicestudio/nord-tmux`. The status line
+  is composed from Nord modules (session on the left, date/time on the right).
+
+---
+
+### Git
 
 GPG commit/tag **signing** is enabled (`gpg.format = openpgp`, signing key is
 the GPG primary key fingerprint). The same key is registered on both GitHub and
@@ -428,7 +464,7 @@ before `make git` is run, or `git diff`/`git log` will fail. `make apps` install
 `help.autocorrect = prompt`, `init.defaultBranch = main`, branches sorted by
 most-recent commit.
 
-### Git aliases
+#### Git aliases
 
 | Alias         | Command                                                          |
 |---------------|------------------------------------------------------------------|
@@ -442,7 +478,7 @@ most-recent commit.
 
 ---
 
-## Prose & Pandoc workflow
+## Prose and Pandoc
 
 This setup is tuned for academic / long-form writing in Markdown.
 
@@ -483,30 +519,30 @@ make latex
 
 ---
 
-## Bin scripts
+## Scripting
 
-On `PATH` via `shell/fish/conf.d/env.fish`. The Python scripts use
-[`uv`](https://docs.astral.sh/uv/)'s inline (PEP 723) dependencies — no venv to
-manage.
+### Bin
 
-| Script                | Purpose                                                                  |
-|-----------------------|--------------------------------------------------------------------------|
-| `ipic -i\|-m\|-a\|-f\|-t\|-b TERM` | Build an HTML gallery of iTunes/App Store artwork and open it. Flags: `-i` iOS app, `-m` Mac app, `-a` album, `-f` film, `-t` TV, `-b` book. |
-| `waybackup <URL>`     | Save a URL to the Internet Archive Wayback Machine; prints the snapshot URL. |
-| `homebrewupdate.sh`   | `brew update` + `outdated` + `upgrade`, with timestamped log output.     |
-| `homebrewlogclean.sh` | Delete the update log — but only on the **first Monday** of the month.   |
+Scripts in `bin/` are on `PATH` via `shell/fish/conf.d/env.fish`. The Python
+scripts use [`uv`](https://docs.astral.sh/uv/)'s inline (PEP 723) dependencies
+— no venv to manage.
 
----
+| Script                              | Purpose                                                                                                              |
+|-------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| `ipic -i\|-m\|-a\|-f\|-t\|-b TERM`  | Build an HTML gallery of iTunes/App Store artwork and open it. Flags: `-i` iOS app, `-m` Mac app, `-a` album, `-f` film, `-t` TV, `-b` book. |
+| `waybackup <URL>`                   | Save a URL to the Internet Archive Wayback Machine; prints the snapshot URL.                                         |
+| `homebrewupdate.sh`                 | `brew update` + `outdated` + `upgrade`, with timestamped log output.                                                 |
+| `homebrewlogclean.sh`               | Delete the update log — but only on the **first Monday** of the month.                                               |
 
-## Launchd (scheduled jobs)
+### Launchd
 
 `make brewauto` installs two user LaunchAgents (`__HOME__` is substituted with
 your real home at install time):
 
-| Agent                             | Schedule          | Runs                    |
-|-----------------------------------|-------------------|-------------------------|
-| `org.jaredeberle.brewupdate`      | Mondays 09:00     | `bin/homebrewupdate.sh` |
-| `org.jaredeberle.brewlogclean`    | Mondays 08:00     | `bin/homebrewlogclean.sh` (self-gates to the first Monday) |
+| Agent                             | Schedule       | Runs                                                                  |
+|-----------------------------------|----------------|-----------------------------------------------------------------------|
+| `org.jaredeberle.brewupdate`      | Mondays 09:00  | `bin/homebrewupdate.sh`                                               |
+| `org.jaredeberle.brewlogclean`    | Mondays 08:00  | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
 
 Logs accumulate at `~/.local/brew_update_logs.txt`. Trigger a run on demand:
 
@@ -516,15 +552,10 @@ launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
 
 ---
 
-## SSH / GPG
+## Security
 
 Installed by `make security`.
 
-- **Firefox** (`security/betterfox/` submodule + `security/user-overrides.js`): `make firefox`
-  concatenates both into a single `user.js` written to the active Firefox profile.
-  Personal overrides (Smoothfox scroll tuning, DoH/NextDNS, shutdown sanitizing, etc.) live in
-  `user-overrides.js` — Betterfox itself is never edited. To update Betterfox: `make betterfox-update`,
-  review the diff, then `make firefox`.
 - **SSH** (`security/ssh-config`): dedicated key per host (`id_github`,
   `id_codeberg`), modern crypto only (curve25519, chacha20-poly1305 / AES-GCM),
   `IdentitiesOnly`, agent + Keychain integration, strict host-key checking,
@@ -541,10 +572,16 @@ Installed by `make security`.
   functions handle the import-edit-cleanup cycle for the offline master key.
   `gpg-master-done` detects the machine (Leia/Ahsoka) and reimports only the
   correct machine-specific subkeys.
+- **Firefox** (`security/betterfox/` submodule + `security/user-overrides.js`):
+  `make firefox` concatenates both into a single `user.js` written to the active
+  Firefox profile. Personal overrides (Smoothfox scroll tuning, DoH/NextDNS,
+  shutdown sanitizing, etc.) live in `user-overrides.js` — Betterfox itself is
+  never edited. To update Betterfox: `make betterfox-update`, review the diff,
+  then `make firefox`.
 
 ---
 
-## Repository layout
+## Repository Layout
 
 ```
 .dotfiles/
