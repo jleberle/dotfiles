@@ -71,6 +71,7 @@ security :
 	    { echo "ERROR: gpg-agent.conf.tmpl not found — run: git pull"; exit 1; }
 	@[ -d "$(HOME)/.gnupg" ] && [ -w "$(HOME)/.gnupg" ] || \
 	    { echo "ERROR: $(HOME)/.gnupg is not a writable directory — check for a broken symlink or permission issue"; exit 1; }
+	rm -f $(HOME)/.gnupg/gpg-agent.conf
 	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(HOME)/.dotfiles/security/gpg-agent.conf.tmpl > $(HOME)/.gnupg/gpg-agent.conf
 	chmod 600 $(HOME)/.gnupg/gpg-agent.conf
 	ln -sf $(HOME)/.dotfiles/security/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
@@ -265,7 +266,7 @@ doctor :
 	@test -L $(HOME)/.config/bat/config       || echo "WARNING: bat config not symlinked (run: make shell)"
 	@test -L $(HOME)/.ssh/config              || echo "WARNING: ssh config not symlinked (run: make security)"
 	@test -L $(HOME)/.gnupg/gpg.conf          || echo "WARNING: gpg.conf not symlinked (run: make security)"
-	@test -f $(HOME)/.gnupg/gpg-agent.conf    || echo "WARNING: gpg-agent.conf not written (run: make security)"
+	@if [ -L "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf is a broken symlink (run: make security)"; elif [ ! -f "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf not written (run: make security)"; fi
 	@test -L $(HOME)/.gnupg/common.conf       || echo "WARNING: common.conf not symlinked (run: make security)"
 	@test -L $(HOME)/.config/nvim             || echo "WARNING: nvim config not symlinked (run: make nvim)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
