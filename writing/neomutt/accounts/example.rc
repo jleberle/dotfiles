@@ -4,19 +4,20 @@
 # Copy this file to ~/.config/neomutt/accounts/local.rc and fill in your
 # details. That path is NOT tracked by git (credentials are sensitive).
 #
-# Passwords: use one of the two approaches below.
+# Passwords — store in Keychain using a custom service name so the entry does
+# not conflict with Apple Mail's OAuth tokens (which are stored under the actual
+# server hostnames and will be returned instead of your app-specific password):
 #
-# Option A — direct (simplest, works alongside Apple Mail):
-#   set imap_pass = "xxxx-xxxx-xxxx-xxxx"   # app-specific password
-#   chmod 600 ~/.config/neomutt/accounts/local.rc
+#   read -sp "IMAP password: " PASS && \
+#     security add-internet-password -s "neomutt-imap" -a "neomutt" \
+#       -T /usr/bin/security -w "$PASS"
 #
-# Option B — macOS Keychain (only works if Apple Mail is NOT configured for
-#   the same account; Apple Mail stores OAuth tokens under the same server
-#   keys and security find-internet-password will return those instead):
-#   security add-internet-password -l "NeoMutt IMAP" \
-#     -s imap.example.com -a you@example.com -T /usr/bin/security -w
-#   set imap_pass = `security find-internet-password \
-#     -s imap.example.com -a you@example.com -l "NeoMutt IMAP" -w 2>/dev/null`
+#   read -sp "SMTP password: " PASS && \
+#     security add-internet-password -s "neomutt-smtp" -a "neomutt" \
+#       -T /usr/bin/security -w "$PASS"
+#
+# Then reference them as shown below. The -T flag allows /usr/bin/security to
+# read the entry without a Keychain prompt.
 #
 # iCloud Mail servers (custom domain or @icloud.com):
 #   IMAP: imap.mail.me.com:993   SMTP: smtp.mail.me.com:587
@@ -30,7 +31,7 @@ set from     = "you@example.com"
 # IMAP
 set folder    = "imaps://imap.example.com/"
 set imap_user = "you@example.com"
-set imap_pass = "xxxx-xxxx-xxxx-xxxx"   # app-specific password
+set imap_pass = `security find-internet-password -s "neomutt-imap" -a "neomutt" -w 2>/dev/null`
 
 # Default mailboxes
 set spoolfile = +INBOX
@@ -41,7 +42,7 @@ mailboxes =INBOX =Sent =Drafts =Trash =Archive
 
 # SMTP (encode @ in username as %40)
 set smtp_url  = "smtp://you%40example.com@smtp.example.com:587/"
-set smtp_pass = "xxxx-xxxx-xxxx-xxxx"
+set smtp_pass = `security find-internet-password -s "neomutt-smtp" -a "neomutt" -w 2>/dev/null`
 
 # TLS
 set ssl_starttls  = yes
