@@ -8,13 +8,13 @@
 # not conflict with Apple Mail's OAuth tokens (which are stored under the actual
 # server hostnames and will be returned instead of your app-specific password):
 #
-#   read -sp "IMAP password: " PASS && \
-#     security add-internet-password -s "neomutt-imap" -a "neomutt" \
-#       -T /usr/bin/security -w "$PASS"
+#   read -s -P "IMAP password: " PASS
+#   security add-internet-password -s "neomutt-imap" -a "neomutt" \
+#     -T /usr/bin/security -w $PASS
 #
-#   read -sp "SMTP password: " PASS && \
-#     security add-internet-password -s "neomutt-smtp" -a "neomutt" \
-#       -T /usr/bin/security -w "$PASS"
+#   read -s -P "SMTP password: " PASS
+#   security add-internet-password -s "neomutt-smtp" -a "neomutt" \
+#     -T /usr/bin/security -w $PASS
 #
 # Then reference them as shown below. The -T flag allows /usr/bin/security to
 # read the entry without a Keychain prompt.
