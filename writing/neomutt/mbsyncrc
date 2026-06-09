@@ -1,4 +1,4 @@
-# mbsync configuration — mailbox.org → ~/Mail/mailbox
+# mbsync configuration — mailbox.org → ~/.mail/mailbox
 # Copy to ~/.mbsyncrc and set User to your mailbox.org login address.
 # Run: mbsync -a    to sync all channels
 #      mbsync mailbox   to sync one channel
@@ -15,8 +15,8 @@ Account mailbox
 
 MaildirStore mailbox-local
 SubFolders Verbatim
-Path ~/Mail/mailbox/
-Inbox ~/Mail/mailbox/INBOX
+Path ~/.mail/mailbox/
+Inbox ~/.mail/mailbox/INBOX
 
 Channel mailbox
 Far :mailbox-remote:
