@@ -31,7 +31,7 @@ set from     = "you@example.com"
 # IMAP
 set folder    = "imaps://imap.example.com/"
 set imap_user = "you@example.com"
-set imap_pass = `security find-internet-password -s "neomutt-imap" -a "neomutt" -w 2>/dev/null`
+set imap_pass = `security find-internet-password -s "neomutt-imap" -a "neomutt" -w 2>/dev/null | tr -d '\n'`
 
 # Default mailboxes
 set spoolfile = +INBOX
@@ -42,7 +42,7 @@ mailboxes =INBOX =Sent =Drafts =Trash =Archive
 
 # SMTP (encode @ in username as %40)
 set smtp_url  = "smtp://you%40example.com@smtp.example.com:587/"
-set smtp_pass = `security find-internet-password -s "neomutt-smtp" -a "neomutt" -w 2>/dev/null`
+set smtp_pass = `security find-internet-password -s "neomutt-smtp" -a "neomutt" -w 2>/dev/null | tr -d '\n'`
 
 # TLS
 set ssl_starttls  = yes
