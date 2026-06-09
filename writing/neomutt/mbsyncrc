@@ -1,0 +1,26 @@
+# mbsync configuration — mailbox.org → ~/Mail/mailbox
+# Copy to ~/.mbsyncrc and set User to your mailbox.org login address.
+# Run: mbsync -a    to sync all channels
+#      mbsync mailbox   to sync one channel
+
+IMAPAccount mailbox
+Host imap.mailbox.org
+User you@mailbox.org
+PassCmd "security find-internet-password -s 'mbox-imap' -a 'neomutt' -w 2>/dev/null | tr -d '\n'"
+SSLType IMAPS
+
+IMAPStore mailbox-remote
+Account mailbox
+
+MaildirStore mailbox-local
+SubFolders Verbatim
+Path ~/Mail/mailbox/
+Inbox ~/Mail/mailbox/INBOX
+
+Channel mailbox
+Far :mailbox-remote:
+Near :mailbox-local:
+Patterns *
+Create Near
+Expunge Near
+SyncState *

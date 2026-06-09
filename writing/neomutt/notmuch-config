@@ -1,0 +1,17 @@
+[database]
+path=~/Mail
+
+[user]
+name=Your Name
+primary_email=you@yourdomain.com
+other_email=you@mailbox.org;
+
+[new]
+tags=unread;inbox;
+ignore=.mbsyncstate;.uidvalidity;
+
+[search]
+exclude_tags=deleted;spam;
+
+[maildir]
+synchronize_flags=true

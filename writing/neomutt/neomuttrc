@@ -112,6 +112,9 @@ macro index,pager \Cu "|urlscan<enter>" "extract URLs from message"
 macro attach,compose \Ch "<pipe-entry>open -a Firefox<enter>" \
     "open HTML attachment in Firefox"
 
+# Search with notmuch (requires nm_default_url in local.rc)
+macro index \Cf "<vfolder-from-query>" "search mail with notmuch"
+
 # ── Account configuration ───────────────────────────────────────────────────────
 # Per-account settings live in ~/.config/neomutt/accounts/local.rc (not tracked
 # by git). Copy ~/.dotfiles/writing/neomutt/accounts/example.rc there to start.

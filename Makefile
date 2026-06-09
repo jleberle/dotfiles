@@ -231,6 +231,7 @@ neomutt :
 	mkdir -p $(HOME)/.config/neomutt/accounts
 	mkdir -p $(HOME)/.cache/neomutt/headers
 	mkdir -p $(HOME)/.cache/neomutt/messages
+	mkdir -p $(HOME)/Mail
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/neomuttrc $(HOME)/.config/neomutt/neomuttrc
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/gpg.rc    $(HOME)/.config/neomutt/gpg.rc
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/colors.rc $(HOME)/.config/neomutt/colors.rc
@@ -239,6 +240,12 @@ neomutt :
 	    { printf '# NeoMutt account config — fill in your details.\n# See ~/.dotfiles/writing/neomutt/accounts/example.rc\n' \
 	        > "$(HOME)/.config/neomutt/accounts/local.rc"; \
 	      echo "REMINDER: edit ~/.config/neomutt/accounts/local.rc with your account details"; }
+	@[ -f "$(HOME)/.mbsyncrc" ] || \
+	    { cp $(HOME)/.dotfiles/writing/neomutt/mbsyncrc $(HOME)/.mbsyncrc; \
+	      echo "REMINDER: edit ~/.mbsyncrc and set User to your mailbox.org login"; }
+	@[ -f "$(HOME)/.notmuch-config" ] || \
+	    { cp $(HOME)/.dotfiles/writing/neomutt/notmuch-config $(HOME)/.notmuch-config; \
+	      echo "REMINDER: edit ~/.notmuch-config with your name and email, then run: notmuch new"; }
 	@echo "NeoMutt configured."
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
@@ -284,6 +291,8 @@ doctor :
 	@test -L $(HOME)/.gnupg/common.conf       || echo "WARNING: common.conf not symlinked (run: make security)"
 	@test -L $(HOME)/.config/nvim             || echo "WARNING: nvim config not symlinked (run: make nvim)"
 	@test -L $(HOME)/.config/neomutt/neomuttrc || echo "WARNING: neomuttrc not symlinked (run: make neomutt)"
+	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
+	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
 	@test -d $(HOME)/.local/share/vale/styles && \
 	    ls $(HOME)/.local/share/vale/styles | grep -q . || \
