@@ -36,7 +36,7 @@ set folder   = ~/Mail/mailbox
 set mbox_type = Maildir
 
 # Notmuch
-set nm_default_url = "notmuch://~/Mail"
+set nm_default_url = "notmuch:///Users/your-username/Mail"
 
 # Mailboxes (real folders synced by mbsync)
 set spoolfile = +INBOX

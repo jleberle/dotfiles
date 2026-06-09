@@ -1,5 +1,5 @@
 [database]
-path=~/Mail
+path=/Users/your-username/Mail
 
 [user]
 name=Your Name
