@@ -101,6 +101,9 @@ bind index,pager r  reply
 bind index,pager R  group-reply
 bind index,pager L  list-reply
 
+# Archive current message
+macro index,pager A "<save-message>=Archive<enter>" "archive message"
+
 # Mark all as read
 macro index \Cr "T~U<enter><tag-prefix><clear-flag>N<untag-pattern>.<enter>" \
     "mark all messages as read"
