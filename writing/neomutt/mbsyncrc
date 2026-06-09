@@ -8,6 +8,7 @@ Host imap.mailbox.org
 User you@mailbox.org
 PassCmd "security find-internet-password -s 'mbox-imap' -a 'neomutt' -w 2>/dev/null | tr -d '\n'"
 TLSType IMAPS
+AuthMechs LOGIN
 
 IMAPStore mailbox-remote
 Account mailbox
