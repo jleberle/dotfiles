@@ -231,7 +231,7 @@ neomutt :
 	mkdir -p $(HOME)/.config/neomutt/accounts
 	mkdir -p $(HOME)/.cache/neomutt/headers
 	mkdir -p $(HOME)/.cache/neomutt/messages
-	mkdir -p $(HOME)/.mail/mailbox
+	mkdir -p $(HOME)/.mail/proton
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/neomuttrc $(HOME)/.config/neomutt/neomuttrc
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/gpg.rc    $(HOME)/.config/neomutt/gpg.rc
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/colors.rc $(HOME)/.config/neomutt/colors.rc
@@ -242,7 +242,7 @@ neomutt :
 	      echo "REMINDER: edit ~/.config/neomutt/accounts/local.rc with your account details"; }
 	@[ -f "$(HOME)/.mbsyncrc" ] || \
 	    { cp $(HOME)/.dotfiles/writing/neomutt/mbsyncrc $(HOME)/.mbsyncrc; \
-	      echo "REMINDER: edit ~/.mbsyncrc and set User to your mailbox.org login"; }
+	      echo "REMINDER: edit ~/.mbsyncrc and set User to your Proton Bridge email"; }
 	@[ -f "$(HOME)/.notmuch-config" ] || \
 	    { cp $(HOME)/.dotfiles/writing/neomutt/notmuch-config $(HOME)/.notmuch-config; \
 	      echo "REMINDER: edit ~/.notmuch-config with your name and email, then run: notmuch new"; }

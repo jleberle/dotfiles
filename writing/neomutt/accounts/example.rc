@@ -1,30 +1,32 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# NeoMutt account configuration template — mailbox.org + local Maildir
+# NeoMutt account configuration template — Proton Mail via Bridge + local Maildir
 #
 # Copy to ~/.config/neomutt/accounts/local.rc and fill in your details.
 # That path is NOT tracked by git (credentials are sensitive).
 #
 # Prerequisites (one-time setup):
 #
-#   1. Edit ~/.mbsyncrc — set User to your mailbox.org login address
+#   1. Install and sign in to Proton Bridge. It must be running to sync mail.
+#
+#   2. Edit ~/.mbsyncrc — set User to your Proton Bridge email address.
 #      Template: ~/.dotfiles/writing/neomutt/mbsyncrc (copied by make neomutt)
 #
-#   2. Edit ~/.notmuch-config — set name and primary_email
+#   3. Edit ~/.notmuch-config — set name and primary_email.
 #      Template: ~/.dotfiles/writing/neomutt/notmuch-config (copied by make neomutt)
 #
-#   3. Store SMTP password in Keychain:
-#        read -s -P "SMTP password: " PASS
-#        security add-internet-password -s "mbox-smtp" -a "neomutt" \
+#   4. Store the Bridge password in Keychain (same password for IMAP and SMTP):
+#        read -s -P "Bridge password: " PASS
+#        security add-internet-password -s "proton-bridge" -a "neomutt" \
 #          -T /usr/bin/security -w $PASS
 #
-#   4. Initial sync:
+#   5. Initial sync:
 #        mbsync -a && notmuch new
 #
 # Ongoing sync: run `mailsync` (fish function) or mbsync -a && notmuch new
 #
-# mailbox.org servers:
-#   IMAP handled by mbsync (~/.mbsyncrc) — not configured here
-#   SMTP: smtp.mailbox.org:587
+# Proton Bridge servers (local):
+#   IMAP: 127.0.0.1:1143  (handled by mbsync — not configured here)
+#   SMTP: 127.0.0.1:1025
 # ──────────────────────────────────────────────────────────────────────────────
 
 # Identity
@@ -32,17 +34,17 @@ set realname = "Your Name"
 set from     = "you@yourdomain.com"
 
 # Local Maildir (synced by mbsync — no IMAP credentials needed here)
-set folder   = ~/.mail/mailbox
+set folder    = ~/.mail/proton
 set mbox_type = Maildir
 
-# Notmuch
+# Notmuch — must be an absolute path (~ is not expanded)
 set nm_default_url = "notmuch:///Users/your-username/.mail"
 
 # Mailboxes (real folders synced by mbsync)
 set spoolfile = +INBOX
 set postponed = +Drafts
 set trash     = +Trash
-# mailbox.org SMTP saves sent mail server-side; unset record to avoid duplicates.
+# Proton Bridge mirrors sent mail server-side; unset record to avoid duplicates.
 # Set record = +Sent if you prefer NeoMutt to save a local copy immediately.
 unset record
 mailboxes =INBOX =Sent =Drafts =Trash =Spam =Archive
@@ -52,8 +54,8 @@ virtual-mailboxes \
     "Unread"  "notmuch://?query=tag:unread" \
     "Flagged" "notmuch://?query=tag:flagged"
 
-# SMTP (authenticate with mailbox.org login, even if From uses a custom domain)
-set smtp_url  = "smtp://you%40mailbox.org@smtp.mailbox.org:587/"
-set smtp_pass = "`security find-internet-password -s mbox-smtp -a neomutt -w 2>/dev/null | tr -d '\n'`"
+# SMTP via Proton Bridge (Bridge must be running)
+set smtp_url  = "smtp://you%40proton.me@127.0.0.1:1025/"
+set smtp_pass = "`security find-internet-password -s proton-bridge -a neomutt -w 2>/dev/null | tr -d '\n'`"
 set ssl_starttls  = yes
 set ssl_force_tls = yes

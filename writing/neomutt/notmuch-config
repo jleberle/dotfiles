@@ -4,7 +4,7 @@ path=/Users/your-username/.mail
 [user]
 name=Your Name
 primary_email=you@yourdomain.com
-other_email=you@mailbox.org;
+other_email=you@proton.me;
 
 [new]
 tags=unread;inbox;

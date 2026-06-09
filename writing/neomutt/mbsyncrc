@@ -1,26 +1,34 @@
-# mbsync configuration — mailbox.org → ~/.mail/mailbox
-# Copy to ~/.mbsyncrc and set User to your mailbox.org login address.
-# Run: mbsync -a    to sync all channels
-#      mbsync mailbox   to sync one channel
+# mbsync configuration — Proton Mail via Bridge → ~/.mail/proton
+# Proton Bridge must be running before syncing.
+# The Bridge generates a single password used for both IMAP and SMTP.
+#
+# Store it in Keychain once:
+#   read -s -P "Bridge password: " PASS
+#   security add-internet-password -s "proton-bridge" -a "neomutt" \
+#     -T /usr/bin/security -w $PASS
+#
+# Run: mbsync -a        to sync all channels
+#      mbsync proton    to sync one channel
 
-IMAPAccount mailbox
-Host imap.mailbox.org
-User you@mailbox.org
-PassCmd "security find-internet-password -s 'mbox-imap' -a 'neomutt' -w 2>/dev/null | tr -d '\n'"
-TLSType IMAPS
+IMAPAccount proton
+Host 127.0.0.1
+Port 1143
+User you@proton.me
+PassCmd "security find-internet-password -s 'proton-bridge' -a 'neomutt' -w 2>/dev/null | tr -d '\n'"
+TLSType STARTTLS
 AuthMechs LOGIN
 
-IMAPStore mailbox-remote
-Account mailbox
+IMAPStore proton-remote
+Account proton
 
-MaildirStore mailbox-local
+MaildirStore proton-local
 SubFolders Verbatim
-Path ~/.mail/mailbox/
-Inbox ~/.mail/mailbox/INBOX
+Path ~/.mail/proton/
+Inbox ~/.mail/proton/INBOX
 
-Channel mailbox
-Far :mailbox-remote:
-Near :mailbox-local:
+Channel proton
+Far :proton-remote:
+Near :proton-local:
 Patterns *
 Create Near
 Expunge Near
