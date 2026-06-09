@@ -15,7 +15,7 @@ Host 127.0.0.1
 Port 1143
 User you@proton.me
 PassCmd "security find-internet-password -s 'proton-bridge' -a 'neomutt' -w 2>/dev/null | tr -d '\n'"
-TLSType STARTTLS
+TLSType None
 AuthMechs LOGIN
 
 IMAPStore proton-remote
