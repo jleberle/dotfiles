@@ -54,6 +54,6 @@ virtual-mailboxes \
 
 # SMTP (authenticate with mailbox.org login, even if From uses a custom domain)
 set smtp_url  = "smtp://you%40mailbox.org@smtp.mailbox.org:587/"
-set smtp_pass = `security find-internet-password -s "mbox-smtp" -a "neomutt" -w 2>/dev/null | tr -d '\n'`
+set smtp_pass = "`security find-internet-password -s mbox-smtp -a neomutt -w 2>/dev/null | tr -d '\n'`"
 set ssl_starttls  = yes
 set ssl_force_tls = yes
