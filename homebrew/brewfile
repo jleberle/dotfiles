@@ -59,6 +59,7 @@ brew "zoxide" # smarter cd via frecency (the `z` command)
 cask "alfred" # launcher / productivity
 cask "basictex" # minimal LaTeX distribution (PDF export via Pandoc)
 cask "bbedit" # text editor (used by the bb function)
+cask "bitwarden" # Password Manager
 cask "calibre" # e-book library management
 cask "downie" # Video Downloader
 cask "firefox" # Browser
