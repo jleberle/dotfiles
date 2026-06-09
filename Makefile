@@ -231,7 +231,7 @@ neomutt :
 	mkdir -p $(HOME)/.config/neomutt/accounts
 	mkdir -p $(HOME)/.cache/neomutt/headers
 	mkdir -p $(HOME)/.cache/neomutt/messages
-	mkdir -p $(HOME)/Mail
+	mkdir -p $(HOME)/Mail/mailbox
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/neomuttrc $(HOME)/.config/neomutt/neomuttrc
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/gpg.rc    $(HOME)/.config/neomutt/gpg.rc
 	ln -sf $(HOME)/.dotfiles/writing/neomutt/colors.rc $(HOME)/.config/neomutt/colors.rc
