@@ -23,6 +23,7 @@ wired to work together.
   - [Neovim](#neovim)
   - [tmux](#tmux)
   - [Git](#git)
+  - [NeoMutt](#neomutt)
 - [Prose and Pandoc](#prose-and-pandoc)
 - [Scripting](#scripting)
   - [Bin](#bin)
@@ -67,7 +68,7 @@ Then finish the per-app setup:
 | Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                             |
 | tmux      | Start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM                           |
 | Neovim    | Launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
-| NeoMutt   | Copy `writing/neomutt/accounts/example.rc` → `~/.config/neomutt/accounts/local.rc` and fill in account details |
+| NeoMutt   | Run `make neomutt`, edit `~/.mbsyncrc` and `~/.notmuch-config`, add Keychain entries, edit `local.rc`, run `mbsync -a && notmuch new`, then `make mailsync` |
 | BasicTeX  | Run `make latex` to install the required `tlmgr` packages for PDF export                   |
 | macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
 
@@ -151,7 +152,8 @@ just prints a warning) so nothing destructive happens by accident.
 | `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)                 |
 | `nvim`             | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                           |
 | `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir, runs `vale sync` |
-| `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs                         |
+| `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs, scaffolds `~/.mbsyncrc` and `~/.notmuch-config` from templates if missing |
+| `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
 | `latex`            | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)          |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
@@ -497,36 +499,88 @@ most-recent commit.
 
 ### NeoMutt
 
-`make neomutt` creates `~/.config/neomutt/`, symlinks the four tracked config
-files (`neomuttrc`, `gpg.rc`, `colors.rc`, `mailcap`), and creates
-`~/.cache/neomutt/` for the header and message caches.
+A local-first mail setup: **mbsync** syncs mailbox.org IMAP to a local Maildir
+(`~/.mail/mailbox/`), **notmuch** indexes it for fast full-text search, and
+**NeoMutt** reads the local Maildir and sends via SMTP. A launchd agent keeps
+everything in sync every 5 minutes in the background.
 
-**Account setup** (credentials are not tracked by git):
+| Layer      | Tool                 | Purpose                                              |
+|------------|----------------------|------------------------------------------------------|
+| Sync       | mbsync (isync)       | Syncs mailbox.org IMAP → `~/.mail/mailbox/` Maildir  |
+| Index      | notmuch              | Full-text search over the local Maildir              |
+| Client     | NeoMutt              | Reads local Maildir; sends via mailbox.org SMTP      |
+| Background | launchd              | Runs `mailsync` every 5 minutes                      |
 
-1. Copy `writing/neomutt/accounts/example.rc` to
-   `~/.config/neomutt/accounts/local.rc`
-2. Fill in your `realname`, `from`, IMAP/SMTP host, and mailbox names
-3. Store passwords in the macOS Keychain so the config reads them at runtime:
-   ```sh
-   security add-internet-password -s imap.example.com -a you@example.com -w
-   security add-internet-password -s smtp.example.com -a you@example.com -w
+#### One-time setup
+
+`make neomutt` symlinks the four config files, creates cache directories,
+creates `~/.mail/mailbox/`, and copies `mbsyncrc` + `notmuch-config` templates
+if they don't already exist.
+
+1. **Run `make neomutt`** to scaffold everything.
+
+2. **Edit `~/.mbsyncrc`** — set `User` to your mailbox.org login address.
+
+3. **Edit `~/.notmuch-config`** — set `name`, `primary_email`, and `path`
+   (must be an absolute path, e.g. `/Users/you/.mail` — notmuch does not
+   expand `~`).
+
+4. **Store credentials in Keychain** using custom service names (avoids
+   conflicts with Apple Mail's OAuth tokens stored under the same server keys):
+   ```fish
+   read -s -P "IMAP password: " PASS
+   security add-internet-password -s "mbox-imap" -a "neomutt" -T /usr/bin/security -w $PASS
+   read -s -P "SMTP password: " PASS
+   security add-internet-password -s "mbox-smtp" -a "neomutt" -T /usr/bin/security -w $PASS
    ```
 
-**GPG/PGP integration** (`writing/neomutt/gpg.rc`) uses GPGME with the same
-key and `gpg.conf` managed by `make security`. Encrypted replies are
-automatically encrypted; signed messages are automatically verified. Toggle
-signing/encryption per message with `p` in the compose menu.
+5. **Edit `~/.config/neomutt/accounts/local.rc`** — use
+   `writing/neomutt/accounts/example.rc` as the template. Key settings:
+   - `set folder = ~/.mail/mailbox` — local Maildir root
+   - `set nm_default_url = "notmuch:///Users/you/.mail"` — absolute path
+   - `set smtp_url` — authenticate as your mailbox.org login, `From` uses your custom domain
+   - `smtp_pass` backtick must be wrapped in double quotes to handle `%` in passwords
 
-**`mutt` alias** — the fish alias `mutt` maps to `neomutt`,
-so both `mutt` and `neomutt` launch the client.
+6. **Initial sync:**
+   ```sh
+   mbsync -a && notmuch new
+   ```
 
-**URL navigation** — `Ctrl-U` in the pager pipes the message through `urlscan`,
-showing a numbered list of all URLs. Navigate with `j`/`k`, press `Enter` to
-open in the browser. Requires `urlscan` (included in the Brewfile).
+7. **Install background sync:**
+   ```sh
+   make mailsync
+   ```
 
-**HTML rendering** — HTML emails render inline via `w3m`, preserving tables
-and formatting. Press `\Ch` to open in Firefox instead. Requires `w3m`
-(included in the Brewfile).
+After this, use `mailsync` in the terminal to sync on demand, or let launchd
+handle it automatically. Logs go to `~/.local/mail_sync_logs.txt`.
+
+#### Keybindings
+
+| Key              | Mode            | Action                                         |
+|------------------|-----------------|------------------------------------------------|
+| `A`              | Index / Pager   | Archive message to `=Archive`                  |
+| `B`              | Index / Pager   | Open sidebar folder                            |
+| `Ctrl-F`         | Index           | Search mail with notmuch (vfolder-from-query)  |
+| `Ctrl-U`         | Index / Pager   | Extract and open URLs via urlscan              |
+| `Ctrl-P` / `Ctrl-N` | Index / Pager | Previous / next sidebar item                |
+| `\Ch`            | Attach / Compose | Open HTML in Firefox                          |
+| `Ctrl-R`         | Index           | Mark all messages as read                      |
+
+#### GPG/PGP
+
+`writing/neomutt/gpg.rc` uses GPGME with the same key and `gpg.conf` managed
+by `make security`. Encrypted replies are automatically encrypted; signed
+messages are automatically verified. Toggle signing/encryption per message with
+`p` in the compose menu.
+
+#### HTML rendering
+
+HTML emails render inline via `w3m`. Press `\Ch` to open in Firefox instead.
+Both `w3m` and `urlscan` are in the Brewfile.
+
+#### Aliases
+
+`mutt` is aliased to `neomutt`; both commands launch the client.
 
 ---
 
@@ -584,21 +638,24 @@ scripts use [`uv`](https://docs.astral.sh/uv/)'s inline (PEP 723) dependencies
 | `waybackup <URL>`                   | Save a URL to the Internet Archive Wayback Machine; prints the snapshot URL.                                         |
 | `homebrewupdate.sh`                 | `brew update` + `outdated` + `upgrade`, with timestamped log output.                                                 |
 | `homebrewlogclean.sh`               | Delete the update log — but only on the **first Monday** of the month.                                               |
+| `mailsync.sh`                       | `mbsync -a` + `notmuch new` with timestamped log output; invoked by the mailsync launchd agent.                      |
 
 ### Launchd
 
-`make brewauto` installs two user LaunchAgents (`__HOME__` is substituted with
-your real home at install time):
+`make brewauto` and `make mailsync` install user LaunchAgents (`__HOME__` is
+substituted with your real home at install time):
 
-| Agent                             | Schedule       | Runs                                                                  |
-|-----------------------------------|----------------|-----------------------------------------------------------------------|
-| `org.jaredeberle.brewupdate`      | Mondays 09:00  | `bin/homebrewupdate.sh`                                               |
-| `org.jaredeberle.brewlogclean`    | Mondays 08:00  | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
+| Agent                             | Schedule        | Runs                                                                  |
+|-----------------------------------|-----------------|-----------------------------------------------------------------------|
+| `org.jaredeberle.brewupdate`      | Mondays 09:00   | `bin/homebrewupdate.sh`                                               |
+| `org.jaredeberle.brewlogclean`    | Mondays 08:00   | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
+| `org.jaredeberle.mailsync`        | Every 5 minutes | `bin/mailsync.sh`                                                     |
 
-Logs are at `~/.local/brew_update_logs.txt` with the newest run at the top. Trigger a run on demand:
+Logs: `~/.local/brew_update_logs.txt` (newest run first), `~/.local/mail_sync_logs.txt`. Trigger a run on demand:
 
 ```sh
 launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
+launchctl kickstart -k gui/$(id -u)/org.jaredeberle.mailsync
 ```
 
 ---
@@ -649,8 +706,9 @@ Installed by `make security`.
 │   ├── fish/             # config.fish, conf.d, functions
 │   ├── ghostty/          # terminal emulator config
 │   └── tmux.conf         # tmux config
-└── writing/              # editor, Pandoc templates, and Vale configs
+└── writing/              # editor, Pandoc templates, Vale configs, and mail
     ├── nvim/             # Neovim config (see Neovim section)
+    ├── neomutt/          # NeoMutt config (neomuttrc, gpg.rc, colors.rc, mailcap, mbsyncrc, notmuch-config, plist)
     ├── pandoc/           # metadata.yaml, CSL, reference.docx
     └── vale/             # global vale.ini + vale-project.ini template
 ```

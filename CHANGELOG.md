@@ -5,6 +5,54 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-09 — mailbox.org migration, mbsync + notmuch, background sync
+
+### Added
+- `bin/mailsync.sh` — runs `mbsync -a && notmuch new` with timestamped logging
+  to `~/.local/mail_sync_logs.txt`; invoked by launchd
+- `writing/neomutt/org.jaredeberle.mailsync.plist` — LaunchAgent template;
+  `make mailsync` installs it to sync mail every 5 minutes
+- `writing/neomutt/mbsyncrc` — mbsync config template for mailbox.org →
+  `~/.mail/mailbox/` Maildir sync; uses Keychain `PassCmd`
+- `writing/neomutt/notmuch-config` — notmuch config template; indexes
+  `~/.mail` for full-text search
+- `mailsync` fish function (`shell/fish/functions/mailsync.fish`) — runs
+  `mbsync -a && notmuch new` on demand
+- `isync` and `notmuch` added to Brewfile
+- `make mailsync` Makefile target — installs and bootstraps the launchd agent
+- `A` keybinding (index + pager) — archive current message to `=Archive`
+- `Ctrl-F` keybinding (index) — notmuch `vfolder-from-query` search prompt
+- `make neomutt` now creates `~/.mail/mailbox/`, scaffolds `~/.mbsyncrc` and
+  `~/.notmuch-config` from templates on first run
+- `make doctor` checks for `~/.mbsyncrc`, `~/.notmuch-config`, and the
+  mailsync LaunchAgent plist
+
+### Changed
+- Mail store moved from `~/Mail` to `~/.mail`
+- `accounts/example.rc` rewritten for mailbox.org + local Maildir: no IMAP
+  credentials (mbsync handles sync), SMTP only via mailbox.org, notmuch virtual
+  mailboxes in sidebar, `unset record` (mailbox.org saves sent mail server-side)
+- Keychain password commands corrected for Fish shell: `read -s -P` instead of
+  bash `read -sp`; two separate lines instead of `&&` chain
+- Keychain entries use custom service names (`mbox-imap`, `mbox-smtp`) to avoid
+  conflicts with Apple Mail OAuth tokens stored under the actual server hostnames
+- `smtp_pass` backtick wrapped in double quotes to handle passwords containing
+  `%` characters (NeoMutt's config parser misinterprets bare `%` tokens)
+- mbsyncrc: `SSLType` → `TLSType` (deprecated in isync 1.5+); added
+  `AuthMechs LOGIN` for macOS SASL compatibility
+- notmuch `database.path` must be an absolute path — notmuch does not expand `~`
+- README: NeoMutt section rewritten to document the full mbsync + notmuch +
+  launchd stack; NeoMutt added to Apps TOC; `mailsync` added to Makefile Options
+  and Launchd tables; `mailsync.sh` added to Bin table
+
+### Migration notes
+- `imapsync` used to migrate iCloud mail to mailbox.org before switching
+- DNS records configured for `jaredeberle.org`: MX (mxext1/2/3.mailbox.org),
+  SPF (`include:mailbox.org`), four DKIM CNAME keys (MBO0001–MBO0004),
+  MTA-STS (enforce mode), TLS-RPT
+
+---
+
 ## 2026-06-08 — NeoMutt integration (refined)
 
 ### Changed
