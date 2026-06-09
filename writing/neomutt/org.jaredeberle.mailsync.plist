@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template: __HOME__ is replaced with $(HOME) by `make mailsync`. -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.jaredeberle.mailsync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__HOME__/.dotfiles/bin/mailsync.sh</string>
+    </array>
+
+    <!-- Every 5 minutes. -->
+    <key>StartInterval</key>
+    <integer>300</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>

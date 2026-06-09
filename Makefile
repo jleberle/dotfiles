@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt latex macos macos-check doctor brew-check tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync latex macos macos-check doctor brew-check tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -247,6 +247,16 @@ neomutt :
 	    { cp $(HOME)/.dotfiles/writing/neomutt/notmuch-config $(HOME)/.notmuch-config; \
 	      echo "REMINDER: edit ~/.notmuch-config with your name and email, then run: notmuch new"; }
 	@echo "NeoMutt configured."
+mailsync :
+	@echo "Installing mail sync LaunchAgent"
+	chmod +x $(HOME)/.dotfiles/bin/mailsync.sh
+	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/neomutt/org.jaredeberle.mailsync.plist \
+	    > $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
+	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
+	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.mailsync 2>/dev/null
+	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
+	@echo "Mail sync running every 5 minutes."
+	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.mailsync"
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
@@ -293,6 +303,7 @@ doctor :
 	@test -L $(HOME)/.config/neomutt/neomuttrc || echo "WARNING: neomuttrc not symlinked (run: make neomutt)"
 	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
 	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"
+	@test -f $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist || echo "WARNING: mail sync LaunchAgent not installed (run: make mailsync)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
 	@test -d $(HOME)/.local/share/vale/styles && \
 	    ls $(HOME)/.local/share/vale/styles | grep -q . || \
