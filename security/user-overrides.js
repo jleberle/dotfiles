@@ -25,12 +25,6 @@ user_pref("extensions.formautofill.creditCards.enabled", false);
 // PREF: disable passkeys
 user_pref("security.webauth.webauthn", false);
 
-// PREF: set DoH provider
-user_pref("network.trr.uri", "https://dns.nextdns.io/<ID>/Firefox"); // Hagezi Normal + TIF
-
-// PREF: enforce DNS-over-HTTPS (DoH)
-user_pref("network.trr.mode", 3);
-
 // PREF: hide site shortcut thumbnails on New Tab page
 user_pref("browser.newtabpage.activity-stream.feeds.topsites", false);
 
