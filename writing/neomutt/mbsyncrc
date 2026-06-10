@@ -32,7 +32,9 @@ Inbox ~/.mail/proton/INBOX
 Channel proton
 Far :proton-remote:
 Near :proton-local:
-Patterns *
+# Skip "All Mail": Proton mirrors every message there, so syncing it
+# duplicates the entire mailbox locally (~624 MB of the Maildir).
+Patterns * !"All Mail"
 Create Near
 Expunge Near
 SyncState *
