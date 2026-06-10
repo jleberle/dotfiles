@@ -1,3 +1,3 @@
-function mailsync --description 'Sync mail from mailbox.org and update notmuch index'
+function mailsync --description 'Sync mail from Proton Bridge and update notmuch index'
     mbsync -a && notmuch new
 end

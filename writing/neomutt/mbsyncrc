@@ -15,6 +15,9 @@ Host 127.0.0.1
 Port 1143
 User you@proton.me
 PassCmd "security find-internet-password -s 'proton-bridge' -a 'neomutt' -w 2>/dev/null | tr -d '\n'"
+# No TLS on purpose: this is loopback-only traffic to the Bridge, which holds
+# the real (end-to-end) encryption to Proton's servers. The Bridge's local cert
+# is self-signed and not exported on macOS, so TLS here buys nothing.
 TLSType None
 AuthMechs LOGIN
 

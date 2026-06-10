@@ -28,8 +28,12 @@ end
 fish_add_path --global --prepend $HOME/.dotfiles/bin $HOME/.local/bin
 
 # --- GPG ----------------------------------------------------------------------
-# Required for pinentry to open a passphrase prompt in the current terminal
-set -gx GPG_TTY (tty)
+# Required for pinentry to open a passphrase prompt in the current terminal.
+# Guarded: in non-interactive shells `tty` returns the literal "not a tty",
+# which would leak a garbage value to any gpg invocation.
+if test -t 0
+    set -gx GPG_TTY (tty)
+end
 
 # --- Editors / pagers (mirrors zshenv) ----------------------------------------
 set -gx EDITOR nvim

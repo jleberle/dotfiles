@@ -499,54 +499,63 @@ most-recent commit.
 
 ### NeoMutt
 
-A local-first mail setup: **mbsync** syncs mailbox.org IMAP to a local Maildir
-(`~/.mail/mailbox/`), **notmuch** indexes it for fast full-text search, and
-**NeoMutt** reads the local Maildir and sends via SMTP. A launchd agent keeps
-everything in sync every 5 minutes in the background.
+A local-first mail setup: **Proton Bridge** exposes Proton Mail over local
+IMAP/SMTP, **mbsync** syncs it to a local Maildir (`~/.mail/proton/`),
+**notmuch** indexes it for fast full-text search, and **NeoMutt** reads the
+local Maildir and sends via the Bridge. A launchd agent keeps everything in
+sync every 5 minutes in the background.
 
-| Layer      | Tool                 | Purpose                                              |
-|------------|----------------------|------------------------------------------------------|
-| Sync       | mbsync (isync)       | Syncs mailbox.org IMAP → `~/.mail/mailbox/` Maildir  |
-| Index      | notmuch              | Full-text search over the local Maildir              |
-| Client     | NeoMutt              | Reads local Maildir; sends via mailbox.org SMTP      |
-| Background | launchd              | Runs `mailsync` every 5 minutes                      |
+| Layer      | Tool                 | Purpose                                                |
+|------------|----------------------|--------------------------------------------------------|
+| Gateway    | Proton Bridge        | Decrypts Proton Mail locally; IMAP `127.0.0.1:1143`, SMTP `127.0.0.1:1025` |
+| Sync       | mbsync (isync)       | Syncs Bridge IMAP → `~/.mail/proton/` Maildir          |
+| Index      | notmuch              | Full-text search over the local Maildir                |
+| Client     | NeoMutt              | Reads local Maildir; sends via Bridge SMTP             |
+| Background | launchd              | Runs `mailsync` every 5 minutes                        |
+
+The Bridge must be running for sync and send to work — the background sync
+exits quietly when it isn't.
 
 #### One-time setup
 
 `make neomutt` symlinks the four config files, creates cache directories,
-creates `~/.mail/mailbox/`, and copies `mbsyncrc` + `notmuch-config` templates
+creates `~/.mail/proton/`, and copies `mbsyncrc` + `notmuch-config` templates
 if they don't already exist.
 
-1. **Run `make neomutt`** to scaffold everything.
+1. **Install and sign in to Proton Bridge**, and note the password it
+   generates (Bridge → account → show password). The same password is used
+   for IMAP and SMTP.
 
-2. **Edit `~/.mbsyncrc`** — set `User` to your mailbox.org login address.
+2. **Run `make neomutt`** to scaffold everything.
 
-3. **Edit `~/.notmuch-config`** — set `name`, `primary_email`, and `path`
+3. **Edit `~/.mbsyncrc`** — set `User` to your Proton Bridge email address.
+
+4. **Edit `~/.notmuch-config`** — set `name`, `primary_email`, and `path`
    (must be an absolute path, e.g. `/Users/you/.mail` — notmuch does not
    expand `~`).
 
-4. **Store credentials in Keychain** using custom service names (avoids
-   conflicts with Apple Mail's OAuth tokens stored under the same server keys):
+5. **Store the Bridge password in Keychain** under a custom service name
+   (avoids conflicts with Apple Mail's tokens stored under server hostnames):
    ```fish
-   read -s -P "IMAP password: " PASS
-   security add-internet-password -s "mbox-imap" -a "neomutt" -T /usr/bin/security -w $PASS
-   read -s -P "SMTP password: " PASS
-   security add-internet-password -s "mbox-smtp" -a "neomutt" -T /usr/bin/security -w $PASS
+   read -s -P "Bridge password: " PASS
+   security add-internet-password -s "proton-bridge" -a "neomutt" -T /usr/bin/security -w $PASS
    ```
 
-5. **Edit `~/.config/neomutt/accounts/local.rc`** — use
+6. **Edit `~/.config/neomutt/accounts/local.rc`** — use
    `writing/neomutt/accounts/example.rc` as the template. Key settings:
-   - `set folder = ~/.mail/mailbox` — local Maildir root
+   - `set folder = ~/.mail/proton` — local Maildir root
    - `set nm_default_url = "notmuch:///Users/you/.mail"` — absolute path
-   - `set smtp_url` — authenticate as your mailbox.org login, `From` uses your custom domain
+   - `set smtp_url` — authenticate as your Bridge login, `From` uses your custom domain
    - `smtp_pass` backtick must be wrapped in double quotes to handle `%` in passwords
+   - On first send, accept the Bridge's self-signed certificate; it persists
+     in the file set by `certificate_file`
 
-6. **Initial sync:**
+7. **Initial sync** (Bridge running):
    ```sh
    mbsync -a && notmuch new
    ```
 
-7. **Install background sync:**
+8. **Install background sync:**
    ```sh
    make mailsync
    ```

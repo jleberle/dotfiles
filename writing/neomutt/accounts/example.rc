@@ -59,3 +59,5 @@ set smtp_url  = "smtp://you%40proton.me@127.0.0.1:1025/"
 set smtp_pass = "`security find-internet-password -s proton-bridge -a neomutt -w 2>/dev/null | tr -d '\n'`"
 set ssl_starttls  = yes
 set ssl_force_tls = yes
+# Bridge uses a self-signed cert; accept it once on first send and it's saved here.
+set certificate_file = ~/.config/neomutt/certificates

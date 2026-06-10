@@ -22,6 +22,7 @@ jobs:
         run: |
           shellcheck bin/homebrewupdate.sh
           shellcheck bin/homebrewlogclean.sh
+          shellcheck bin/mailsync.sh
 
       - name: fish syntax check
         run: |
@@ -30,4 +31,4 @@ jobs:
           done
 
       - name: luacheck (nvim lua)
-        run: luacheck nvim/lua/ --globals vim --no-unused-args
+        run: luacheck writing/nvim/lua/ --globals vim --no-unused-args
