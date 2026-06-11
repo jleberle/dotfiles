@@ -7,6 +7,21 @@ individual commit — the git log has the full detail.
 
 ## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
 
+### Added
+- Markdown/Pandoc writing upgrades in nvim:
+  - `<leader>pd` — Pandoc export to docx (the `reference.docx` workflow had
+    no keybinding); `<leader>pv` — open in Marked 2 for live preview
+  - Pandoc exports now run async via `vim.system` — no more frozen editor
+    during LaTeX builds; notification on success/failure; buffer auto-written
+    before export
+  - `telescope-bibtex.nvim` (`<leader>fc`) — fuzzy-find the Zotero
+    Better BibTeX export and insert a pandoc `@citekey`
+  - `harper_ls` grammar LSP for markdown (brew `harper`); SpellCheck linter
+    disabled (vim spell covers it), vale still owns style
+  - pandoc-crossref snippets (`fig`, `tbl`, `eq`, `sec`) in
+    `writing/nvim/snippets/markdown.json`, served by blink's snippets source
+  - Word count in lualine for markdown/text buffers (selection-aware)
+
 ### Changed
 - Completion migrated `nvim-cmp` → `blink.cmp`: nvim-cmp is feature-frozen
   upstream; blink has lsp/buffer/path sources and `vim.snippet` support built

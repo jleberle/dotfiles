@@ -1,0 +1,22 @@
+{
+  "Figure with crossref label": {
+    "prefix": "fig",
+    "body": "![${1:caption}](${2:path}){#fig:${3:label}}",
+    "description": "pandoc-crossref figure — reference with @fig:label"
+  },
+  "Table caption with crossref label": {
+    "prefix": "tbl",
+    "body": ": ${1:caption} {#tbl:${2:label}}",
+    "description": "pandoc-crossref table caption (place under the table) — reference with @tbl:label"
+  },
+  "Display equation with crossref label": {
+    "prefix": "eq",
+    "body": "$$${1:equation}$$ {#eq:${2:label}}",
+    "description": "pandoc-crossref equation — reference with @eq:label"
+  },
+  "Section heading with crossref label": {
+    "prefix": "sec",
+    "body": "${1:Heading} {#sec:${2:label}}",
+    "description": "pandoc-crossref section label — reference with @sec:label"
+  }
+}

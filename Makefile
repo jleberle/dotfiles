@@ -284,6 +284,7 @@ tools-check :
 	@command -v lua-language-server >/dev/null 2>&1 || echo "WARNING: lua-language-server not found (run: make apps)"
 	@command -v pyright    >/dev/null 2>&1 || echo "WARNING: pyright not found (run: make apps)"
 	@command -v bash-language-server >/dev/null 2>&1 || echo "WARNING: bash-language-server not found (run: make apps)"
+	@command -v harper-ls  >/dev/null 2>&1 || echo "WARNING: harper-ls not found (run: make apps)"
 	@command -v stylua     >/dev/null 2>&1 || echo "WARNING: stylua not found (run: make apps)"
 	@command -v black      >/dev/null 2>&1 || echo "WARNING: black not found (run: make apps)"
 	@command -v prettier   >/dev/null 2>&1 || echo "WARNING: prettier not found (run: make apps)"

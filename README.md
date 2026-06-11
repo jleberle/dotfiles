@@ -118,7 +118,7 @@ Fast way to spot drift after `brew cleanup` or a fresh clone.
 make tools-check
 ```
 
-Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `lazygit`,
+Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `lazygit`, `harper-ls`,
 `lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
 and `prettier` are all on `PATH`.
 
@@ -334,7 +334,8 @@ Autoloaded — call them like commands.
 
 A lean, **prose-first** Neovim config built on `lazy.nvim`. The emphasis is
 fast startup (almost everything is lazy-loaded), Markdown/Pandoc authoring, and
-just enough LSP for the languages used in `bin/` (Lua, Python, Bash).
+just enough LSP for the languages used in `bin/` (Lua, Python, Bash) plus
+grammar checking in prose (`harper_ls`).
 
 **Leader key:** `,` (comma)
 
@@ -352,7 +353,7 @@ writing/nvim/
     │   └── lazy.lua         # bootstraps lazy.nvim
     └── plugins/
         ├── ui.lua           # nord theme + lualine
-        ├── editor.lua       # oil, telescope, treesitter, gitsigns
+        ├── editor.lua       # oil, telescope (+bibtex), treesitter, gitsigns
         ├── completion.lua   # blink.cmp
         ├── lsp.lua          # lspconfig + conform (formatting)
         ├── linting.lua      # nvim-lint (vale)
@@ -371,10 +372,17 @@ writing/nvim/
 | `<leader>fb`  | Normal | Telescope **b**uffers                               |
 | `<leader>z`   | Normal | Toggle **Zen mode** (distraction-free writing)      |
 | `-`           | Normal | Open **Oil** file browser in the current dir        |
+| `<leader>fc`  | Normal | Telescope bibtex — insert `@citekey` **c**itation   |
 | `<leader>cf`  | Normal | **C**onform **f**ormat the buffer                   |
 | `<leader>ph`  | Normal | **P**andoc export → **H**TML (citeproc + crossref)  |
 | `<leader>pp`  | Normal | **P**andoc export → **P**DF (citeproc + crossref)   |
+| `<leader>pd`  | Normal | **P**andoc export → **d**ocx (uses `reference.docx`) |
+| `<leader>pv`  | Normal | Pre**v**iew in Marked 2 (live-updates on save)      |
 | `<CR>`        | Insert | Confirm the selected completion item                |
+
+Pandoc exports run **asynchronously** (`vim.system`) — the editor stays
+responsive during slow LaTeX builds; a notification reports success/failure.
+The buffer is auto-written before export/preview.
 
 **From `mini.nvim` (defaults):**
 
@@ -408,11 +416,18 @@ writing/nvim/
   automatically on first launch; highlighting starts per-filetype).
 - **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`
   (`pairs`, `comment`, `surround`).
-- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls` (loads only for
-  those filetypes).
-- **Completion:** `blink.cmp` (lsp + buffer + path sources, all built in —
-  no separate source plugins) with the built-in `vim.snippet` expander;
-  loads on `InsertEnter`. Enter confirms only an explicitly selected item.
+- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls`, and `harper_ls`
+  (grammar checking in Markdown — vale covers style, vim's built-in spell
+  covers spelling, so harper's own SpellCheck linter is disabled). Loads only
+  for those filetypes.
+- **Completion:** `blink.cmp` (lsp + buffer + path + snippets sources, all
+  built in — no separate source plugins) with the built-in `vim.snippet`
+  expander; loads on `InsertEnter`. Enter confirms only an explicitly
+  selected item. `snippets/markdown.json` provides pandoc-crossref snippets
+  (`fig`, `tbl`, `eq`, `sec` — label syntax for figures/tables/equations/sections).
+- **Citations:** `telescope-bibtex` (`<leader>fc`) fuzzy-finds the Zotero
+  Better BibTeX export (`~/Documents/Library/Library.bib`) and inserts a
+  pandoc `@citekey`.
 - **Formatting:** `conform.nvim` — `stylua` (Lua), `black` (Python),
   `prettier` (Markdown). Trigger with `<leader>cf`.
 - **Linting:** `nvim-lint` runs `vale` on Markdown (read/save) — see

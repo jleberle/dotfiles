@@ -16,7 +16,26 @@ return {
 				defaults = {
 					layout_strategy = "horizontal",
 				},
+				extensions = {
+					-- Zotero library, kept current by Better BibTeX auto-export.
+					-- Enter inserts @citekey (pandoc style, detected from the
+					-- markdown filetype).
+					bibtex = {
+						global_files = { vim.fn.expand("~/Documents/Library/Library.bib") },
+					},
+				},
 			})
+		end,
+	},
+
+	{
+		"nvim-telescope/telescope-bibtex.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim" },
+		keys = {
+			{ "<leader>fc", "<cmd>Telescope bibtex<cr>", desc = "Insert citation" },
+		},
+		config = function()
+			require("telescope").load_extension("bibtex")
 		end,
 	},
 

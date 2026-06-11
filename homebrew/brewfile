@@ -14,6 +14,7 @@ brew "uv" # runs bin/ python scripts via inline PEP 723 deps
 # Neovim LSPs, formatters, linters (referenced by nvim/lua/plugins/*)
 brew "bash-language-server" # bashls
 brew "black"              # python formatter (conform)
+brew "harper"             # grammar LSP for markdown (harper_ls; vale covers style, vim spell covers spelling)
 brew "lua-language-server" # lua_ls
 brew "luacheck"           # Lua linter (CI lint workflow)
 brew "prettier"           # markdown formatter (conform)

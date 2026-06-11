@@ -23,22 +23,35 @@ map("n", "<leader>z", "<cmd>ZenMode<cr>")
 map("n", "-", "<cmd>Oil<cr>")
 
 -- Pandoc exports with citation + cross-reference processing.
--- Runs from the document's own directory so relative paths in metadata.yaml
--- (bibliography, CSL) and relative image/links resolve correctly. pandoc-crossref
--- must precede --citeproc, since pandoc applies filters left-to-right.
+-- Runs asynchronously (vim.system) so the editor stays responsive during slow
+-- PDF/LaTeX builds; notifies on completion. Runs from the document's own
+-- directory so relative paths in metadata.yaml (bibliography, CSL) and
+-- relative image/links resolve correctly. pandoc-crossref must precede
+-- --citeproc, since pandoc applies filters left-to-right.
 local function pandoc_export(ext)
-	local dir = vim.fn.expand("%:p:h")
-	local file = vim.fn.shellescape(vim.fn.expand("%:t"))
-	local output = vim.fn.shellescape(vim.fn.expand("%:t:r") .. "." .. ext)
+	vim.cmd.update() -- write the buffer first (only if modified)
 
-	local cmd = "pandoc --filter pandoc-crossref --citeproc " .. file .. " -o " .. output
+	local dir = vim.fn.expand("%:p:h")
+	local file = vim.fn.expand("%:t")
+	local output = vim.fn.expand("%:t:r") .. "." .. ext
+
+	local cmd = { "pandoc", "--filter", "pandoc-crossref", "--citeproc", file, "-o", output }
 
 	-- Pick up a sibling metadata.yaml (bibliography, CSL, etc.) if present.
 	if vim.fn.filereadable(dir .. "/metadata.yaml") == 1 then
-		cmd = cmd .. " --metadata-file=metadata.yaml"
+		table.insert(cmd, "--metadata-file=metadata.yaml")
 	end
 
-	vim.cmd("!cd " .. vim.fn.shellescape(dir) .. " && " .. cmd)
+	vim.notify("Exporting " .. output .. " …")
+	vim.system(cmd, { cwd = dir }, function(result)
+		vim.schedule(function()
+			if result.code == 0 then
+				vim.notify("Exported " .. output)
+			else
+				vim.notify("pandoc failed:\n" .. (result.stderr or "unknown error"), vim.log.levels.ERROR)
+			end
+		end)
+	end)
 end
 
 map("n", "<leader>ph", function()
@@ -48,3 +61,13 @@ end, { desc = "Pandoc → HTML" })
 map("n", "<leader>pp", function()
 	pandoc_export("pdf")
 end, { desc = "Pandoc → PDF" })
+
+map("n", "<leader>pd", function()
+	pandoc_export("docx")
+end, { desc = "Pandoc → Word" })
+
+-- Live preview in Marked 2 (re-renders on every save)
+map("n", "<leader>pv", function()
+	vim.cmd.update()
+	vim.system({ "open", "-a", "Marked 2", vim.fn.expand("%:p") })
+end, { desc = "Preview in Marked 2" })

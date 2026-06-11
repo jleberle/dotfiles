@@ -1,7 +1,7 @@
 return {
 	{
 		"neovim/nvim-lspconfig",
-		ft = { "lua", "python", "sh", "bash" },
+		ft = { "lua", "python", "sh", "bash", "markdown" },
 		dependencies = { "saghen/blink.cmp" },
 		config = function()
 			local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -9,7 +9,17 @@ return {
 			vim.lsp.config("lua_ls", { capabilities = capabilities })
 			vim.lsp.config("pyright", { capabilities = capabilities })
 			vim.lsp.config("bashls", { capabilities = capabilities })
-			vim.lsp.enable({ "lua_ls", "pyright", "bashls" })
+			-- Grammar (not style — that's vale via nvim-lint, and not spelling
+			-- — that's vim's built-in spell, so SpellCheck is off here).
+			vim.lsp.config("harper_ls", {
+				capabilities = capabilities,
+				settings = {
+					["harper-ls"] = {
+						linters = { SpellCheck = false },
+					},
+				},
+			})
+			vim.lsp.enable({ "lua_ls", "pyright", "bashls", "harper_ls" })
 		end,
 	},
 	{

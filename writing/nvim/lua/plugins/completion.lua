@@ -15,12 +15,18 @@ return {
 				list = { selection = { preselect = false, auto_insert = true } },
 			},
 
-			-- Same sources as the old nvim-cmp setup (all built into blink).
-			-- The blink default also includes 'snippets' (vscode-style snippet
-			-- files), which this setup doesn't use; LSP snippet completions
-			-- still expand via vim.snippet natively.
+			-- lsp/path/buffer match the old nvim-cmp setup (all built into
+			-- blink). 'snippets' loads vscode-format files from the config
+			-- dir's snippets/ (blink's default search path) — currently the
+			-- pandoc-crossref snippets in snippets/markdown.json. LSP snippet
+			-- completions still expand via vim.snippet natively.
 			sources = {
-				default = { "lsp", "path", "buffer" },
+				default = { "lsp", "path", "snippets", "buffer" },
+				providers = {
+					-- Only our own snippet files; skip the friendly-snippets
+					-- collection (not installed).
+					snippets = { opts = { friendly_snippets = false } },
+				},
 			},
 		},
 	},
