@@ -41,22 +41,27 @@ if status is-interactive
     # Cache `fzf --fish` output; rebuild if the fzf binary is newer than cache.
     # Uses $HOMEBREW_PREFIX (set by `brew shellenv` in conf.d/env.fish) so this
     # works on Apple Silicon (/opt/homebrew), Intel (/usr/local), and Linux.
+    # Guarded so a machine mid-bootstrap (no brew/fzf yet) still gets a shell.
     set -l fzf_cache $cache/fzf.fish
     set -l fzf_bin $HOMEBREW_PREFIX/bin/fzf
-    if not test -s $fzf_cache; or test $fzf_bin -nt $fzf_cache
-        $fzf_bin --fish >$fzf_cache
+    if test -x "$fzf_bin"
+        if not test -s $fzf_cache; or test $fzf_bin -nt $fzf_cache
+            $fzf_bin --fish >$fzf_cache
+        end
+        source $fzf_cache
     end
-    source $fzf_cache
 
     # --------------------------------------------------------------------------
     # Zoxide
     # --------------------------------------------------------------------------
     set -l zoxide_cache $cache/zoxide.fish
     set -l zoxide_bin $HOMEBREW_PREFIX/bin/zoxide
-    if not test -s $zoxide_cache; or test $zoxide_bin -nt $zoxide_cache
-        $zoxide_bin init fish >$zoxide_cache
+    if test -x "$zoxide_bin"
+        if not test -s $zoxide_cache; or test $zoxide_bin -nt $zoxide_cache
+            $zoxide_bin init fish >$zoxide_cache
+        end
+        source $zoxide_cache
     end
-    source $zoxide_cache
 
     # Prompt is handled by fish/functions/fish_prompt.fish (native fish, no external dependency)
 end

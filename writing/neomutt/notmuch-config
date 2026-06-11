@@ -1,5 +1,7 @@
+# Template — __HOME__ is replaced with $(HOME) by `make neomutt`
+# (notmuch does not expand ~ or env vars in database.path).
 [database]
-path=/Users/your-username/.mail
+path=__HOME__/.mail
 
 [user]
 name=Your Name

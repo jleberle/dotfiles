@@ -96,7 +96,7 @@ links = [linkFmt.format(x, y, html.escape(z, quote=True))
             for x, y, z in zip(turls, burls, names) ]
 safe_title = html.escape(searchterm)
 page = '''<html>
-<head><meta charset=”utf-8”><title>{0} pictures</title></head>
+<head><meta charset="utf-8"><title>{0} pictures</title></head>
 <body>
 <h1>”{0}” pictures</h1>
 {1}

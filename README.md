@@ -142,7 +142,7 @@ just prints a warning) so nothing destructive happens by accident.
 
 | Target             | What it does                                                                                        |
 |--------------------|-----------------------------------------------------------------------------------------------------|
-| `install`          | Runs `git shell security nvim vale neomutt brewauto` in order, then `doctor`                        |
+| `install`          | Runs `apps git shell security nvim vale neomutt brewauto` in order, then `doctor`                   |
 | `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
 | `git`              | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config                |
 | `shell`            | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                       |
@@ -465,7 +465,7 @@ twice to send a literal `Ctrl-a` to the underlying program.
 - `terminal-features` passes **RGB true color**, **colored underlines**
   (undercurl diagnostics in Neovim), and **cursor-shape** changes through
   (block in normal, beam in insert).
-- **Plugins** (via TPM): `tpm`, `arcticicestudio/nord-tmux`. The status line
+- **Plugins** (via TPM): `tpm`, `nordtheme/tmux`. The status line
   is composed from Nord modules (session on the left, date/time on the right).
 
 ---
@@ -530,9 +530,8 @@ if they don't already exist.
 
 3. **Edit `~/.mbsyncrc`** — set `User` to your Proton Bridge email address.
 
-4. **Edit `~/.notmuch-config`** — set `name`, `primary_email`, and `path`
-   (must be an absolute path, e.g. `/Users/you/.mail` — notmuch does not
-   expand `~`).
+4. **Edit `~/.notmuch-config`** — set `name` and `primary_email`
+   (`path` is filled in automatically by `make neomutt`).
 
 5. **Store the Bridge password in Keychain** under a custom service name
    (avoids conflicts with Apple Mail's tokens stored under server hostnames):
@@ -674,8 +673,10 @@ launchctl kickstart -k gui/$(id -u)/org.jaredeberle.mailsync
 Installed by `make security`.
 
 - **SSH** (`security/ssh-config`): dedicated key per host (`id_github`,
-  `id_codeberg`), modern crypto only (curve25519, chacha20-poly1305 / AES-GCM),
-  `IdentitiesOnly`, agent + Keychain integration, strict host-key checking,
+  `id_codeberg`), modern crypto only — hybrid post-quantum key exchange first
+  (ML-KEM / sntrup761 + x25519), AEAD-only ciphers (AES-256-GCM preferred,
+  ChaCha20-Poly1305 fallback), `IdentitiesOnly`, agent + Keychain integration,
+  strict host-key checking,
   connection multiplexing for Codeberg (`ControlPath ~/.ssh/control/%C`,
   persisted 10m), no agent/X11 forwarding. Includes a `github-443` fallback
   host alias for networks that block port 22.

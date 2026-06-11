@@ -5,6 +5,41 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
+
+### Changed
+- SSH key exchange now prefers hybrid post-quantum algorithms
+  (`mlkem768x25519-sha256`, `sntrup761x25519-sha512`) ahead of curve25519 —
+  the previous pinned list silently excluded the OpenSSH 9.x/10.x defaults.
+  Verified live against GitHub (negotiates `sntrup761x25519-sha512`)
+- SSH ciphers reordered AES-256-GCM first: unaffected by Terrapin
+  (CVE-2023-48795), so security no longer leans on the strict-KEX
+  countermeasure; ChaCha20-Poly1305 kept as fallback for servers without
+  AES hardware acceleration
+- tmux Nord plugin renamed `arcticicestudio/nord-tmux` → `nordtheme/tmux`
+  (upstream org migration; old name only worked via GitHub redirect)
+- `writing/neomutt/notmuch-config` is now a `__HOME__` template;
+  `make neomutt` substitutes the home path like `make vale` does, so only
+  `name`/`primary_email` need hand-editing
+- `make install` now depends on `apps` first, so a fresh machine gets
+  Homebrew + packages before targets that need them (vale, tpm clone)
+
+### Fixed
+- `writing/pandoc/metadata.yaml` pointed at the removed `templates/`
+  directory; CSL and reference-doc paths now resolve to `writing/pandoc/`
+- `bin/ipic` emitted `<meta charset=”utf-8”>` with curly quotes — invalid
+  attribute, breaking the UTF-8 rendering the script exists to provide
+- `make mailsync` failed on a fresh account: `~/Library/LaunchAgents` was
+  never created (only `brewauto` made it)
+- `make vale` now fails fast with a clear error when vale isn't installed
+- fish startup no longer errors on machines without Homebrew/fzf/zoxide —
+  the init-cache blocks are guarded by `test -x`
+- `git/gitup-bookmarks` used an absolute `/Users/jaredeberle` path for
+  micro-theme; now `~` like the other entries
+- Brewfile tmux comment pointed at the old `general/tmux.conf` location
+
+---
+
 ## 2026-06-09 — mailbox.org migration, mbsync + notmuch, background sync
 
 ### Added

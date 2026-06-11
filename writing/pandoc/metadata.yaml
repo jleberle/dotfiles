@@ -5,11 +5,11 @@ date: 2026-05-28
 bibliography:
   - ~/Documents/Library/Library.bib
 
-csl: ~/.dotfiles/templates/chicago-notes-bibliography-17th-edition.csl
+csl: ~/.dotfiles/writing/pandoc/chicago-notes-bibliography-17th-edition.csl
 
 link-citations: true
 
-reference-doc: ~/.dotfiles/templates/reference.docx
+reference-doc: ~/.dotfiles/writing/pandoc/reference.docx
 
 geometry: margin=1in
 

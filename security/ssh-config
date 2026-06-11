@@ -46,9 +46,15 @@ Host *
     ServerAliveCountMax 3
     TCPKeepAlive no
 
-    # Modern crypto
-    KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com
+    # Modern crypto — hybrid post-quantum kex first (OpenSSH 9.x/10.x defaults),
+    # classical curve25519 as the floor for older servers.
+    KexAlgorithms mlkem768x25519-sha256,sntrup761x25519-sha512,curve25519-sha256,curve25519-sha256@libssh.org
+    # AEAD-only, 256-bit. AES-256-GCM preferred: ChaCha20-Poly1305 was the
+    # cipher affected by Terrapin (CVE-2023-48795); kept second for servers
+    # without AES hardware acceleration.
+    Ciphers aes256-gcm@openssh.com,chacha20-poly1305@openssh.com
+    # Only used if a non-AEAD cipher were ever negotiated (GCM/ChaCha carry
+    # their own authentication); encrypt-then-MAC variants only.
     MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
 
     # Privacy / noise reduction

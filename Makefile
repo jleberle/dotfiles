@@ -16,7 +16,7 @@ FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 default :
 	@echo "There is no default for your own safety."
 
-install : git shell security nvim vale neomutt brewauto
+install : apps git shell security nvim vale neomutt brewauto
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
 	@echo "Run 'make latex' to install LaTeX packages. Will load slowly"
@@ -221,6 +221,7 @@ nvim :
 	@echo "Symlinking nvim config"
 	ln -sfn $(HOME)/.dotfiles/writing/nvim $(HOME)/.config/nvim
 vale :
+	@command -v vale >/dev/null 2>&1 || { echo "ERROR: vale not found — install it first (make apps)"; exit 1; }
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
 	mkdir -p $(HOME)/.local/share/vale/styles
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/vale/vale.ini > $(HOME)/.vale.ini
@@ -244,11 +245,12 @@ neomutt :
 	    { cp $(HOME)/.dotfiles/writing/neomutt/mbsyncrc $(HOME)/.mbsyncrc; \
 	      echo "REMINDER: edit ~/.mbsyncrc and set User to your Proton Bridge email"; }
 	@[ -f "$(HOME)/.notmuch-config" ] || \
-	    { cp $(HOME)/.dotfiles/writing/neomutt/notmuch-config $(HOME)/.notmuch-config; \
+	    { sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/neomutt/notmuch-config > $(HOME)/.notmuch-config; \
 	      echo "REMINDER: edit ~/.notmuch-config with your name and email, then run: notmuch new"; }
 	@echo "NeoMutt configured."
 mailsync :
 	@echo "Installing mail sync LaunchAgent"
+	mkdir -p $(LAUNCH_AGENTS)
 	chmod +x $(HOME)/.dotfiles/bin/mailsync.sh
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/neomutt/org.jaredeberle.mailsync.plist \
 	    > $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
