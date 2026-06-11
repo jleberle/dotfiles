@@ -33,6 +33,10 @@ alias paths 'string join \n $PATH'
 alias myip 'curl -s https://ifconfig.me; echo'
 alias ports 'lsof -iTCP -sTCP:LISTEN -n -P'
 
+# Markdown / academic writing
+alias rgmd 'rg -t md'   # search only markdown files (named to avoid macOS's mdfind)
+alias drafts 'fd -e md --changed-within 7d -X eza -lh --sort=modified'  # md files touched this week
+
 # Housekeeping
 alias cleands 'find . -type f -name "*.DS_Store" -delete'
 alias brewup 'brew update && brew upgrade && brew upgrade --cask && brew cleanup'
@@ -47,6 +51,7 @@ if test (uname) = Darwin
     alias pubkey-codeberg 'pbcopy < ~/.ssh/id_codeberg.pub && echo "=> Codeberg public key copied to pasteboard."'
     alias cb 'pbcopy'        # pipe into clipboard:  echo hi | cb
     alias cv 'pbpaste'       # paste from clipboard
+    alias marked 'open -a "Marked 2"'   # markdown preview (shell twin of nvim <leader>pv)
 end
 
 # System management

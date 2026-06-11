@@ -8,6 +8,20 @@ individual commit — the git log has the full detail.
 ## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
 
 ### Added
+- Markdown/academic-writing fish functions and aliases:
+  - `mdexport <fmt> <files…>` — batch Pandoc export (crossref + citeproc +
+    sibling metadata.yaml); shell mirror of the nvim `<leader>p` mappings
+  - `words <files…>` — prose word count via `pandoc -t plain` (excludes
+    frontmatter, markdown syntax, URLs — what a word limit actually counts)
+  - `cite` — fzf picker over the Zotero Better BibTeX export; copies
+    `@citekey`; warns when the .bib is >30 days stale
+  - `linkcheck [files…]` — lychee wrapper (the Brewfile had lychee but
+    nothing used it)
+  - `valeinit` — scaffold per-project `.vale.ini` from the
+    `writing/vale/vale-project.ini` template (previously orphaned)
+  - `pdfpages` / `pdfmerge` — qpdf wrappers for page extraction and merging
+  - aliases: `rgmd` (`rg -t md`), `drafts` (markdown touched this week),
+    `marked` (open in Marked 2)
 - Markdown/Pandoc writing upgrades in nvim:
   - `<leader>pd` — Pandoc export to docx (the `reference.docx` workflow had
     no keybinding); `<leader>pv` — open in Marked 2 for live preview

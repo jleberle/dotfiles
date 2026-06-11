@@ -254,6 +254,14 @@ picker.
 | `findd`     | `fd --type d`                                           |
 | `findf`     | `fd --type f`                                           |
 
+**Markdown / writing**
+
+| Alias    | Expands to                                                            |
+|----------|-----------------------------------------------------------------------|
+| `rgmd`   | `rg -t md` — search only markdown (named to avoid macOS's `mdfind`)   |
+| `drafts` | Markdown files modified in the last 7 days (`fd` → `eza`, by mtime)   |
+| `marked` | `open -a "Marked 2"` — preview (shell twin of nvim `<leader>pv`)      |
+
 **Safety & navigation**
 
 | Alias                | Expands to                               |
@@ -317,6 +325,13 @@ Autoloaded — call them like commands.
 | `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
 | `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim             |
+| `mdexport <fmt> <md…>`  | Batch Pandoc export (crossref + citeproc + sibling `metadata.yaml`); mirrors nvim `<leader>p` |
+| `words <md…>`           | Prose word count via `pandoc -t plain` (excludes frontmatter/syntax/URLs)             |
+| `cite`                  | fzf over the Zotero `.bib`; copies `@citekey` (warns if the export is >30 days stale) |
+| `linkcheck [md…]`       | Check links with `lychee` (no args: all `*.md` under the cwd)                         |
+| `valeinit`              | Scaffold a per-project `.vale.ini` from `writing/vale/vale-project.ini`               |
+| `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |
+| `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
 | `fn <text>`             | List files whose name contains `<text>` (recursive glob)                              |
