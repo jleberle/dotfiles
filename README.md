@@ -10,6 +10,8 @@ wired to work together.
 > uses `pbcopy`/`pbpaste`, `launchd`, `osascript`, and symlinks Ghostty into
 > `~/Library/Application Support`. It will not work as-is on Linux.
 
+**Note**: I had Claude write this up largely so I know where to look when something breaks or I forget a command, if something doesn't make sense, it's probably really internal for my system. Feel free to reach out but all of this is beyond my abilities to troubleshoot.
+
 ---
 
 ## Table of Contents
