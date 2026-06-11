@@ -40,12 +40,13 @@ trap 'rm -f "$TMPFILE"' EXIT
     "$BREW" upgrade
     echo ""
 
-    # Notify if Hugo was upgraded
+    # Notify if Hugo was upgraded. The follow-ups live in ~/git/website/scripts/
+    # (sync-hugo-version.sh, csp-hashes.sh), reachable via the `site` fish function.
     HUGO_AFTER=$("$HUGO" version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
     if [[ -n "$HUGO_BEFORE" && -n "$HUGO_AFTER" && "$HUGO_BEFORE" != "$HUGO_AFTER" ]]; then
         echo "Hugo updated: $HUGO_BEFORE → $HUGO_AFTER"
-        echo "  → run sync-hugo-version.sh (CI configs) and csp-hashes.sh --check (CSP hashes)"
-        osascript -e "display notification \"Hugo $HUGO_BEFORE → $HUGO_AFTER. Run sync-hugo-version.sh + csp-hashes.sh --check.\" with title \"Homebrew Update\" sound name \"Glass\""
+        echo "  → run: site sync-hugo && site csp"
+        osascript -e "display notification \"Hugo $HUGO_BEFORE → $HUGO_AFTER. Run: site sync-hugo && site csp.\" with title \"Homebrew Update\" sound name \"Glass\""
     fi
 
     echo "Upgrading outdated casks..."

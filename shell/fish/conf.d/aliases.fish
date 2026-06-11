@@ -92,5 +92,5 @@ abbr -a glst 'git log -1 HEAD'
 # Gitup with bookmarks file
 alias gitup 'gitup -b ~/.dotfiles/git/gitup-bookmarks'
 
-# Website theme submodule update
-alias update-theme 'git -C $HOME/git/website submodule update --remote themes/PaperMod'
+# Website tasks (serve, new post, preflight, theme update, …) are handled by
+# the `site` function — see shell/fish/functions/site.fish

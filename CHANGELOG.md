@@ -7,6 +7,21 @@ individual commit — the git log has the full detail.
 
 ## 2026-06-11 — academic history workflow: CMOS 18, shared pandoc pipeline, link archiving
 
+### Added (website integration)
+- `site` fish function — website tasks from anywhere, pure dispatch to
+  `~/git/website/scripts/` (new/images/preflight/push/serve/archive/
+  sync-hugo/csp/theme). Args that exist relative to the caller's cwd are
+  absolutized before cd'ing to the repo, so `site images <dir> ~/Downloads/x.jpg`
+  works. Retires the `update-theme` alias (`site theme`)
+- `bin/homebrewupdate.sh` Hugo notification now says `run: site sync-hugo &&
+  site csp` and records where the scripts live
+- nvim-lint now anchors vale's cwd to the linted file's directory — vale
+  discovers `.vale.ini` upward from its cwd (stdin input carries no path), so
+  project configs (website repo, `valeinit` scaffolds) previously only applied
+  when nvim happened to be cd'd into the project
+- Website repo (committed there): project `.vale.ini` with Readability enabled
+  (public-facing prose), `.vale/` gitignored
+
 ### Added
 - `writing/pandoc/chicago-notes-bibliography-18th-edition.csl` — current CMOS;
   now the default for `newdoc` and `metadata.yaml`. The 17th-edition CSL stays
