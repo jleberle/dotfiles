@@ -17,14 +17,15 @@ wired to work together.
 - [Quick Start](#quick-start)
 - [Check System](#check-system)
 - [Makefile Options](#makefile-options)
+- [Prose and Pandoc](#prose-and-pandoc)
+  - [Neovim](#neovim)
+  - [Writing functions and aliases (fish)](#writing-functions-and-aliases-fish)
 - [Apps](#apps)
   - [Ghostty](#ghostty)
   - [Fish](#fish)
-  - [Neovim](#neovim)
   - [tmux](#tmux)
   - [Git](#git)
   - [NeoMutt](#neomutt)
-- [Prose and Pandoc](#prose-and-pandoc)
 - [Scripting](#scripting)
   - [Bin](#bin)
   - [Launchd](#launchd)
@@ -165,185 +166,57 @@ just prints a warning) so nothing destructive happens by accident.
 
 ---
 
-## Apps
+## Prose and Pandoc
 
-### Ghostty
+This setup is tuned for academic / long-form writing in Markdown.
 
-The terminal config lives at `shell/ghostty/config` and is symlinked into
-Application Support.
+- **Live rendering** in Neovim via `render-markdown.nvim` (LaTeX module
+  disabled — no `latex` parser installed).
+- **Linting** via `vale`. `make vale` writes a global `~/.vale.ini` with an
+  absolute `StylesPath` (`~/.local/share/vale/styles`) and runs `vale sync` to
+  download four packages: `proselint`, `write-good`, `Readability`, and `alex`.
+  Only `Vale` + `proselint` run globally — the lean baseline for scholarly
+  prose (write-good's E-Prime/passive rules, Readability's grade-level caps,
+  and alex's terminology checks all misfire on academic history; measured at
+  22 of 23 alerts being noise on a typical paragraph). The others are
+  per-project opt-ins via `valeinit` (e.g. `Readability` for syllabi).
+  `Vale.Spelling` is off — vim's built-in spell owns spelling, `harper_ls`
+  owns grammar. A per-project `.vale.ini` overrides the global one.
+- **Templates** in `writing/pandoc/`:
+  - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
+    `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
+    ```sh
+    cp ~/.dotfiles/writing/pandoc/metadata.yaml .
+    ```
+  - `defaults.yaml` — the shared Pandoc pipeline (pandoc-crossref → citeproc),
+    used by both the nvim `<leader>p` exports and `mdexport`. CSL deliberately
+    excluded — a defaults-file `csl` overrides document frontmatter, which
+    would silently re-style manuscripts pinned to an older edition.
+  - `chicago-notes-bibliography-18th-edition.csl` — the current CMOS (default
+    for `newdoc` and `metadata.yaml`).
+  - `chicago-notes-bibliography-17th-edition.csl` — kept for in-progress
+    manuscripts and journals still on 17e; point a document's `csl:`
+    frontmatter at it.
+  - `vale-project.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
+    project root to override the global `~/.vale.ini`:
+    ```sh
+    cp ~/.dotfiles/writing/vale/vale-project.ini .
+    ```
+- **Export** with `<leader>ph` (HTML), `<leader>pp` (PDF), or `<leader>pd`
+  (docx) — or `mdexport` from the shell. All:
+  - run the shared pipeline from `writing/pandoc/defaults.yaml`
+    (pandoc-crossref → citeproc, so cross-references resolve *before*
+    citations),
+  - `cd` into the document's own directory first, so relative paths in
+    `metadata.yaml` (bibliography, CSL) and relative images resolve correctly,
+  - auto-add `--metadata-file=metadata.yaml` when a sibling file exists.
+- PDF export uses the LaTeX engine from **BasicTeX** (installed via the Brewfile
+  cask). After `make apps`, install the packages required by the CV and syllabus
+  templates:
 
-| Setting                        | Value                          | Notes                                           |
-|--------------------------------|--------------------------------|-------------------------------------------------|
-| `theme`                        | Nord                           | Matches Neovim, tmux, bat, fzf                  |
-| `font-family` / `font-size`    | JetBrainsMono Nerd Font / 15   | Nerd Font for icons in `eza`, lualine, etc.     |
-| `background-opacity` / blur    | `0.93` / `18`                  | Subtle translucency                             |
-| `copy-on-select`               | `clipboard`                    | Selecting text copies it                        |
-| `macos-option-as-alt`          | `true`                         | Makes `Option` send `Alt` for tmux `M-h`/`M-l`  |
-| `mouse-hide-while-typing`      | `true`                         | —                                               |
-| `cursor-style-blink`           | `false`                        | Steady cursor                                   |
-| `window-save-state`            | `always`                       | Restores layout/working dirs after restart      |
-| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Neovim |
-
-> Reload Ghostty config with **`Cmd-Shift-,`**.
-
----
-
-### Fish
-
-Configured for speed: external tool initializations (`fzf`, `zoxide`) are
-**cached to disk** and only regenerated when the binary is newer than the
-cache. Autosuggestions, syntax highlighting, and completions are
-built into fish, so there are no shell plugins to source or `compinit` to run.
-
-- `conf.d/env.fish` — environment (`EDITOR=nvim`, `PAGER="bat --style=plain"`,
-  `MANPAGER="nvim +Man!"`, `BAT_THEME`, `LS_COLORS`, `HOMEBREW_NO_ANALYTICS`,
-  `HOMEBREW_NO_ENV_HINTS`), PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the
-  Homebrew shellenv.
-  `conf.d/*.fish` is auto-sourced for every session.
-- `conf.d/options.fish` — documents how zsh `setopt`s map to fish defaults and
-  disables the startup greeting.
-- `conf.d/aliases.fish` — see below.
-- `config.fish` — interactive setup: keybindings, fzf, zoxide.
-- `functions/` — autoloaded functions (see below).
-- `functions/fish_prompt.fish` — native fish prompt: directory (Nord purple),
-  git branch (Nord yellow), git status indicators (Nord blue), prompt character
-  (green ❯ on success, red on error). No external dependency.
-
-#### Shell behavior
-
-- **History:** **shared** across sessions, de-duplicated, and effectively
-  unbounded — all by default (no `HISTSIZE`/`SHARE_HISTORY` to configure).
-- **Autosuggestions** and **syntax highlighting** are built in (replacing
-  `zsh-autosuggestions`/`zsh-syntax-highlighting`), as are man-page-backed
-  **completions** (no `compinit`).
-- **Directory history** — `prevd`/`nextd` (Alt-←/→) and `cd -` cover the
-  `AUTO_PUSHD` workflow; `**` recursive globbing is built in.
-- **Gaps vs zsh:** fish has no `AUTO_CD` (use `cd`, or zoxide's `z`), no
-  `NO_CLOBBER` (`>` overwrites — use `>>`), and no `HIST_IGNORE_SPACE`.
-
-#### Keybindings
-
-| Keys                       | Action                                            |
-|----------------------------|---------------------------------------------------|
-| `Ctrl-←` / `Ctrl-→`        | Move by word                                      |
-| `↑` / `↓`                  | History search seeded by what you've typed        |
-| `Ctrl-R`                   | fzf fuzzy history search                          |
-| `Ctrl-T`                   | fzf file picker (uses `fd`, `bat` preview)        |
-| `Alt-C`                    | fzf `cd` into a subdirectory (`eza` tree preview) |
-
-#### zoxide
-
-`z <partial>` jumps to a frecency-ranked directory; `zi` opens an interactive
-picker.
-
-#### Aliases
-
-**Editor & files**
-
-| Alias       | Expands to                                              |
-|-------------|---------------------------------------------------------|
-| `v`, `vim`  | `nvim`                                                  |
-| `cat`       | `bat`                                                   |
-| `ls`        | `eza --icons`                                           |
-| `ll`        | `eza -lh --git --icons --group-directories-first`       |
-| `la`        | `eza -lah --git --icons --group-directories-first`      |
-| `lt`        | `eza --tree --level=2 --icons`                          |
-| `ltt`       | `eza --tree --level=3 --icons`                          |
-| `recent`    | `eza -lah --sort=modified`                              |
-| `biggest`   | `eza -lah --sort=size --reverse`                        |
-| `findd`     | `fd --type d`                                           |
-| `findf`     | `fd --type f`                                           |
-
-**Markdown / writing**
-
-| Alias    | Expands to                                                            |
-|----------|-----------------------------------------------------------------------|
-| `rgmd`   | `rg -t md` — search only markdown (named to avoid macOS's `mdfind`)   |
-| `drafts` | Markdown files modified in the last 7 days (`fd` → `eza`, by mtime)   |
-| `marked` | `open -a "Marked 2"` — preview (shell twin of nvim `<leader>pv`)      |
-
-**Safety & navigation**
-
-| Alias                | Expands to                               |
-|----------------------|------------------------------------------|
-| `cp` / `mv`          | `cp -i` / `mv -i` (prompt before clobber)|
-| `..` / `...` / `....`| `cd ..` / `cd ../..` / `cd ../../..`     |
-| `reload`             | `exec fish`                              |
-| `paths`              | Print `$PATH` one entry per line         |
-
-**Clipboard & keys**
-
-| Alias            | Expands to                                         |
-|------------------|----------------------------------------------------|
-| `cb`             | `pbcopy` (pipe into it: `echo hi \| cb`)           |
-| `cv`             | `pbpaste`                                          |
-| `pubkey-github`  | Copy `~/.ssh/id_github.pub` to the clipboard       |
-| `pubkey-codeberg`| Copy `~/.ssh/id_codeberg.pub` to the clipboard     |
-
-**System / network / housekeeping**
-
-| Alias                     | Purpose                                                       |
-|---------------------------|---------------------------------------------------------------|
-| `myip`                    | Public IP via `ifconfig.me`                                   |
-| `ports`                   | Listening TCP ports (`lsof`)                                  |
-| `network`                 | `networkQuality` speed test                                   |
-| `disk`                    | `df -h` — free/used space per mount                           |
-| `usage`                   | `du -sh -- *` — directory sizes in cwd (pairs with `biggest`) |
-| `brewup`                  | `brew update && upgrade && cleanup`                           |
-| `flushdns`                | Flush the macOS DNS cache                                     |
-| `cleands`                 | Delete `.DS_Store` files under the current tree               |
-| `showfiles` / `hidefiles` | Toggle hidden files in Finder                                 |
-
-**Git**
-
-| Abbr   | Expands to                                              |
-|--------|---------------------------------------------------------|
-| `lg`   | `lazygit`                                               |
-| `gs`   | `git status -sb`                                        |
-| `ga`   | `git add`                                               |
-| `gc`   | `git commit`                                            |
-| `gp`   | `git push`                                              |
-| `gpl`  | `git pull`                                              |
-| `gf`   | `git fetch`                                             |
-| `gd`   | `git diff` (rendered by delta)                          |
-| `gds`  | `git diff --staged`                                     |
-| `gl`   | `git log --oneline --graph --decorate -20`              |
-| `glo`  | `git log --graph --decorate --oneline --all`            |
-| `gco`  | `git checkout`                                          |
-| `gb`   | `git branch`                                            |
-| `grst` | `git restore`                                           |
-| `gund` | `git reset --soft HEAD~1` (undo last commit)            |
-| `gus`  | `git restore --staged` (unstage)                        |
-| `glst` | `git log -1 HEAD` (show last commit)                    |
-
-#### Functions (`shell/fish/functions/`)
-
-Autoloaded — call them like commands.
-
-| Function                | Usage / behavior                                                                      |
-|-------------------------|---------------------------------------------------------------------------------------|
-| `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
-| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
-| `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim             |
-| `mdexport <fmt> <md…>`  | Batch Pandoc export (crossref + citeproc + sibling `metadata.yaml`); mirrors nvim `<leader>p` |
-| `words <md…>`           | Prose word count via `pandoc -t plain` (excludes frontmatter/syntax/URLs)             |
-| `cite`                  | fzf over the Zotero `.bib`; copies `@citekey` (warns if the export is >30 days stale) |
-| `linkcheck [md…]`       | Check links with `lychee` (no args: all `*.md` under the cwd)                         |
-| `valeinit`              | Scaffold a per-project `.vale.ini` from `writing/vale/vale-project.ini`               |
-| `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |
-| `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
-| `mdarchive <md…>`       | Snapshot every URL cited in the file(s) to the Wayback Machine (lychee + `waybackup`) |
-| `mdimport <docx> [mode]`| Convert returned `.docx` edits to markdown (`--track-changes`: all/accept/reject)     |
-| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
-| `cdf`                   | `cd` to the directory open in the front Finder window                                 |
-| `fn <text>`             | List files whose name contains `<text>` (recursive glob)                              |
-| `fuck`                  | Re-run the previous command under `sudo`                                              |
-| `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |
-| `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only                          |
-| `mkd <dir>`             | `mkdir -p` then `cd` into it                                                          |
-| `o [paths]`             | `open` the current dir (no args) or the given paths                                   |
-| `pman <cmd>`            | Open a man page rendered as a PDF in Preview                                          |
-| `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)                       |
+```sh
+make latex
+```
 
 ---
 
@@ -459,6 +332,201 @@ The buffer is auto-written before export/preview.
 > All LSP servers, formatters, and linters are installed by the Brewfile
 > (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`,
 > `black`, `prettier`, `vale`) — there is no Mason layer.
+
+---
+
+### Writing functions and aliases (fish)
+
+The writing-specific subset of `shell/fish/functions/` — autoloaded, call them
+like commands. (General-purpose shell functions are listed under [Fish](#fish).)
+
+| Function                | Usage / behavior                                                                      |
+|-------------------------|---------------------------------------------------------------------------------------|
+| `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim             |
+| `mdexport <fmt> <md…>`  | Batch Pandoc export (crossref + citeproc + sibling `metadata.yaml`); mirrors nvim `<leader>p` |
+| `words <md…>`           | Prose word count via `pandoc -t plain` (excludes frontmatter/syntax/URLs)             |
+| `cite`                  | fzf over the Zotero `.bib`; copies `@citekey` (warns if the export is >30 days stale) |
+| `linkcheck [md…]`       | Check links with `lychee` (no args: all `*.md` under the cwd)                         |
+| `mdarchive <md…>`       | Snapshot every URL cited in the file(s) to the Wayback Machine (lychee + `waybackup`) |
+| `mdimport <docx> [mode]`| Convert returned `.docx` edits to markdown (`--track-changes`: all/accept/reject)     |
+| `valeinit`              | Scaffold a per-project `.vale.ini` from `writing/vale/vale-project.ini`               |
+| `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |
+| `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
+| `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)                       |
+
+**Aliases**
+
+| Alias    | Expands to                                                            |
+|----------|-----------------------------------------------------------------------|
+| `rgmd`   | `rg -t md` — search only markdown (named to avoid macOS's `mdfind`)   |
+| `drafts` | Markdown files modified in the last 7 days (`fd` → `eza`, by mtime)   |
+| `marked` | `open -a "Marked 2"` — preview (shell twin of nvim `<leader>pv`)      |
+
+For revision review, `git wdiff` (abbr `gwd`) shows word-level diffs of prose —
+see [Git aliases](#git-aliases).
+
+---
+
+## Apps
+
+### Ghostty
+
+The terminal config lives at `shell/ghostty/config` and is symlinked into
+Application Support.
+
+| Setting                        | Value                          | Notes                                           |
+|--------------------------------|--------------------------------|-------------------------------------------------|
+| `theme`                        | Nord                           | Matches Neovim, tmux, bat, fzf                  |
+| `font-family` / `font-size`    | JetBrainsMono Nerd Font / 15   | Nerd Font for icons in `eza`, lualine, etc.     |
+| `background-opacity` / blur    | `0.93` / `18`                  | Subtle translucency                             |
+| `copy-on-select`               | `clipboard`                    | Selecting text copies it                        |
+| `macos-option-as-alt`          | `true`                         | Makes `Option` send `Alt` for tmux `M-h`/`M-l`  |
+| `mouse-hide-while-typing`      | `true`                         | —                                               |
+| `cursor-style-blink`           | `false`                        | Steady cursor                                   |
+| `window-save-state`            | `always`                       | Restores layout/working dirs after restart      |
+| `shell-integration`            | `fish` + `cursor,sudo,title`   | Explicit fish integration; prompt/cursor reporting for Neovim |
+
+> Reload Ghostty config with **`Cmd-Shift-,`**.
+
+---
+
+### Fish
+
+Configured for speed: external tool initializations (`fzf`, `zoxide`) are
+**cached to disk** and only regenerated when the binary is newer than the
+cache. Autosuggestions, syntax highlighting, and completions are
+built into fish, so there are no shell plugins to source or `compinit` to run.
+
+- `conf.d/env.fish` — environment (`EDITOR=nvim`, `PAGER="bat --style=plain"`,
+  `MANPAGER="nvim +Man!"`, `BAT_THEME`, `LS_COLORS`, `HOMEBREW_NO_ANALYTICS`,
+  `HOMEBREW_NO_ENV_HINTS`), PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the
+  Homebrew shellenv.
+  `conf.d/*.fish` is auto-sourced for every session.
+- `conf.d/options.fish` — documents how zsh `setopt`s map to fish defaults and
+  disables the startup greeting.
+- `conf.d/aliases.fish` — see below.
+- `config.fish` — interactive setup: keybindings, fzf, zoxide.
+- `functions/` — autoloaded functions (see below).
+- `functions/fish_prompt.fish` — native fish prompt: directory (Nord purple),
+  git branch (Nord yellow), git status indicators (Nord blue), prompt character
+  (green ❯ on success, red on error). No external dependency.
+
+#### Shell behavior
+
+- **History:** **shared** across sessions, de-duplicated, and effectively
+  unbounded — all by default (no `HISTSIZE`/`SHARE_HISTORY` to configure).
+- **Autosuggestions** and **syntax highlighting** are built in (replacing
+  `zsh-autosuggestions`/`zsh-syntax-highlighting`), as are man-page-backed
+  **completions** (no `compinit`).
+- **Directory history** — `prevd`/`nextd` (Alt-←/→) and `cd -` cover the
+  `AUTO_PUSHD` workflow; `**` recursive globbing is built in.
+- **Gaps vs zsh:** fish has no `AUTO_CD` (use `cd`, or zoxide's `z`), no
+  `NO_CLOBBER` (`>` overwrites — use `>>`), and no `HIST_IGNORE_SPACE`.
+
+#### Keybindings
+
+| Keys                       | Action                                            |
+|----------------------------|---------------------------------------------------|
+| `Ctrl-←` / `Ctrl-→`        | Move by word                                      |
+| `↑` / `↓`                  | History search seeded by what you've typed        |
+| `Ctrl-R`                   | fzf fuzzy history search                          |
+| `Ctrl-T`                   | fzf file picker (uses `fd`, `bat` preview)        |
+| `Alt-C`                    | fzf `cd` into a subdirectory (`eza` tree preview) |
+
+#### zoxide
+
+`z <partial>` jumps to a frecency-ranked directory; `zi` opens an interactive
+picker.
+
+#### Aliases
+
+**Editor & files**
+
+| Alias       | Expands to                                              |
+|-------------|---------------------------------------------------------|
+| `v`, `vim`  | `nvim`                                                  |
+| `cat`       | `bat`                                                   |
+| `ls`        | `eza --icons`                                           |
+| `ll`        | `eza -lh --git --icons --group-directories-first`       |
+| `la`        | `eza -lah --git --icons --group-directories-first`      |
+| `lt`        | `eza --tree --level=2 --icons`                          |
+| `ltt`       | `eza --tree --level=3 --icons`                          |
+| `recent`    | `eza -lah --sort=modified`                              |
+| `biggest`   | `eza -lah --sort=size --reverse`                        |
+| `findd`     | `fd --type d`                                           |
+| `findf`     | `fd --type f`                                           |
+
+**Safety & navigation**
+
+| Alias                | Expands to                               |
+|----------------------|------------------------------------------|
+| `cp` / `mv`          | `cp -i` / `mv -i` (prompt before clobber)|
+| `..` / `...` / `....`| `cd ..` / `cd ../..` / `cd ../../..`     |
+| `reload`             | `exec fish`                              |
+| `paths`              | Print `$PATH` one entry per line         |
+
+**Clipboard & keys**
+
+| Alias            | Expands to                                         |
+|------------------|----------------------------------------------------|
+| `cb`             | `pbcopy` (pipe into it: `echo hi \| cb`)           |
+| `cv`             | `pbpaste`                                          |
+| `pubkey-github`  | Copy `~/.ssh/id_github.pub` to the clipboard       |
+| `pubkey-codeberg`| Copy `~/.ssh/id_codeberg.pub` to the clipboard     |
+
+**System / network / housekeeping**
+
+| Alias                     | Purpose                                                       |
+|---------------------------|---------------------------------------------------------------|
+| `myip`                    | Public IP via `ifconfig.me`                                   |
+| `ports`                   | Listening TCP ports (`lsof`)                                  |
+| `network`                 | `networkQuality` speed test                                   |
+| `disk`                    | `df -h` — free/used space per mount                           |
+| `usage`                   | `du -sh -- *` — directory sizes in cwd (pairs with `biggest`) |
+| `brewup`                  | `brew update && upgrade && cleanup`                           |
+| `flushdns`                | Flush the macOS DNS cache                                     |
+| `cleands`                 | Delete `.DS_Store` files under the current tree               |
+| `showfiles` / `hidefiles` | Toggle hidden files in Finder                                 |
+
+**Git**
+
+| Abbr   | Expands to                                              |
+|--------|---------------------------------------------------------|
+| `lg`   | `lazygit`                                               |
+| `gs`   | `git status -sb`                                        |
+| `ga`   | `git add`                                               |
+| `gc`   | `git commit`                                            |
+| `gp`   | `git push`                                              |
+| `gpl`  | `git pull`                                              |
+| `gf`   | `git fetch`                                             |
+| `gd`   | `git diff` (rendered by delta)                          |
+| `gds`  | `git diff --staged`                                     |
+| `gl`   | `git log --oneline --graph --decorate -20`              |
+| `glo`  | `git log --graph --decorate --oneline --all`            |
+| `gco`  | `git checkout`                                          |
+| `gb`   | `git branch`                                            |
+| `grst` | `git restore`                                           |
+| `gund` | `git reset --soft HEAD~1` (undo last commit)            |
+| `gus`  | `git restore --staged` (unstage)                        |
+| `glst` | `git log -1 HEAD` (show last commit)                    |
+
+#### Functions (`shell/fish/functions/`)
+
+Autoloaded — call them like commands.
+
+| Function                | Usage / behavior                                                                      |
+|-------------------------|---------------------------------------------------------------------------------------|
+| `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
+| `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
+| `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
+| `cdf`                   | `cd` to the directory open in the front Finder window                                 |
+| `fn <text>`             | List files whose name contains `<text>` (recursive glob)                              |
+| `fuck`                  | Re-run the previous command under `sudo`                                              |
+| `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |
+| `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only                          |
+| `mkd <dir>`             | `mkdir -p` then `cd` into it                                                          |
+| `o [paths]`             | `open` the current dir (no args) or the given paths                                   |
+| `pman <cmd>`            | Open a man page rendered as a PDF in Preview                                          |
 
 ---
 
@@ -625,60 +693,6 @@ Both `w3m` and `urlscan` are in the Brewfile.
 #### Aliases
 
 `mutt` is aliased to `neomutt`; both commands launch the client.
-
----
-
-## Prose and Pandoc
-
-This setup is tuned for academic / long-form writing in Markdown.
-
-- **Live rendering** in Neovim via `render-markdown.nvim` (LaTeX module
-  disabled — no `latex` parser installed).
-- **Linting** via `vale`. `make vale` writes a global `~/.vale.ini` with an
-  absolute `StylesPath` (`~/.local/share/vale/styles`) and runs `vale sync` to
-  download four packages: `proselint`, `write-good`, `Readability`, and `alex`.
-  Only `Vale` + `proselint` run globally — the lean baseline for scholarly
-  prose (write-good's E-Prime/passive rules, Readability's grade-level caps,
-  and alex's terminology checks all misfire on academic history; measured at
-  22 of 23 alerts being noise on a typical paragraph). The others are
-  per-project opt-ins via `valeinit` (e.g. `Readability` for syllabi).
-  `Vale.Spelling` is off — vim's built-in spell owns spelling, `harper_ls`
-  owns grammar. A per-project `.vale.ini` overrides the global one.
-- **Templates** in `writing/pandoc/`:
-  - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
-    `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
-    ```sh
-    cp ~/.dotfiles/writing/pandoc/metadata.yaml .
-    ```
-  - `defaults.yaml` — the shared Pandoc pipeline (pandoc-crossref → citeproc),
-    used by both the nvim `<leader>p` exports and `mdexport`. CSL deliberately
-    excluded — a defaults-file `csl` overrides document frontmatter, which
-    would silently re-style manuscripts pinned to an older edition.
-  - `chicago-notes-bibliography-18th-edition.csl` — the current CMOS (default
-    for `newdoc` and `metadata.yaml`).
-  - `chicago-notes-bibliography-17th-edition.csl` — kept for in-progress
-    manuscripts and journals still on 17e; point a document's `csl:`
-    frontmatter at it.
-  - `vale-project.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
-    project root to override the global `~/.vale.ini`:
-    ```sh
-    cp ~/.dotfiles/writing/vale/vale-project.ini .
-    ```
-- **Export** with `<leader>ph` (HTML), `<leader>pp` (PDF), or `<leader>pd`
-  (docx) — or `mdexport` from the shell. All:
-  - run the shared pipeline from `writing/pandoc/defaults.yaml`
-    (pandoc-crossref → citeproc, so cross-references resolve *before*
-    citations),
-  - `cd` into the document's own directory first, so relative paths in
-    `metadata.yaml` (bibliography, CSL) and relative images resolve correctly,
-  - auto-add `--metadata-file=metadata.yaml` when a sibling file exists.
-- PDF export uses the LaTeX engine from **BasicTeX** (installed via the Brewfile
-  cask). After `make apps`, install the packages required by the CV and syllabus
-  templates:
-
-```sh
-make latex
-```
 
 ---
 
