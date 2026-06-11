@@ -7,6 +7,17 @@ individual commit — the git log has the full detail.
 
 ## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
 
+### Changed (Vale)
+- Global Vale config trimmed to `Vale, proselint` for scholarly prose.
+  Measured on a typical history paragraph: 23 alerts → 1, with the survivor
+  the only actionable one. write-good (E-Prime, passive voice), Readability
+  (grade-level caps), and alex (flags period terminology and primary-source
+  quotes — "master" in slavery scholarship, "remains") moved to per-project
+  opt-in; all four packages stay synced. `Vale.Spelling = NO` — vim spell
+  owns spelling, harper_ls owns grammar
+- `vale-project.ini` template documents the opt-in packages and disables
+  `Vale.Spelling` to match
+
 ### Added
 - Markdown/academic-writing fish functions and aliases:
   - `mdexport <fmt> <files…>` — batch Pandoc export (crossref + citeproc +

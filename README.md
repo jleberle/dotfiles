@@ -631,8 +631,14 @@ This setup is tuned for academic / long-form writing in Markdown.
   disabled — no `latex` parser installed).
 - **Linting** via `vale`. `make vale` writes a global `~/.vale.ini` with an
   absolute `StylesPath` (`~/.local/share/vale/styles`) and runs `vale sync` to
-  download the configured packages: `proselint`, `write-good`, `Readability`,
-  and `alex`. A per-project `.vale.ini` placed in a repo overrides the global one.
+  download four packages: `proselint`, `write-good`, `Readability`, and `alex`.
+  Only `Vale` + `proselint` run globally — the lean baseline for scholarly
+  prose (write-good's E-Prime/passive rules, Readability's grade-level caps,
+  and alex's terminology checks all misfire on academic history; measured at
+  22 of 23 alerts being noise on a typical paragraph). The others are
+  per-project opt-ins via `valeinit` (e.g. `Readability` for syllabi).
+  `Vale.Spelling` is off — vim's built-in spell owns spelling, `harper_ls`
+  owns grammar. A per-project `.vale.ini` overrides the global one.
 - **Templates** in `writing/pandoc/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
     `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
