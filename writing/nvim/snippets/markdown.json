@@ -18,5 +18,10 @@
     "prefix": "sec",
     "body": "${1:Heading} {#sec:${2:label}}",
     "description": "pandoc-crossref section label — reference with @sec:label"
+  },
+  "Inline footnote": {
+    "prefix": "note",
+    "body": "^[${1:Note text.}]",
+    "description": "pandoc inline footnote — self-numbering, no [^n] bookkeeping (Chicago notes style)"
   }
 }

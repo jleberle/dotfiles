@@ -1,0 +1,16 @@
+# Shared Pandoc export pipeline — the single source of truth used by both the
+# nvim <leader>p mappings (writing/nvim/lua/config/keymaps.lua) and the fish
+# mdexport function:
+#
+#   pandoc -d ~/.dotfiles/writing/pandoc/defaults.yaml file.md -o file.ext
+#
+# Deliberately NOT here: csl / bibliography / reference-doc. Anything set in a
+# defaults file overrides document frontmatter (verified empirically — both
+# the top-level `csl:` and `metadata: csl:` forms clobber the document's own),
+# which would silently re-style manuscripts pinned to an older CSL edition.
+# Those stay per-document: newdoc's frontmatter or a sibling metadata.yaml.
+
+# pandoc-crossref must run before citeproc (filters apply in order).
+filters:
+  - pandoc-crossref
+  - citeproc

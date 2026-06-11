@@ -1,9 +1,10 @@
 function mdexport --description 'Pandoc-export markdown files (crossref + citeproc, sibling metadata.yaml)'
     # usage: mdexport <format> <file.md> [more.md ...]
     # e.g.:  mdexport docx chapter-*.md
-    # Mirrors the nvim <leader>p mappings: runs from each document's own
-    # directory so relative paths in metadata.yaml (bibliography, CSL) and
-    # relative images resolve; pandoc-crossref must precede --citeproc.
+    # Mirrors the nvim <leader>p mappings — both use the shared pipeline in
+    # writing/pandoc/defaults.yaml (crossref + citeproc). Runs from each
+    # document's own directory so relative paths in metadata.yaml
+    # (bibliography, CSL) and relative images resolve.
     if test (count $argv) -lt 2
         echo "usage: mdexport <html|pdf|docx|...> <file.md> [more.md ...]" >&2
         return 1
@@ -28,7 +29,7 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
         end
 
         pushd (path dirname $file)
-        if pandoc --filter pandoc-crossref --citeproc $name -o $out $meta_args
+        if pandoc -d ~/.dotfiles/writing/pandoc/defaults.yaml $name -o $out $meta_args
             echo "Exported "(path dirname $file)/$out
         else
             echo "mdexport: pandoc failed for $file" >&2

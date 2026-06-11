@@ -5,7 +5,9 @@ date: 2026-05-28
 bibliography:
   - ~/Documents/Library/Library.bib
 
-csl: ~/.dotfiles/writing/pandoc/chicago-notes-bibliography-17th-edition.csl
+# CMOS 18th edition (current); swap to ...-17th-edition.csl for journals
+# still on 17e. Keep this default in sync with the newdoc fish function.
+csl: ~/.dotfiles/writing/pandoc/chicago-notes-bibliography-18th-edition.csl
 
 link-citations: true
 

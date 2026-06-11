@@ -5,6 +5,30 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-11 — academic history workflow: CMOS 18, shared pandoc pipeline, link archiving
+
+### Added
+- `writing/pandoc/chicago-notes-bibliography-18th-edition.csl` — current CMOS;
+  now the default for `newdoc` and `metadata.yaml`. The 17th-edition CSL stays
+  for in-progress manuscripts and journals still on 17e (set per-document via
+  `csl:` frontmatter)
+- `writing/pandoc/defaults.yaml` — single source of truth for the export
+  pipeline (pandoc-crossref → citeproc), used by both the nvim `<leader>p`
+  mappings and `mdexport`. CSL deliberately excluded: verified empirically
+  that defaults-file `csl` (both top-level and `metadata:`) overrides document
+  frontmatter, which would silently re-style pinned manuscripts
+- `mdarchive` fish function — extracts every URL from markdown files (lychee
+  --dump) and snapshots each to the Wayback Machine via `waybackup`; cite the
+  archive URL alongside the original to beat link rot
+- `mdimport` fish function — `pandoc --track-changes` docx → markdown for
+  round-tripping editor/colleague revisions; extracts embedded media
+- `git wdiff` alias + `gwd` abbr — `diff --word-diff=color`, word-level diffs
+  for manuscript revision (verified delta passes word-diff through cleanly)
+- `note` snippet — pandoc inline footnote `^[…]`, self-numbering (no `[^n]`
+  bookkeeping), the low-friction form for Chicago notes style
+
+---
+
 ## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
 
 ### Changed (Vale)

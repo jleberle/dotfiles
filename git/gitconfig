@@ -25,6 +25,8 @@
 	lol = log --graph --decorate --oneline --all
 	unstage = restore --staged
 	discard = restore
+	# Word-level diff for prose — shows the changed words, not changed lines
+	wdiff = diff --word-diff=color
 
 [color]
 	ui = auto

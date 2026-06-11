@@ -21,7 +21,11 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
     set -l today (date +%Y-%m-%d)
     set -l author (git config user.name)
 
-    printf '---\ntitle: "%s"\nauthor: "%s"\ndate: %s\n\nbibliography:\n  - ~/Documents/Library/Library.bib\n\ncsl: %s/.dotfiles/writing/pandoc/chicago-notes-bibliography-17th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/.dotfiles/writing/pandoc/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $author $today $HOME $HOME > $filename
+    # CSL defaults to CMOS 18th edition (current since Sept 2024); swap the
+    # frontmatter to ...-17th-edition.csl for journals still on 17e. Keep this
+    # default in sync with writing/pandoc/metadata.yaml — the CSL must live in
+    # document metadata, not defaults.yaml (defaults override frontmatter).
+    printf '---\ntitle: "%s"\nauthor: "%s"\ndate: %s\n\nbibliography:\n  - ~/Documents/Library/Library.bib\n\ncsl: %s/.dotfiles/writing/pandoc/chicago-notes-bibliography-18th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/.dotfiles/writing/pandoc/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $author $today $HOME $HOME > $filename
 
     nvim $filename
 end

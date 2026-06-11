@@ -22,12 +22,14 @@ map("n", "<leader>z", "<cmd>ZenMode<cr>")
 -- Oil file browser
 map("n", "-", "<cmd>Oil<cr>")
 
--- Pandoc exports with citation + cross-reference processing.
--- Runs asynchronously (vim.system) so the editor stays responsive during slow
--- PDF/LaTeX builds; notifies on completion. Runs from the document's own
--- directory so relative paths in metadata.yaml (bibliography, CSL) and
--- relative image/links resolve correctly. pandoc-crossref must precede
--- --citeproc, since pandoc applies filters left-to-right.
+-- Pandoc exports with citation + cross-reference processing. The pipeline
+-- (crossref filter ordering, citeproc) lives in writing/pandoc/defaults.yaml,
+-- shared with the fish mdexport function. Runs asynchronously (vim.system) so
+-- the editor stays responsive during slow PDF/LaTeX builds; notifies on
+-- completion. Runs from the document's own directory so relative paths in
+-- metadata.yaml (bibliography, CSL) and relative image/links resolve.
+local pandoc_defaults = vim.fn.expand("~/.dotfiles/writing/pandoc/defaults.yaml")
+
 local function pandoc_export(ext)
 	vim.cmd.update() -- write the buffer first (only if modified)
 
@@ -35,7 +37,7 @@ local function pandoc_export(ext)
 	local file = vim.fn.expand("%:t")
 	local output = vim.fn.expand("%:t:r") .. "." .. ext
 
-	local cmd = { "pandoc", "--filter", "pandoc-crossref", "--citeproc", file, "-o", output }
+	local cmd = { "pandoc", "-d", pandoc_defaults, file, "-o", output }
 
 	-- Pick up a sibling metadata.yaml (bibliography, CSL, etc.) if present.
 	if vim.fn.filereadable(dir .. "/metadata.yaml") == 1 then

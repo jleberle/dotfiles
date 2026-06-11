@@ -79,6 +79,7 @@ abbr -a gpl 'git pull'
 abbr -a gf  'git fetch'
 abbr -a gd  'git diff'
 abbr -a gds 'git diff --staged'
+abbr -a gwd 'git wdiff'   # word-level diff (prose/manuscripts)
 abbr -a gl   'git log --oneline --graph --decorate -20'
 abbr -a glo  'git log --graph --decorate --oneline --all'
 abbr -a gco  'git checkout'

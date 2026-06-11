@@ -332,6 +332,8 @@ Autoloaded — call them like commands.
 | `valeinit`              | Scaffold a per-project `.vale.ini` from `writing/vale/vale-project.ini`               |
 | `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |
 | `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
+| `mdarchive <md…>`       | Snapshot every URL cited in the file(s) to the Wayback Machine (lychee + `waybackup`) |
+| `mdimport <docx> [mode]`| Convert returned `.docx` edits to markdown (`--track-changes`: all/accept/reject)     |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
 | `fn <text>`             | List files whose name contains `<text>` (recursive glob)                              |
@@ -439,7 +441,9 @@ The buffer is auto-written before export/preview.
   built in — no separate source plugins) with the built-in `vim.snippet`
   expander; loads on `InsertEnter`. Enter confirms only an explicitly
   selected item. `snippets/markdown.json` provides pandoc-crossref snippets
-  (`fig`, `tbl`, `eq`, `sec` — label syntax for figures/tables/equations/sections).
+  (`fig`, `tbl`, `eq`, `sec` — label syntax for figures/tables/equations/sections —
+  plus `note` for self-numbering inline footnotes, the low-friction form for
+  Chicago notes style).
 - **Citations:** `telescope-bibtex` (`<leader>fc`) fuzzy-finds the Zotero
   Better BibTeX export (`~/Documents/Library/Library.bib`) and inserts a
   pandoc `@citekey`.
@@ -525,6 +529,7 @@ most-recent commit.
 | `git lol`     | `log --graph --decorate --oneline --all`                         |
 | `git unstage` | `restore --staged`                                               |
 | `git discard` | `restore` (discard working-tree changes)                         |
+| `git wdiff`   | `diff --word-diff=color` — word-level diff for prose/manuscripts (abbr: `gwd`) |
 
 ---
 
@@ -645,17 +650,25 @@ This setup is tuned for academic / long-form writing in Markdown.
     ```sh
     cp ~/.dotfiles/writing/pandoc/metadata.yaml .
     ```
-  - `chicago-notes-bibliography-17th-edition.csl` — CSL style file referenced
-    automatically by `newdoc` (hardcoded to `~/.dotfiles/writing/pandoc/`). Pandoc
-    exports via `<leader>ph`/`<leader>pp` will resolve it from there.
+  - `defaults.yaml` — the shared Pandoc pipeline (pandoc-crossref → citeproc),
+    used by both the nvim `<leader>p` exports and `mdexport`. CSL deliberately
+    excluded — a defaults-file `csl` overrides document frontmatter, which
+    would silently re-style manuscripts pinned to an older edition.
+  - `chicago-notes-bibliography-18th-edition.csl` — the current CMOS (default
+    for `newdoc` and `metadata.yaml`).
+  - `chicago-notes-bibliography-17th-edition.csl` — kept for in-progress
+    manuscripts and journals still on 17e; point a document's `csl:`
+    frontmatter at it.
   - `vale-project.ini` — a per-project Vale config (relative `StylesPath`). Copy to a
     project root to override the global `~/.vale.ini`:
     ```sh
     cp ~/.dotfiles/writing/vale/vale-project.ini .
     ```
-- **Export** with `<leader>ph` (HTML) or `<leader>pp` (PDF). Both:
-  - run `pandoc --filter pandoc-crossref --citeproc` (cross-references resolve
-    *before* citations),
+- **Export** with `<leader>ph` (HTML), `<leader>pp` (PDF), or `<leader>pd`
+  (docx) — or `mdexport` from the shell. All:
+  - run the shared pipeline from `writing/pandoc/defaults.yaml`
+    (pandoc-crossref → citeproc, so cross-references resolve *before*
+    citations),
   - `cd` into the document's own directory first, so relative paths in
     `metadata.yaml` (bibliography, CSL) and relative images resolve correctly,
   - auto-add `--metadata-file=metadata.yaml` when a sibling file exists.
