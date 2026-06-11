@@ -353,7 +353,7 @@ writing/nvim/
     └── plugins/
         ├── ui.lua           # nord theme + lualine
         ├── editor.lua       # oil, telescope, treesitter, gitsigns
-        ├── completion.lua   # nvim-cmp
+        ├── completion.lua   # blink.cmp
         ├── lsp.lua          # lspconfig + conform (formatting)
         ├── linting.lua      # nvim-lint (vale)
         ├── markdown.lua     # render-markdown
@@ -410,8 +410,9 @@ writing/nvim/
   (`pairs`, `comment`, `surround`).
 - **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls` (loads only for
   those filetypes).
-- **Completion:** `nvim-cmp` (lsp + buffer + path sources) using the built-in
-  `vim.snippet` expander; loads on `InsertEnter`.
+- **Completion:** `blink.cmp` (lsp + buffer + path sources, all built in —
+  no separate source plugins) with the built-in `vim.snippet` expander;
+  loads on `InsertEnter`. Enter confirms only an explicitly selected item.
 - **Formatting:** `conform.nvim` — `stylua` (Lua), `black` (Python),
   `prettier` (Markdown). Trigger with `<leader>cf`.
 - **Linting:** `nvim-lint` runs `vale` on Markdown (read/save) — see

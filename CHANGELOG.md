@@ -8,6 +8,12 @@ individual commit — the git log has the full detail.
 ## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
 
 ### Changed
+- Completion migrated `nvim-cmp` → `blink.cmp`: nvim-cmp is feature-frozen
+  upstream; blink has lsp/buffer/path sources and `vim.snippet` support built
+  in, so `cmp-buffer`, `cmp-path`, and `cmp-nvim-lsp` are dropped (4 plugins
+  → 1). LSP capabilities now come from `blink.cmp.get_lsp_capabilities()`.
+  Enter-confirms-only-selected behavior preserved via the `enter` keymap
+  preset with `preselect = false`
 - SSH key exchange now prefers hybrid post-quantum algorithms
   (`mlkem768x25519-sha256`, `sntrup761x25519-sha512`) ahead of curve25519 —
   the previous pinned list silently excluded the OpenSSH 9.x/10.x defaults.

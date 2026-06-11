@@ -1,37 +1,27 @@
 return {
 	{
-		"hrsh7th/nvim-cmp",
+		"saghen/blink.cmp",
+		-- Release tags ship a prebuilt fuzzy-matcher binary (no Rust toolchain
+		-- needed); blink falls back to its Lua implementation if unavailable.
+		version = "1.*",
 		event = "InsertEnter",
-		dependencies = {
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-nvim-lsp",
+
+		opts = {
+			-- Enter confirms; C-n/C-p or arrows select. With preselect off,
+			-- Enter inserts a newline unless an item was explicitly selected —
+			-- matches the old nvim-cmp confirm({ select = false }) behavior.
+			keymap = { preset = "enter" },
+			completion = {
+				list = { selection = { preselect = false, auto_insert = true } },
+			},
+
+			-- Same sources as the old nvim-cmp setup (all built into blink).
+			-- The blink default also includes 'snippets' (vscode-style snippet
+			-- files), which this setup doesn't use; LSP snippet completions
+			-- still expand via vim.snippet natively.
+			sources = {
+				default = { "lsp", "path", "buffer" },
+			},
 		},
-
-		config = function()
-			local cmp = require("cmp")
-
-			cmp.setup({
-				-- Use Neovim's built-in snippet expander (0.10+) so accepting
-				-- an LSP snippet completion doesn't error.
-				snippet = {
-					expand = function(args)
-						vim.snippet.expand(args.body)
-					end,
-				},
-
-				mapping = cmp.mapping.preset.insert({
-					["<CR>"] = cmp.mapping.confirm({
-						select = false,
-					}),
-				}),
-
-				sources = {
-					{ name = "nvim_lsp" },
-					{ name = "buffer" },
-					{ name = "path" },
-				},
-			})
-		end,
 	},
 }
