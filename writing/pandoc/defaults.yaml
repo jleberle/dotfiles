@@ -14,3 +14,8 @@
 filters:
   - pandoc-crossref
   - citeproc
+
+# Tectonic: self-contained XeTeX engine, fetches LaTeX packages on demand —
+# no TeX distribution or tlmgr package list to maintain. Same engine the CV
+# and syllabi repos build with.
+pdf-engine: tectonic

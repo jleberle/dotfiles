@@ -52,7 +52,7 @@ brew "pinentry-mac" # GPG passphrase prompt on macOS
 brew "poppler" # PDF text/image extraction (pdftotext, pdfinfo; complements qpdf)
 brew "qpdf" # PDF transformation (CV, syllabi PDF builds; pdfpages/pdfmerge functions)
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
-brew "tectonic" # self-contained LaTeX engine (auto-fetches packages on first use)
+brew "tectonic" # LaTeX engine for all PDF builds (pandoc defaults.yaml, CV, syllabi); auto-fetches packages
 brew "tmux" # terminal multiplexer (config shell/tmux.conf)
 brew "urlscan" # extract and open URLs from emails (used by NeoMutt \Cu macro)
 brew "w3m" # terminal browser; renders HTML emails inline in NeoMutt
@@ -60,7 +60,6 @@ brew "zoxide" # smarter cd via frecency (the `z` command)
 
 # GUI apps
 cask "alfred" # launcher / productivity
-cask "basictex" # minimal LaTeX distribution (PDF export via Pandoc)
 cask "bbedit" # text editor (used by the bb function)
 cask "bitwarden" # Password Manager
 cask "calibre" # e-book library management

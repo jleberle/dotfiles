@@ -7,6 +7,15 @@ individual commit — the git log has the full detail.
 
 ## 2026-06-11 — academic history workflow: CMOS 18, shared pandoc pipeline, link archiving
 
+### Changed (PDF engine)
+- Pandoc PDF export now uses tectonic (`pdf-engine: tectonic` in
+  defaults.yaml) — self-contained XeTeX, fetches LaTeX packages on demand.
+  The CV repo already requires tectonic and syllabi prefers it, so BasicTeX
+  had no remaining consumers: removed the cask from the Brewfile and the
+  `make latex` tlmgr target. `make tools-check` now checks for tectonic
+- Brewfile: added poppler (PDF text/image extraction) and tectonic;
+  added ChangeTheHeaders (App Store); hush and emacs deliberately untracked
+
 ### Added (website integration)
 - `site` fish function — website tasks from anywhere, pure dispatch to
   `~/git/website/scripts/` (new/images/preflight/push/serve/archive/

@@ -72,7 +72,6 @@ Then finish the per-app setup:
 | tmux      | Start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM                           |
 | Neovim    | Launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
 | NeoMutt   | Run `make neomutt`, edit `~/.mbsyncrc` and `~/.notmuch-config`, add Keychain entries, edit `local.rc`, run `mbsync -a && notmuch new`, then `make mailsync` |
-| BasicTeX  | Run `make latex` to install the required `tlmgr` packages for PDF export                   |
 | macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
 
 > **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
@@ -121,7 +120,7 @@ Fast way to spot drift after `brew cleanup` or a fresh clone.
 make tools-check
 ```
 
-Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `lazygit`, `harper-ls`,
+Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `tectonic`, `lazygit`, `harper-ls`,
 `lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
 and `prettier` are all on `PATH`.
 
@@ -158,7 +157,6 @@ just prints a warning) so nothing destructive happens by accident.
 | `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs, scaffolds `~/.mbsyncrc` and `~/.notmuch-config` from templates if missing |
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
-| `latex`            | Installs the `tlmgr` packages required for PDF export (requires BasicTeX from `make apps`)          |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` and warns on any that are missing or wrong value                |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
@@ -212,13 +210,11 @@ This setup is tuned for academic / long-form writing in Markdown.
   - `cd` into the document's own directory first, so relative paths in
     `metadata.yaml` (bibliography, CSL) and relative images resolve correctly,
   - auto-add `--metadata-file=metadata.yaml` when a sibling file exists.
-- PDF export uses the LaTeX engine from **BasicTeX** (installed via the Brewfile
-  cask). After `make apps`, install the packages required by the CV and syllabus
-  templates:
-
-```sh
-make latex
-```
+- PDF export uses **tectonic** (set in `defaults.yaml`): a self-contained
+  XeTeX engine that fetches LaTeX packages on demand — no TeX distribution
+  to install, no `tlmgr` package list to maintain. The first PDF build
+  downloads what it needs; later builds are offline. Same engine the CV and
+  syllabi repos use.
 
 ---
 

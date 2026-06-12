@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync latex macos macos-check doctor brew-check tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync macos macos-check doctor brew-check tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -19,7 +19,6 @@ default :
 install : apps git shell security nvim vale neomutt brewauto
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
-	@echo "Run 'make latex' to install LaTeX packages. Will load slowly"
 	@echo ""
 	@$(MAKE) doctor
 
@@ -209,14 +208,6 @@ macos-check :
 	@VAL=$$(defaults read com.apple.screensaver askForPasswordDelay 2>/dev/null); \
 	[ "$$VAL" = "0" ] || echo "WARNING: screensaver password delay not set to 0 (run: make macos)"
 	@echo "Done."
-latex :
-	@command -v tlmgr >/dev/null 2>&1 || { echo "ERROR: tlmgr not found — install BasicTeX first (make apps)"; exit 1; }
-	tlmgr install \
-	    tex-gyre xcharter sourcesans microtype geometry \
-	    titlesec titling parskip enumitem fancyhdr \
-	    booktabs adjustbox xcolor float listings \
-	    tools graphics ec collection-fontsrecommended \
-	    xstring fontaxes ly1
 nvim :
 	@echo "Symlinking nvim config"
 	ln -sfn $(HOME)/.dotfiles/writing/nvim $(HOME)/.config/nvim
@@ -280,6 +271,7 @@ tools-check :
 	@command -v vale       >/dev/null 2>&1 || echo "WARNING: vale not found (run: make apps)"
 	@command -v pandoc     >/dev/null 2>&1 || echo "WARNING: pandoc not found (run: make apps)"
 	@command -v pandoc-crossref >/dev/null 2>&1 || echo "WARNING: pandoc-crossref not found (run: make apps)"
+	@command -v tectonic   >/dev/null 2>&1 || echo "WARNING: tectonic not found — PDF export will fail (run: make apps)"
 	@command -v lazygit    >/dev/null 2>&1 || echo "WARNING: lazygit not found (run: make apps)"
 	@command -v lua-language-server >/dev/null 2>&1 || echo "WARNING: lua-language-server not found (run: make apps)"
 	@command -v pyright    >/dev/null 2>&1 || echo "WARNING: pyright not found (run: make apps)"
