@@ -109,3 +109,4 @@ cask "font-ibm-plex-serif" # IBM Plex Serif
 cask "font-inconsolata" # monospace font
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
 cask "font-source-sans-3" # humanist sans-serif (prose/document body text)
+cask "font-tex-gyre-schola" # Century Schoolbook-style serif (TeX Gyre; document/PDF body text)
