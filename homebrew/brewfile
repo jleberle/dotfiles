@@ -84,6 +84,7 @@ cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager
 mas "acorn", id:6737921844 # image editor
 mas "broadcasts", id:1469995354 # Internet Radio
+mas "changetheheaders", id:6743129567 # rewrite link-tracking headers in Safari
 mas "dropover", id:1355679052 # drag-and-drop shelf
 mas "folder quick look", id:6753110395 # Quick Look folder previews
 mas "hazeover", id:430798174 # blur background
