@@ -16,6 +16,25 @@ map("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
 map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
 map("n", "<leader>fb", "<cmd>Telescope buffers<cr>")
 
+-- Jump from the @citekey under the cursor to its item in Zotero (PDF and
+-- notes are one keystroke away there). Better BibTeX registers the
+-- zotero://select URL handler and resolves @citekey form; companion to the
+-- <leader>fc picker, which inserts these keys.
+map("n", "<leader>fo", function()
+	-- Citekey chars per the pandoc spec (alphanumerics plus internal
+	-- punctuation); the trailing strip drops sentence punctuation when the
+	-- citation isn't bracket-terminated, e.g. "see @smith2020."
+	local key = vim.fn.expand("<cWORD>"):match("@([%w_.:#$%%&+?<>~/%-]+)")
+	if key then
+		key = key:gsub("[.:#$%%&+?<>~/%-]+$", "")
+	end
+	if not key or key == "" then
+		vim.notify("No @citekey under cursor", vim.log.levels.WARN)
+		return
+	end
+	vim.ui.open("zotero://select/items/@" .. key)
+end, { desc = "Open citation in Zotero" })
+
 -- Zen mode
 map("n", "<leader>z", "<cmd>ZenMode<cr>")
 
