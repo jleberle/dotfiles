@@ -9,6 +9,10 @@ return {
 			vim.lsp.config("lua_ls", { capabilities = capabilities })
 			vim.lsp.config("pyright", { capabilities = capabilities })
 			vim.lsp.config("bashls", { capabilities = capabilities })
+			-- Cross-document Markdown navigation: go-to-definition on links and
+			-- headings, link/reference completion, rename across files. Style is
+			-- vale, grammar is harper_ls, spelling is vim's built-in spell.
+			vim.lsp.config("marksman", { capabilities = capabilities })
 			-- Grammar (not style — that's vale via nvim-lint, and not spelling
 			-- — that's vim's built-in spell, so SpellCheck is off here).
 			vim.lsp.config("harper_ls", {
@@ -19,7 +23,7 @@ return {
 					},
 				},
 			})
-			vim.lsp.enable({ "lua_ls", "pyright", "bashls", "harper_ls" })
+			vim.lsp.enable({ "lua_ls", "pyright", "bashls", "harper_ls", "marksman" })
 		end,
 	},
 	{

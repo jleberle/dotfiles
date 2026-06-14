@@ -11,7 +11,7 @@ HOMEBREW_PREFIX := $(shell \
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync macos macos-check doctor brew-check tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync macos macos-check doctor brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -26,6 +26,7 @@ git :
 	@echo "Symlinking Git files"
 	ln -sf $(HOME)/.dotfiles/git/gitconfig $(HOME)/.gitconfig
 	ln -sf $(HOME)/.dotfiles/git/gitignore $(HOME)/.gitignore
+	ln -sf $(HOME)/.dotfiles/git/gitmessage $(HOME)/.gitmessage
 	@echo "Symlinking lazygit config"
 	mkdir -p "$(HOME)/Library/Application Support/lazygit"
 	ln -sf $(HOME)/.dotfiles/git/lazygit.yml "$(HOME)/Library/Application Support/lazygit/config.yml"
@@ -217,6 +218,10 @@ vale :
 	mkdir -p $(HOME)/.local/share/vale/styles
 	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/vale/vale.ini > $(HOME)/.vale.ini
 	@echo "Wrote $(HOME)/.vale.ini (StylesPath: $(HOME)/.local/share/vale/styles)"
+	@echo "Symlinking the Academic vocabulary"
+	mkdir -p $(HOME)/.local/share/vale/styles/config/vocabularies
+	ln -sfn $(HOME)/.dotfiles/writing/vale/vocab/Academic \
+	    $(HOME)/.local/share/vale/styles/config/vocabularies/Academic
 	vale sync
 neomutt :
 	@echo "Setting up NeoMutt"
@@ -265,6 +270,13 @@ brew-check :
 	@echo "Checking Brewfile packages..."
 	@brew bundle check --file=$(HOME)/.dotfiles/homebrew/brewfile --no-upgrade || \
 	    echo "Run 'make apps' to install missing packages."
+
+brew-drift :
+	@echo "Checking for formulae/casks installed but not in the Brewfile..."
+	@brew bundle cleanup --file=$(HOME)/.dotfiles/homebrew/brewfile || true
+	@echo ""
+	@echo "Nothing listed above = no drift. To add a package, edit the Brewfile;"
+	@echo "to uninstall the drift instead, run: brew bundle cleanup --force --file=$(HOME)/.dotfiles/homebrew/brewfile"
 tools-check :
 	@echo "Checking tools..."
 	@command -v delta      >/dev/null 2>&1 || echo "WARNING: delta not found (run: make apps)"
@@ -277,6 +289,7 @@ tools-check :
 	@command -v pyright    >/dev/null 2>&1 || echo "WARNING: pyright not found (run: make apps)"
 	@command -v bash-language-server >/dev/null 2>&1 || echo "WARNING: bash-language-server not found (run: make apps)"
 	@command -v harper-ls  >/dev/null 2>&1 || echo "WARNING: harper-ls not found (run: make apps)"
+	@command -v marksman   >/dev/null 2>&1 || echo "WARNING: marksman not found (run: make apps)"
 	@command -v stylua     >/dev/null 2>&1 || echo "WARNING: stylua not found (run: make apps)"
 	@command -v black      >/dev/null 2>&1 || echo "WARNING: black not found (run: make apps)"
 	@command -v prettier   >/dev/null 2>&1 || echo "WARNING: prettier not found (run: make apps)"
@@ -285,6 +298,7 @@ doctor :
 	@echo "Checking symlinks..."
 	@test -L $(HOME)/.gitconfig                || echo "WARNING: .gitconfig not symlinked (run: make git)"
 	@test -L $(HOME)/.gitignore                || echo "WARNING: .gitignore not symlinked (run: make git)"
+	@test -L $(HOME)/.gitmessage               || echo "WARNING: .gitmessage not symlinked (run: make git)"
 	@test -L "$(HOME)/Library/Application Support/lazygit/config.yml" || echo "WARNING: lazygit config not symlinked (run: make git)"
 	@test -L $(HOME)/.config/fish              || echo "WARNING: fish config not symlinked (run: make shell)"
 	@test -L "$(GHOSTTY_DIR)/config"           || echo "WARNING: ghostty config not symlinked (run: make shell)"
@@ -318,4 +332,11 @@ doctor :
 	@echo "Checking GPG..."
 	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
 	    echo "WARNING: no GPG secret key found — import your key"
+	@echo "Checking background agents..."
+	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.brewlogclean; do \
+	    if [ -f "$(LAUNCH_AGENTS)/$$agent.plist" ]; then \
+	        launchctl print gui/$(LAUNCHD_UID)/$$agent >/dev/null 2>&1 || \
+	            echo "WARNING: $$agent plist installed but not loaded (run: launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$$agent.plist)"; \
+	    fi; \
+	done
 	@echo "Done."

@@ -93,7 +93,9 @@ make doctor
 
 Checks every symlink created by `make install`, plus: SSH keys exist
 (`id_github`, `id_codeberg`), fish is set as the login shell, TPM is cloned,
-vale styles directory is populated, and a GPG secret key is present.
+vale styles directory is populated, a GPG secret key is present, and any
+installed launchd agents (mailsync, brewupdate, brewlogclean) are actually
+loaded — not just that their plist files exist.
 
 ### macOS defaults
 
@@ -121,8 +123,19 @@ make tools-check
 ```
 
 Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `tectonic`, `lazygit`, `harper-ls`,
-`lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
+`marksman`, `lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
 and `prettier` are all on `PATH`.
+
+### Brewfile drift (reverse direction)
+
+```sh
+make brew-drift
+```
+
+Lists formulae/casks that are **installed but not in the Brewfile** — the
+reverse of `make brew-check`. Catches ad-hoc `brew install`s that would vanish
+on the next machine. Informational only (a dry run); deliberately-untracked
+items will also appear, so it never removes anything.
 
 ### Maintenance
 
@@ -146,7 +159,7 @@ just prints a warning) so nothing destructive happens by accident.
 |--------------------|-----------------------------------------------------------------------------------------------------|
 | `install`          | Runs `apps git shell security nvim vale neomutt brewauto` in order, then `doctor`                   |
 | `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
-| `git`              | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, lazygit config                |
+| `git`              | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, `gitmessage` → `~/.gitmessage`, lazygit config |
 | `shell`            | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                       |
 | `security`         | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms          |
 | `firefox`          | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) |
@@ -160,8 +173,9 @@ just prints a warning) so nothing destructive happens by accident.
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` and warns on any that are missing or wrong value                |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
+| `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
-| `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, and GPG key                              |
+| `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, GPG key, and that launchd agents are loaded |
 | `clean`            | Removes stale directories left over from old repo layouts (`fish/`, `general/`)                    |
 
 ---
@@ -182,6 +196,10 @@ This setup is tuned for academic / long-form writing in Markdown.
   per-project opt-ins via `valeinit` (e.g. `Readability` for syllabi).
   `Vale.Spelling` is off — vim's built-in spell owns spelling, `harper_ls`
   owns grammar. A per-project `.vale.ini` overrides the global one.
+  A curated **`Academic` vocabulary** (`writing/vale/vocab/Academic/`) is
+  tracked in the repo and symlinked into the styles dir by `make vale`
+  (`Vocab = Academic`), so proper nouns / domain terms are exempt from any
+  spelling or terminology rule and the allowlist syncs across machines.
 - **Templates** in `writing/pandoc/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
     `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
@@ -304,10 +322,12 @@ The buffer is auto-written before export/preview.
   automatically on first launch; highlighting starts per-filetype).
 - **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`
   (`pairs`, `comment`, `surround`).
-- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls`, and `harper_ls`
+- **LSP:** `nvim-lspconfig` for `lua_ls`, `pyright`, `bashls`, `harper_ls`
   (grammar checking in Markdown — vale covers style, vim's built-in spell
-  covers spelling, so harper's own SpellCheck linter is disabled). Loads only
-  for those filetypes.
+  covers spelling, so harper's own SpellCheck linter is disabled), and
+  `marksman` (cross-document Markdown navigation: go-to-definition on
+  links/headings, link completion, rename across files). Loads only for those
+  filetypes.
 - **Completion:** `blink.cmp` (lsp + buffer + path + snippets sources, all
   built in — no separate source plugins) with the built-in `vim.snippet`
   expander; loads on `InsertEnter`. Enter confirms only an explicitly
@@ -328,8 +348,13 @@ The buffer is auto-written before export/preview.
 > inside Neovim, then commit the resulting `lazy-lock.json` change.
 
 > All LSP servers, formatters, and linters are installed by the Brewfile
-> (`lua-language-server`, `pyright`, `bash-language-server`, `stylua`,
-> `black`, `prettier`, `vale`) — there is no Mason layer.
+> (`lua-language-server`, `pyright`, `bash-language-server`, `harper`,
+> `marksman`, `stylua`, `black`, `prettier`, `vale`) — there is no Mason layer.
+
+> **Personal dictionary:** words added with `zg` write to
+> `writing/nvim/spell/en.utf-8.add` (`spellfile` is pinned to the config dir),
+> so the dictionary is version-controlled and syncs across machines. The
+> compiled `.add.spl` binary is regenerated locally and gitignored.
 
 ---
 
@@ -583,7 +608,9 @@ before `make git` is run, or `git diff`/`git log` will fail. `make apps` install
 `default = current`, `rebase.autoStash` + `updateRefs`, `fetch.prune`,
 `rerere.enabled`, `diff.algorithm = histogram`, `merge.conflictstyle = zdiff3`,
 `help.autocorrect = prompt`, `init.defaultBranch = main`, branches sorted by
-most-recent commit.
+most-recent commit. A commit-message template (`git/gitmessage` →
+`~/.gitmessage`, via `commit.template`) prefills subject/body guidance for
+manual commits.
 
 #### Git aliases
 
@@ -772,7 +799,7 @@ Installed by `make security`.
 ├── security/             # ssh, gpg, dirmngr, firefox configs
 │   ├── betterfox/        # Betterfox submodule (upstream user.js — never edited)
 │   └── user-overrides.js # personal Firefox prefs appended on top of Betterfox
-├── git/                  # gitconfig, gitignore, lazygit.yml
+├── git/                  # gitconfig, gitignore, gitmessage, lazygit.yml
 ├── homebrew/             # Brewfile + LaunchAgent plist templates
 ├── shell/                # all terminal/shell environment configs
 │   ├── bat/              # bat pager config
@@ -780,10 +807,10 @@ Installed by `make security`.
 │   ├── ghostty/          # terminal emulator config
 │   └── tmux.conf         # tmux config
 └── writing/              # editor, Pandoc templates, Vale configs, and mail
-    ├── nvim/             # Neovim config (see Neovim section)
+    ├── nvim/             # Neovim config (see Neovim section); spell/ holds the tracked personal dictionary
     ├── neomutt/          # NeoMutt config (neomuttrc, gpg.rc, colors.rc, mailcap, mbsyncrc, notmuch-config, plist)
     ├── pandoc/           # metadata.yaml, CSL, reference.docx
-    └── vale/             # global vale.ini + vale-project.ini template
+    └── vale/             # global vale.ini + vale-project.ini template + vocab/ (Academic vocabulary)
 ```
 
 ---

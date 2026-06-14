@@ -17,6 +17,7 @@ brew "black"              # python formatter (conform)
 brew "harper"             # grammar LSP for markdown (harper_ls; vale covers style, vim spell covers spelling)
 brew "lua-language-server" # lua_ls
 brew "luacheck"           # Lua linter (CI lint workflow)
+brew "marksman"           # markdown LSP (cross-document links/headings navigation)
 brew "prettier"           # markdown formatter (conform)
 brew "pyright"             # python LSP
 brew "stylua"             # lua formatter (conform)
@@ -85,6 +86,7 @@ mas "acorn", id:6737921844 # image editor
 mas "broadcasts", id:1469995354 # Internet Radio
 mas "changetheheaders", id:6743129567 # rewrite link-tracking headers in Safari
 mas "dropover", id:1355679052 # drag-and-drop shelf
+mas "focus for youtube", id:1514703160
 mas "folder quick look", id:6753110395 # Quick Look folder previews
 mas "hazeover", id:430798174 # blur background
 mas "kagi for safari", id:1622835804 # Kagi Search

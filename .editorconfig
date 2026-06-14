@@ -1,0 +1,27 @@
+# Editor defaults for this repo, aligned with the conform.nvim formatters
+# (stylua, black, prettier). See writing/nvim/lua/plugins/lsp.lua.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# stylua's default is tabs
+[*.lua]
+indent_style = tab
+
+# black uses 4-space indentation
+[*.py]
+indent_size = 4
+
+# make requires real tabs in recipes
+[Makefile]
+indent_style = tab
+
+# preserve two-space hard line breaks in prose
+[*.{md,markdown}]
+trim_trailing_whitespace = false

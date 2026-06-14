@@ -5,6 +5,39 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-14 — cross-machine sync, drift checks, markdown LSP
+
+### Added (cross-machine consistency)
+- Neovim personal dictionary is now tracked in the repo
+  (`writing/nvim/spell/en.utf-8.add`) and `spellfile` is pinned to the config
+  dir, so words added with `zg` sync across machines. The compiled `.add.spl`
+  binary is gitignored
+- Vale `Academic` vocabulary (`writing/vale/vocab/Academic/`) — a curated
+  allowlist of proper nouns / domain terms, tracked in the repo. `make vale`
+  symlinks it under `StylesPath/config/vocabularies/`; `vale.ini` references it
+  via `Vocab = Academic`
+
+### Added (markdown LSP)
+- `marksman` markdown LSP (Brewfile + `nvim/lua/plugins/lsp.lua` + tools-check):
+  cross-document go-to-definition on links/headings, link completion, and
+  rename across files. Style stays vale, grammar harper_ls, spelling vim spell
+
+### Added (health & drift)
+- `make doctor` now verifies the launchd agents (mailsync, brewupdate,
+  brewlogclean) are actually *loaded*, not just that the plist exists — catches
+  silent background-sync failures after a macOS upgrade or `bootout`
+- `make brew-drift` — lists formulae/casks installed but absent from the
+  Brewfile (reverse of `brew-check`). Note: deliberately-untracked items (e.g.
+  `claude`, Hush) will appear here; it is informational, not a cleanup command
+
+### Added (consistency)
+- `.editorconfig` at the repo root, aligned with the conform formatters
+  (stylua tabs, black 4-space, prettier 2-space, preserve markdown hard breaks)
+- Git commit-message template (`git/gitmessage` → `~/.gitmessage`, wired via
+  `commit.template`); symlinked by `make git`, checked by `doctor`
+
+---
+
 ## 2026-06-11 — academic history workflow: CMOS 18, shared pandoc pipeline, link archiving
 
 ### Changed (PDF engine)

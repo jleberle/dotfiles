@@ -46,6 +46,12 @@ opt.colorcolumn = "81"
 -- they don't fire spell underlines or hide characters in code buffers.
 opt.spelllang = { "en_us" }
 
+-- Personal dictionary (words added with `zg`). Pinned to the config dir so it
+-- lives in the symlinked dotfiles repo and syncs across machines, instead of
+-- the first writable runtimepath entry. The compiled `.spl` is regenerated
+-- locally and gitignored.
+opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
+
 -- Better completion
 opt.completeopt = "menu,menuone,noselect"
 

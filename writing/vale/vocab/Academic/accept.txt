@@ -1,0 +1,9 @@
+Eberle
+NeoMutt
+Ghostty
+Neovim
+Zotero
+pandoc
+proselint
+tectonic
+notmuch

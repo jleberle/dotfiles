@@ -1,0 +1,8 @@
+
+
+# Subject: imperative, capitalized, <=50 chars, no trailing period
+#   e.g. "Add marksman LSP for markdown navigation"
+#
+# Body: wrap at 72 chars. Explain what and why, not how.
+#
+# - The CHANGELOG tracks the narrative; keep messages self-contained.
