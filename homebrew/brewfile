@@ -54,6 +54,7 @@ brew "pinentry-mac" # GPG passphrase prompt on macOS
 brew "poppler" # PDF text/image extraction (pdftotext, pdfinfo, pdftoppm for the Zotero OCR plugin; complements qpdf)
 brew "qpdf" # PDF transformation (CV, syllabi PDF builds; pdfpages/pdfmerge functions)
 brew "ripgrep" # fast recursive search (used by Telescope in nvim)
+brew "ripgrep-all" # ripgrep wrapper that searches inside PDFs/etc. via poppler (rga; used by the archgrep function for OCR'd archival scans)
 brew "tectonic" # LaTeX engine for all PDF builds (pandoc defaults.yaml, CV, syllabi); auto-fetches packages
 brew "tesseract" # OCR engine (Zotero OCR plugin + Zotero connector image OCR; backs ocrmypdf)
 brew "tmux" # terminal multiplexer (config shell/tmux.conf)
