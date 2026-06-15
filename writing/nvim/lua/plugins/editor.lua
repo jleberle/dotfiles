@@ -20,6 +20,8 @@ return {
 					-- Zotero library, kept current by Better BibTeX auto-export.
 					-- Enter inserts @citekey (pandoc style, detected from the
 					-- markdown filetype).
+					-- Stays on .bib (not the .json pandoc renders from):
+					-- telescope-bibtex parses BibTeX syntax and can't read CSL JSON.
 					bibtex = {
 						global_files = { vim.fn.expand("~/Documents/Library/Library.bib") },
 					},

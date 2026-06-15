@@ -3,7 +3,10 @@ author: "Jared Eberle"
 date: 2026-05-28
 
 bibliography:
-  - ~/Documents/Library/Library.bib
+  # CSL JSON (not .bib): preserves Zotero's archive / archive-location fields,
+  # which the BibTeX export drops. Better BibTeX keeps both auto-exported.
+  # The telescope-bibtex / cite.fish citekey pickers still read the .bib.
+  - ~/Documents/Library/Library.json
 
 # CMOS 18th edition (current); swap to ...-17th-edition.csl for journals
 # still on 17e. Keep this default in sync with the newdoc fish function.

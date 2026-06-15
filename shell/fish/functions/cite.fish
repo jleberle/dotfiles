@@ -2,6 +2,8 @@ function cite --description 'Fuzzy-pick a citation from the BibTeX library; copi
     # usage: cite
     # Shell-side sibling of the nvim <leader>fc telescope-bibtex binding —
     # for citing in email, BBEdit, or anywhere outside the editor.
+    # Reads the .bib (not the .json pandoc renders from): the rg/grep below
+    # parse BibTeX entry syntax. Citekeys are identical across both exports.
     set -l bib ~/Documents/Library/Library.bib
 
     if not test -f $bib

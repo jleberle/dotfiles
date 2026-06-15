@@ -202,7 +202,12 @@ This setup is tuned for academic / long-form writing in Markdown.
   spelling or terminology rule and the allowlist syncs across machines.
 - **Templates** in `writing/pandoc/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
-    `geometry`, `fontsize`, `linestretch`). Copy it next to a document and edit:
+    `geometry`, `fontsize`, `linestretch`). The `bibliography` points at the
+    Better CSL JSON export (`Library.json`), not the `.bib` — CSL JSON
+    preserves Zotero's archive / archive-location fields that BibTeX drops, so
+    archival citations render with repository and box/folder. Better BibTeX
+    keeps both `Library.bib` and `Library.json` auto-exported. Copy it next to
+    a document and edit:
     ```sh
     cp ~/.dotfiles/writing/pandoc/metadata.yaml .
     ```
