@@ -381,6 +381,23 @@ like commands. (General-purpose shell functions are listed under [Fish](#fish).)
 | `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |
 | `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
 | `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)                       |
+| `archgrep <query>`      | Full-text search the OCR'd archival scans (`ripgrep-all`); prints matching page numbers |
+| `archcheck`             | List archival PDFs with no OCR text layer (run `ocrmypdf` on those)                    |
+| `archverify [--update]` | SHA-256 manifest of the scans; detects corruption / bit-rot                           |
+| `archbackup [snapshots]`| `restic` versioned, encrypted snapshot of the archive to an external HD               |
+| `citecheck <md…>`       | Validate every `@citekey` in a draft against `Library.json` before export            |
+| `zotcheck [--list]`     | Reconcile notes vs Zotero — orphaned citekeys, and items lacking a note                |
+
+**Bibliography sources.** Pandoc *rendering* (`newdoc`, `metadata.yaml`) reads
+the Better CSL JSON export (`~/Documents/Library/Library.json`), which preserves
+Zotero's archive / box-folder fields that BibTeX drops; the citekey *pickers*
+(`cite`, telescope-bibtex) stay on `Library.bib` since they parse BibTeX syntax.
+Better BibTeX keeps both auto-exported. The Obsidian Pandoc plugins use the same
+CMOS 18e CSL, so in-app previews match final output.
+
+**Archive integrity.** `archgrep` / `archcheck` / `archverify` / `archbackup`
+operate on `~/Notes/03 Research/Archives` (the Obsidian vault, outside this repo)
+— the functions live here, the irreplaceable scans live there.
 
 **Aliases**
 

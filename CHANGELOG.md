@@ -5,6 +5,47 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-15 — Zotero/Obsidian research integration: CSL JSON bibliography, OCR'd archive search & integrity
+
+### Changed (bibliography)
+- Pandoc citation rendering (`newdoc`, `writing/pandoc/metadata.yaml`) now reads
+  the Better CSL JSON export (`~/Documents/Library/Library.json`) instead of
+  `Library.bib`. CSL JSON preserves Zotero's archive / archive-location fields
+  that the BibTeX translator drops, so archival citations render with the
+  repository and box/folder. Better BibTeX keeps both files auto-exported
+- The citekey pickers (`cite`, telescope-bibtex `<leader>fc`) stay on
+  `Library.bib` — they parse BibTeX entry syntax and can't read CSL JSON; added
+  guard comments noting why. Citekeys are identical across both exports
+- Unified the toolchain on one stylesheet: the version-controlled CMOS 18e
+  (`writing/pandoc/chicago-notes-bibliography-18th-edition.csl`) now also drives
+  the Obsidian Pandoc and Pandoc Reference List plugins, so in-app previews
+  match final pandoc output
+
+### Added (OCR'd archive search & integrity)
+Research-workflow fish functions over the Obsidian vault's `03 Research/Archives`
+tree and the `Library.json` export:
+- `archgrep <query>` — full-text search inside the OCR'd archival PDFs via
+  `ripgrep-all` (poppler-backed); prints the matching page number. No Obsidian
+  plugin or search index to maintain
+- `archverify [--update]` — SHA-256 manifest of the irreplaceable scans
+  (`Archives/checksums.sha256`) to detect corruption / bit-rot
+- `archbackup [snapshots]` — `restic` versioned, encrypted, deduplicated
+  snapshot of the archive to an external HD (`ARCHIVE_RESTIC_REPO`; one-time
+  `restic init`)
+- `archcheck` — flags any archival PDF lacking an OCR text layer (invisible to
+  `archgrep`) so it can be run through `ocrmypdf`
+- `citecheck <md…>` — validates every `@citekey` in a draft against
+  `Library.json` before export, catching broken pandoc citations
+- `zotcheck [--list]` — reconciles notes against Zotero: orphaned note citekeys
+  and Zotero items still lacking a note
+
+### Added (Brewfile)
+- `ocrmypdf` and `tesseract` — OCR pipeline for scanned archival PDFs (searchable
+  text layer + Zotero OCR); `ripgrep-all` (rga) for `archgrep`; `restic` for
+  `archbackup`. The `poppler` comment now notes `pdftoppm` (Zotero OCR plugin)
+
+---
+
 ## 2026-06-14 — cross-machine sync, drift checks, markdown LSP
 
 ### Added (cross-machine consistency)
@@ -47,7 +88,8 @@ individual commit — the git log has the full detail.
   had no remaining consumers: removed the cask from the Brewfile and the
   `make latex` tlmgr target. `make tools-check` now checks for tectonic
 - Brewfile: added poppler (PDF text/image extraction) and tectonic;
-  added ChangeTheHeaders (App Store); hush and emacs deliberately untracked
+  added ChangeTheHeaders (App Store) and font-tex-gyre-schola (academic PDF
+  body font for tectonic builds); hush and emacs deliberately untracked
 
 ### Added (website integration)
 - `site` fish function — website tasks from anywhere, pure dispatch to
@@ -83,6 +125,9 @@ individual commit — the git log has the full detail.
   for manuscript revision (verified delta passes word-diff through cleanly)
 - `note` snippet — pandoc inline footnote `^[…]`, self-numbering (no `[^n]`
   bookkeeping), the low-friction form for Chicago notes style
+- nvim `<leader>fo` ("Open citation in Zotero") — jumps from the `@citekey`
+  under the cursor to its Zotero item via `zotero://select`; companion to the
+  `<leader>fc` telescope-bibtex citekey-insert binding
 
 ---
 
