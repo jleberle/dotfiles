@@ -2,10 +2,17 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
     # usage: archbackup            create a new snapshot
     #        archbackup snapshots  list existing snapshots
     #
-    # One-time setup (do once):
+    # One-time setup, per machine that has the drive (universal vars don't sync):
+    #   mkdir -p ~/.config/restic
+    #   # Write a strong password into the file below — AND save the same password
+    #   # in your password manager. It is the ONLY key to the encrypted repo;
+    #   # lose it and the backup is permanently unrecoverable, drive intact or not.
+    #   chmod 600 ~/.config/restic/archive.pass
     #   set -Ux ARCHIVE_RESTIC_REPO /Volumes/<external-hd>/research-backup
     #   set -Ux RESTIC_PASSWORD_FILE ~/.config/restic/archive.pass   # or RESTIC_PASSWORD
     #   restic -r $ARCHIVE_RESTIC_REPO init
+    # The -U (universal) flag matters: without it the vars live only in the shell
+    # you set them in, so `init` works but a later `archbackup` errors.
     #
     # restic is versioned + deduplicated + encrypted, so re-running is cheap and
     # old snapshots survive an accidental deletion or a bad sync — unlike a plain
