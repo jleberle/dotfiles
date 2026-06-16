@@ -31,6 +31,7 @@ wired to work together.
 - [Scripting](#scripting)
   - [Bin](#bin)
   - [Launchd](#launchd)
+  - [macOS Services](#macos-services)
 - [Security](#security)
 - [Repository Layout](#repository-layout)
 - [Credits](#credits)
@@ -778,6 +779,37 @@ launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
 launchctl kickstart -k gui/$(id -u)/org.jaredeberle.mailsync
 ```
 
+### macOS Services
+
+`make services` (run automatically by `make install`) symlinks every Automator
+workflow in `macos/services/` into `~/Library/Services`. All three are browser
+integrations that reach into a running browser — they have no terminal
+equivalent, which is why they earn a place in an otherwise terminal-only
+environment:
+
+| Service                     | Does                                                       |
+|-----------------------------|------------------------------------------------------------|
+| `Open in Firefox`           | Opens the frontmost Safari tab's URL in Firefox            |
+| `md - Links - Firefox Tabs` | Copies all open Firefox tabs as a Markdown reference list  |
+| `md - Links - Safari Tabs`  | Copies all open Safari tabs as a Markdown reference list   |
+
+`Open in Firefox` is meant to be bound to a hotkey (System Settings → Keyboard →
+Keyboard Shortcuts → Services). Because that hotkey uses Option — which triggers
+Firefox's Troubleshoot/safe mode if held during a cold launch — the script only
+launches the binary directly (with `MOZ_DISABLE_SAFE_MODE_KEY=1`) when Firefox is
+closed; when it's already running it hands the URL off with `open -a Firefox`,
+which opens a new tab reliably and skips the startup modifier check entirely. The
+cold-start path passes `-new-tab` so the URL isn't swallowed by session restore.
+
+To add another, drop the `.workflow` bundle into `macos/services/` and re-run
+`make services`; `make doctor` then verifies the symlink. Restart the target
+app (or `killall Finder`) if the Services menu doesn't refresh.
+
+> The rest of the Markdown Service Tools (the `md - *` text transforms) were
+> deleted deliberately: macOS Services only fire from a GUI app's right-click
+> menu, and this is a Neovim/NeoMutt/Pandoc setup with no GUI text editor — so
+> they had nowhere to fire and duplicated `pandoc`/Neovim functionality.
+
 ---
 
 ## Security
@@ -823,6 +855,8 @@ Installed by `make security`.
 │   └── user-overrides.js # personal Firefox prefs appended on top of Betterfox
 ├── git/                  # gitconfig, gitignore, gitmessage, lazygit.yml
 ├── homebrew/             # Brewfile + LaunchAgent plist templates
+├── macos/                # macOS GUI artifacts
+│   └── services/         # Automator workflows symlinked into ~/Library/Services
 ├── shell/                # all terminal/shell environment configs
 │   ├── bat/              # bat pager config
 │   ├── fish/             # config.fish, conf.d, functions

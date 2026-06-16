@@ -10,13 +10,14 @@ HOMEBREW_PREFIX := $(shell \
 	else brew --prefix 2>/dev/null || echo /usr/local; fi)
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
+SERVICES_DIR := $(HOME)/Library/Services
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync macos macos-check doctor brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync services macos macos-check doctor brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
 
-install : apps git shell security nvim vale neomutt brewauto
+install : apps git shell security nvim vale neomutt services brewauto
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
 	@echo ""
@@ -93,6 +94,19 @@ betterfox-update :
 	git submodule update --remote security/betterfox
 	@echo "Done. Review changes with: git diff security/betterfox"
 	@echo "Then re-run 'make firefox' to rebuild the profile user.js."
+services :
+	@echo "Symlinking macOS Services (Automator workflows)"
+	mkdir -p "$(SERVICES_DIR)"
+	@for wf in "$(HOME)"/.dotfiles/macos/services/*.workflow; do \
+	    name=$$(basename "$$wf"); \
+	    target="$(SERVICES_DIR)/$$name"; \
+	    if [ -e "$$target" ] && [ ! -L "$$target" ]; then \
+	        echo "  removing existing non-symlink: $$name"; rm -rf "$$target"; \
+	    fi; \
+	    ln -sfn "$$wf" "$$target"; \
+	    echo "  $$name"; \
+	done
+	@echo "Restart target apps (or 'killall Finder') if the Services menu doesn't refresh."
 apps :
 	@command -v brew >/dev/null 2>&1 || { \
 		echo "Homebrew not found. Installing..."; \
@@ -322,6 +336,11 @@ doctor :
 	[ -z "$$FFPROFILE" ] || \
 	test -f "$(FIREFOX_DIR)/$$FFPROFILE/user.js" || \
 	echo "WARNING: Firefox user.js not written (run: make firefox)"
+	@for wf in "$(HOME)"/.dotfiles/macos/services/*.workflow; do \
+	    name=$$(basename "$$wf"); \
+	    test -L "$(SERVICES_DIR)/$$name" || \
+	        echo "WARNING: Service '$$name' not symlinked (run: make services)"; \
+	done
 	@echo "Checking SSH keys..."
 	@test -f $(HOME)/.ssh/id_github           || echo "WARNING: ~/.ssh/id_github not found — generate or copy your key"
 	@test -f $(HOME)/.ssh/id_codeberg        || echo "WARNING: ~/.ssh/id_codeberg not found — generate or copy your key"

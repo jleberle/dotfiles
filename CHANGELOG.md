@@ -5,6 +5,39 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-16 — Manage macOS Services; drop stale zsh submodules
+
+### Added (macOS Services)
+- New `macos/services/` directory and `make services` target (folded into
+  `make install`) that symlinks Automator workflows into `~/Library/Services`.
+  `make doctor` now verifies each workflow's symlink. Documented under
+  Scripting → macOS Services in the README
+- Brought three browser integrations under version control: `Open in Firefox`
+  (open the frontmost Safari tab in Firefox), `md - Links - Firefox Tabs`, and
+  `md - Links - Safari Tabs` (copy all open tabs of each browser as a Markdown
+  reference list). All reach into a running browser and have no terminal
+  equivalent
+- Hardened the `Open in Firefox` AppleScript: hands the URL to an
+  already-running Firefox via `open -a` (reliably opens a new tab), and only
+  cold-starts the binary directly when Firefox is closed — there using
+  `-new-tab` so the URL survives session restore (a bare positional URL was
+  intermittently dropped) while keeping `MOZ_DISABLE_SAFE_MODE_KEY=1` so the
+  Option-using hotkey can't trigger Troubleshoot Mode. Also guards the Safari
+  read (`front document`, with running/empty-window checks)
+
+### Removed
+- Deleted the rest of the Markdown Service Tools (36 `md - *` text transforms)
+  from `~/Library/Services`. macOS Services only fire from a GUI app's
+  right-click menu; in this Neovim/NeoMutt/Pandoc setup there's no GUI text
+  editor for them to act on, and they duplicated `pandoc`/Neovim functionality.
+  (`HTML to Markdown` was also broken outright — it embeds a Python-2-only
+  script, and `/usr/bin/python` is gone on current macOS.)
+- Purged orphaned `zsh/submodules/*` entries from `.git/config` and the stale
+  `.git/modules/zsh` tree (leftovers from the pre-fish zsh era; no `.gitmodules`
+  entry or tracked gitlink referenced them)
+
+---
+
 ## 2026-06-15 — Zotero/Obsidian research integration: CSL JSON bibliography, OCR'd archive search & integrity
 
 ### Changed (bibliography)
