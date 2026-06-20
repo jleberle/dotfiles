@@ -90,7 +90,7 @@ mas "acorn", id:6737921844 # image editor
 mas "broadcasts", id:1469995354 # Internet Radio
 mas "changetheheaders", id:6743129567 # rewrite link-tracking headers in Safari
 mas "dropover", id:1355679052 # drag-and-drop shelf
-# mas "focus for youtube", id:1514703160
+mas "focus for youtube", id:1514703160
 mas "folder quick look", id:6753110395 # Quick Look folder previews
 mas "hazeover", id:430798174 # blur background
 mas "kagi for safari", id:1622835804 # Kagi Search
@@ -105,7 +105,7 @@ mas "StopTheScript", id:1588394487 # JavaScript Blocker
 mas "tot", id:1491071483 # Notes
 mas "typeit4me", id:6474688391 # text expansion
 mas "ublock origin lite", id:6745342698 # Ad Blocker
-# mas "Vinegar", id:1591303229 # Replace Youtube Player
+mas "Vinegar", id:1591303229 # Replace Youtube Player
 
 # Fonts
 cask "font-fira-code" # monospace font with programming ligatures
