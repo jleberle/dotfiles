@@ -36,6 +36,17 @@ if test -t 0
     set -gx GPG_TTY (tty)
 end
 
+# --- SSH agent (Secretive) ----------------------------------------------------
+# Route ssh-agent to Secretive's Secure Enclave socket when it exists, so ssh,
+# git, AND ssh-keygen all use the enclave keys (ssh-keygen ignores ssh_config's
+# IdentityAgent and only honors SSH_AUTH_SOCK — needed for e.g. Codeberg/Forgejo
+# `ssh-keygen -Y sign` key verification and commit signing). Guarded on the
+# socket so a machine without Secretive falls back to the default agent.
+set -l secretive_sock $HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
+if test -S $secretive_sock
+    set -gx SSH_AUTH_SOCK $secretive_sock
+end
+
 # --- umask --------------------------------------------------------------------
 # Default to owner-only permissions (0600 files / 0700 dirs) for anything created
 # without an explicit mode. Defense-in-depth on a single-user Mac. NOTE: this

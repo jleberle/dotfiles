@@ -1,7 +1,7 @@
 Host codeberg
   User git
   HostName codeberg.org
-  IdentityFile ~/.ssh/id_codeberg
+  IdentityFile ~/.ssh/secretive_codeberg.pub
   UseKeychain yes
   AddKeysToAgent yes
   ControlMaster auto
@@ -11,7 +11,7 @@ Host codeberg
 Host github
   User git
   HostName github.com
-  IdentityFile ~/.ssh/id_github
+  IdentityFile ~/.ssh/secretive_github.pub
   UseKeychain yes
   AddKeysToAgent yes
 
@@ -21,7 +21,7 @@ Host github-443
   User git
   HostName ssh.github.com
   Port 443
-  IdentityFile ~/.ssh/id_github
+  IdentityFile ~/.ssh/secretive_github.pub
   UseKeychain yes
   AddKeysToAgent yes
 
@@ -92,5 +92,5 @@ Host *
     # from the providers and disk. To switch over, uncomment IdentityAgent here and
     # change the per-host `IdentityFile ~/.ssh/id_<host>` to the matching
     # `~/.ssh/secretive_<host>.pub`. Left off by default so on-disk keys keep working.
-    # IdentityAgent ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
+IdentityAgent ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
 
