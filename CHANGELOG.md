@@ -53,6 +53,10 @@ individual commit — the git log has the full detail.
   symlink-race on the shared, sticky `/tmp`.
 - **`ipic`**: API-supplied artwork/store URLs are now `html.escape`d, preventing
   a stray quote from breaking out of the `href`/`src` attribute.
+- **`fuck`**: now prints the previous command and asks for confirmation before
+  re-running it under `sudo` (and guards the empty-history / `$history[1] = fuck`
+  off-by-one). Prevents reflexively amplifying a typo to root and re-running
+  command substitutions/globs under root's view of the system without review.
 
 ---
 
