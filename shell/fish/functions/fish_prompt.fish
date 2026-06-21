@@ -1,4 +1,4 @@
-function fish_prompt
+function fish_prompt --description 'Render the prompt: truncated cwd, git branch + status, exit-colored ❯ (Nord)'
     set -l last_status $status
 
     # Directory — truncated to 3 levels, Nord purple
@@ -45,7 +45,7 @@ function fish_prompt
     end
 end
 
-function fish_mode_prompt
+function fish_mode_prompt --description 'Vi-mode indicator: show ❮ in normal mode, nothing otherwise (Nord)'
     # Vi mode indicator — show ❮ in normal mode, nothing otherwise
     if test "$fish_key_bindings" = fish_vi_key_bindings
         switch $fish_bind_mode

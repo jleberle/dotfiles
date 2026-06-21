@@ -18,7 +18,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
     # old snapshots survive an accidental deletion or a bad sync — unlike a plain
     # rsync mirror, which would faithfully propagate the damage. The external HD
     # stays the offline master (see the Archives README).
-    set -l archives ~/Notes/03\ Research/Archives
+    set -l archives $RESEARCH_ARCHIVES_DIR
     if not type -q restic
         echo "archbackup: restic not found — brew install restic" >&2
         return 1

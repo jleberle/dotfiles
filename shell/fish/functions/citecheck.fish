@@ -6,7 +6,7 @@ function citecheck --description 'Check every @citekey in a draft exists in the 
         echo "usage: citecheck <file.md> [more.md ...]" >&2
         return 1
     end
-    set -l lib ~/Documents/Library/Library.json
+    set -l lib $ZOTERO_LIBRARY_JSON
     if not test -f $lib
         echo "citecheck: library not found: $lib — export Better CSL JSON from Zotero" >&2
         return 1

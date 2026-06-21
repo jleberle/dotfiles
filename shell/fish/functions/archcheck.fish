@@ -3,7 +3,7 @@ function archcheck --description 'List archival PDFs with no OCR text layer (inv
     # Every scan under 03 Research/Archives should be OCR'd (ocrmypdf) so its text
     # is searchable. This flags any PDF whose text layer is empty — run
     # `ocrmypdf --skip-text` on the ones listed, then archgrep will see them.
-    set -l archives ~/Notes/03\ Research/Archives
+    set -l archives $RESEARCH_ARCHIVES_DIR
     if not type -q pdftotext
         echo "archcheck: pdftotext not found — brew install poppler" >&2
         return 1

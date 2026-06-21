@@ -15,7 +15,7 @@ function archgrep --description "Full-text search the OCR'd archival PDFs (ripgr
         return 1
     end
 
-    set -l archives ~/Notes/03\ Research/Archives
+    set -l archives $RESEARCH_ARCHIVES_DIR
     if not test -d $archives
         echo "archgrep: archive folder not found: $archives" >&2
         return 1

@@ -5,6 +5,31 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-21 — Workflow: reading-note scaffolder, update target, centralized paths
+
+### Added
+- **`readnote <citekey> [--primary]`**: scaffolds a reading note in
+  `$READING_NOTES_DIR`, pulling authors/title/year from the Zotero CSL JSON into
+  the exact frontmatter `zotcheck` reconciles — closing the loop from "Zotero
+  item with no note yet" to a real note. Refuses unknown citekeys (no instant
+  orphans) and won't overwrite an existing note.
+- **`make update`**: updates the non-brew toolchain in one command — Neovim
+  plugins (`Lazy! sync`), tmux TPM, and `vale sync`. Deliberately leaves
+  Homebrew (weekly launchd / `brewup`) and review-gated Betterfox to their own
+  paths, and reminds you to commit `lazy-lock.json` if Lazy changed it.
+
+### Changed
+- **Centralized workflow paths**: the personal locations several functions
+  hardcoded independently (Zotero library, notes trees, research archives,
+  website repo) now live once in `shell/fish/conf.d/paths.fish` as `set -q`-guarded
+  vars (so a per-machine `set -Ux` override wins). Rewired `cite`, `citecheck`,
+  `zotcheck`, `newdoc`, `archbackup`, `archcheck`, `archverify`, `archgrep`, and
+  `site` to use them.
+- **Function descriptions**: added `--description` to `fish_prompt` and
+  `fish_mode_prompt` so every function in `shell/fish/functions/` carries one.
+
+---
+
 ## 2026-06-21 — Security hardening: secret scanning, key custody, backup integrity
 
 ### Added

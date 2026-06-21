@@ -12,7 +12,7 @@ HOMEBREW_PREFIX := $(shell \
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid doctor brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -322,6 +322,22 @@ resticcheck :
 	@echo "Runs 'archbackup check' every Sunday 10:00 (no-op when the drive is unmounted)."
 	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
+update :
+	@echo "Updating Neovim plugins (Lazy sync)..."
+	@if command -v nvim >/dev/null 2>&1; then nvim --headless "+Lazy! sync" +qa; \
+	    else echo "  (nvim not installed; run: make apps)"; fi
+	@echo "Updating tmux plugins (TPM)..."
+	@if [ -x "$(HOME)/.tmux/plugins/tpm/bin/update_plugins" ]; then \
+	    "$(HOME)/.tmux/plugins/tpm/bin/update_plugins" all; \
+	    else echo "  (TPM not installed; run: make shell)"; fi
+	@echo "Syncing Vale styles..."
+	@if command -v vale >/dev/null 2>&1; then vale sync; \
+	    else echo "  (vale not installed; run: make apps)"; fi
+	@echo ""
+	@echo "Not auto-run here (deliberately):"
+	@echo "  * Homebrew updates weekly via launchd — run 'brewup' to update now."
+	@echo "  * Betterfox is review-gated — run 'make betterfox-update', review, then 'make firefox'."
+	@echo "Review and commit writing/nvim/lazy-lock.json if Lazy changed it."
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)

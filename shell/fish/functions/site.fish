@@ -1,7 +1,7 @@
 function site --description 'Run website (jaredeberle.org) tasks from anywhere'
     # Pure dispatch — all logic lives in ~/git/website/scripts/, which stays
     # canonical. This just removes the `cd`.
-    set -l repo $HOME/git/website
+    set -l repo $WEBSITE_REPO
 
     if not test -d $repo/scripts
         echo "site: website repo not found at $repo" >&2

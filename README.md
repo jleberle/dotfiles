@@ -181,6 +181,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
+| `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
 | `clean`            | Removes stale directories left over from old repo layouts (`fish/`, `general/`)                    |
 
@@ -397,6 +398,7 @@ like commands. (General-purpose shell functions are listed under [Fish](#fish).)
 | `archbackup [snapshots]`| `restic` versioned, encrypted snapshot of the archive to an external HD               |
 | `citecheck <md…>`       | Validate every `@citekey` in a draft against `Library.json` before export            |
 | `zotcheck [--list]`     | Reconcile notes vs Zotero — orphaned citekeys, and items lacking a note                |
+| `readnote <key> [--primary]` | Scaffold a reading note for a Zotero citekey (metadata from `Library.json`); closes a `zotcheck` gap |
 
 **Bibliography sources.** Pandoc *rendering* (`newdoc`, `metadata.yaml`) reads
 the Better CSL JSON export (`~/Documents/Library/Library.json`), which preserves
@@ -408,6 +410,12 @@ CMOS 18e CSL, so in-app previews match final output.
 **Archive integrity.** `archgrep` / `archcheck` / `archverify` / `archbackup`
 operate on `~/Notes/03 Research/Archives` (the Obsidian vault, outside this repo)
 — the functions live here, the irreplaceable scans live there.
+
+**Workflow paths.** The personal locations these functions touch (Zotero
+library, notes trees, research archives, website repo) are defined once in
+`shell/fish/conf.d/paths.fish` (`ZOTERO_LIBRARY_JSON`, `READING_NOTES_DIR`,
+`RESEARCH_ARCHIVES_DIR`, …) rather than hardcoded per function. Each is
+`set -q`-guarded, so a per-machine `set -Ux` override wins.
 
 **Aliases**
 
