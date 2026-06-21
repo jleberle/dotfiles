@@ -37,6 +37,22 @@
 	autocrlf = input
 	excludesfile = ~/.gitignore
 	pager = delta
+	# Run the tracked hooks (gitleaks secret scan) in every repo. NOTE: this is
+	# global — a repo that sets its own core.hooksPath (e.g. husky) overrides it,
+	# so the secret scan won't run there; conversely it supersedes any per-repo
+	# .git/hooks. See git/hooks/pre-commit.
+	hooksPath = ~/.dotfiles/git/hooks
+
+# Reject malformed/malicious objects on fetch, clone, and (local) receive —
+# defense against object-confusion and known git-parsing CVEs. Downside: refuses
+# to clone the rare older repo containing historically-malformed objects; turn
+# fetch.fsckObjects off temporarily if you ever hit a legitimately broken remote.
+[transfer]
+	fsckObjects = true
+[fetch]
+	fsckObjects = true
+[receive]
+	fsckObjects = true
 
 [interactive]
 	diffFilter = delta --color-only

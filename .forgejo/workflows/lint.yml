@@ -18,11 +18,12 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y shellcheck fish lua5.4 luarocks && sudo luarocks install luacheck
 
-      - name: shellcheck (bin scripts)
+      - name: shellcheck (bin scripts + git hooks)
         run: |
           shellcheck bin/homebrewupdate.sh
           shellcheck bin/homebrewlogclean.sh
           shellcheck bin/mailsync.sh
+          shellcheck git/hooks/pre-commit
 
       - name: fish syntax check
         run: |

@@ -12,7 +12,7 @@ HOMEBREW_PREFIX := $(shell \
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync services macos macos-check doctor brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid doctor brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -20,6 +20,8 @@ default :
 install : apps git shell security nvim vale neomutt services brewauto
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
+	@echo "Optional system hardening (each needs sudo): make harden, make touchid"
+	@echo "Optional backup integrity check: make resticcheck (after archbackup is set up)"
 	@echo ""
 	@$(MAKE) doctor
 
@@ -31,7 +33,10 @@ git :
 	@echo "Symlinking lazygit config"
 	mkdir -p "$(HOME)/Library/Application Support/lazygit"
 	ln -sf $(HOME)/.dotfiles/git/lazygit.yml "$(HOME)/Library/Application Support/lazygit/config.yml"
+	@echo "Ensuring git hooks are executable (core.hooksPath → git/hooks)"
+	chmod +x $(HOME)/.dotfiles/git/hooks/pre-commit
 	@command -v delta >/dev/null 2>&1 || echo "WARNING: delta not found — git diff/log will fail. Run: make apps"
+	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not found — commits will NOT be scanned for secrets. Run: make apps"
 chsh :
 	@grep -qF "$(HOMEBREW_PREFIX)/bin/fish" /etc/shells || \
 	    { echo "Adding fish to /etc/shells"; echo "$(HOMEBREW_PREFIX)/bin/fish" | sudo tee -a /etc/shells; }
@@ -61,6 +66,8 @@ security :
 	chmod 700 $(HOME)/.ssh/control
 	@echo "Symlinking SSH Configurations"
 	ln -sf $(HOME)/.dotfiles/security/ssh-config $(HOME)/.ssh/config
+	@echo "Symlinking pinned known_hosts (GitHub/Codeberg host keys)"
+	ln -sf $(HOME)/.dotfiles/security/known_hosts $(HOME)/.ssh/known_hosts_pinned
 	@echo "Creating GPG home directory"
 	@[ ! -L "$(HOME)/.gnupg" ] || { echo "Removing broken .gnupg symlink"; rm "$(HOME)/.gnupg"; }
 	mkdir -p $(HOME)/.gnupg
@@ -222,7 +229,40 @@ macos-check :
 	[ "$$VAL" = "1" ] || echo "WARNING: screensaver password not required (run: make macos)"
 	@VAL=$$(defaults read com.apple.screensaver askForPasswordDelay 2>/dev/null); \
 	[ "$$VAL" = "0" ] || echo "WARNING: screensaver password delay not set to 0 (run: make macos)"
+	@echo "  Security"
+	@fdesetup status 2>/dev/null | grep -q "FileVault is On" || \
+	    echo "WARNING: FileVault is OFF — enable full-disk encryption in System Settings > Privacy & Security"
+	@VAL=$$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate 2>/dev/null); \
+	echo "$$VAL" | grep -q "enabled" || echo "WARNING: application firewall not enabled (run: make harden)"
+	@VAL=$$(/usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode 2>/dev/null); \
+	echo "$$VAL" | grep -q "enabled" || echo "WARNING: firewall stealth mode not enabled (run: make harden)"
+	@VAL=$$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: automatic update checks not enabled (run: make harden)"
+	@VAL=$$(defaults read /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall 2>/dev/null); \
+	[ "$$VAL" = "1" ] || echo "WARNING: automatic security-response install not enabled (run: make harden)"
+	@[ -f /etc/pam.d/sudo_local ] && grep -q pam_tid.so /etc/pam.d/sudo_local || \
+	    echo "WARNING: Touch ID for sudo not configured (run: make touchid)"
 	@echo "Done."
+harden :
+	@echo "Enabling the application firewall (inbound) + stealth mode (requires sudo)"
+	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
+	@echo "Enabling automatic macOS update checks + security-response installs"
+	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+	@echo "Opting out of crash/diagnostic submission to Apple (may be SIP-restricted on newer macOS)"
+	-sudo defaults write "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist" AutoSubmit -bool false
+	-sudo defaults write "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist" ThirdPartyDataSubmit -bool false
+	@echo "Done. Verify with: make macos-check"
+touchid :
+	@echo "Enabling Touch ID for sudo via /etc/pam.d/sudo_local (requires sudo)"
+	@[ -f "$(HOMEBREW_PREFIX)/lib/pam/pam_reattach.so" ] || \
+	    echo "NOTE: pam-reattach not installed — Touch ID won't work inside tmux (run: make apps)"
+	@printf '# Managed by dotfiles `make touchid`. sudo_local survives OS updates.\n# pam_reattach must precede pam_tid so Touch ID works inside tmux.\nauth       optional       %s/lib/pam/pam_reattach.so\nauth       sufficient     pam_tid.so\n' \
+	    "$(HOMEBREW_PREFIX)" | sudo tee /etc/pam.d/sudo_local >/dev/null
+	@echo "Done. Open a new shell and run any 'sudo' command to test (Touch ID prompt)."
 nvim :
 	@echo "Symlinking nvim config"
 	ln -sfn $(HOME)/.dotfiles/writing/nvim $(HOME)/.config/nvim
@@ -269,6 +309,19 @@ mailsync :
 	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
 	@echo "Mail sync running every 5 minutes."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.mailsync"
+resticcheck :
+	@echo "Installing weekly restic integrity-check LaunchAgent"
+	mkdir -p $(HOME)/.local
+	mkdir -p $(LAUNCH_AGENTS)
+	sed -e 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' -e 's|__HOME__|$(HOME)|g' \
+	    $(HOME)/.dotfiles/backup/org.jaredeberle.resticcheck.plist \
+	    > $(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist
+	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist
+	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck 2>/dev/null
+	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist
+	@echo "Runs 'archbackup check' every Sunday 10:00 (no-op when the drive is unmounted)."
+	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
+	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
@@ -316,9 +369,12 @@ doctor :
 	@test -L "$(HOME)/Library/Application Support/lazygit/config.yml" || echo "WARNING: lazygit config not symlinked (run: make git)"
 	@test -L $(HOME)/.config/fish              || echo "WARNING: fish config not symlinked (run: make shell)"
 	@test -L "$(GHOSTTY_DIR)/config"           || echo "WARNING: ghostty config not symlinked (run: make shell)"
+	@HP=$$(git config --global core.hooksPath); [ "$$HP" = "$(HOME)/.dotfiles/git/hooks" ] || echo "WARNING: git core.hooksPath not set to dotfiles hooks (run: make git)"
+	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not installed — pre-commit secret scan inactive (run: make apps)"
 	@test -L $(HOME)/.tmux.conf               || echo "WARNING: .tmux.conf not symlinked (run: make shell)"
 	@test -L $(HOME)/.config/bat/config       || echo "WARNING: bat config not symlinked (run: make shell)"
 	@test -L $(HOME)/.ssh/config              || echo "WARNING: ssh config not symlinked (run: make security)"
+	@test -L $(HOME)/.ssh/known_hosts_pinned  || echo "WARNING: pinned known_hosts not symlinked (run: make security)"
 	@test -L $(HOME)/.gnupg/gpg.conf          || echo "WARNING: gpg.conf not symlinked (run: make security)"
 	@if [ -L "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf is a broken symlink (run: make security)"; elif [ ! -f "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf not written (run: make security)"; fi
 	@test -L $(HOME)/.gnupg/common.conf       || echo "WARNING: common.conf not symlinked (run: make security)"
@@ -352,7 +408,7 @@ doctor :
 	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
 	    echo "WARNING: no GPG secret key found — import your key"
 	@echo "Checking background agents..."
-	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.brewlogclean; do \
+	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.brewlogclean org.jaredeberle.resticcheck; do \
 	    if [ -f "$(LAUNCH_AGENTS)/$$agent.plist" ]; then \
 	        launchctl print gui/$(LAUNCHD_UID)/$$agent >/dev/null 2>&1 || \
 	            echo "WARNING: $$agent plist installed but not loaded (run: launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$$agent.plist)"; \

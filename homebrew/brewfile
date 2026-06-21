@@ -36,6 +36,7 @@ brew "fzf" # fuzzy finder (Ctrl-R/Ctrl-T/Alt-C keybindings)
 brew "ghostscript" # PostScript/PDF engine (CV, syllabi PDF builds; website image processing)
 brew "git" # version control
 brew "git-delta" # diff pager (used by git and lazygit)
+brew "gitleaks" # secret scanner (global git pre-commit hook; see git/hooks/pre-commit)
 brew "gitup" # update multiple repos at once
 brew "gnupg" # GPG encryption / key management
 brew "hugo" # static site generator
@@ -46,6 +47,7 @@ brew "lychee" # fast link checker (markdown/prose)
 brew "mole" # deep clean and optimize macOS
 brew "neomutt" # terminal email client (config in writing/neomutt/)
 brew "notmuch" # mail indexer for fast search (used by NeoMutt virtual mailboxes)
+brew "pam-reattach" # lets pam_tid.so (Touch ID for sudo) work inside tmux; see `make touchid`
 brew "neovim" # text editor (config in nvim/)
 brew "ocrmypdf" # OCR layer for scanned archival PDFs before Zotero/Obsidian full-text indexing (Archives workflow Step 1)
 brew "pandoc" # document converter (prose/Pandoc export workflow)
@@ -81,6 +83,7 @@ cask "obs" # Screen Recording
 cask "obscura-vpn" # VPN client
 cask "obsidian" # markdown notes / knowledge base
 cask "rectangle" # window snapping / management
+cask "secretive" # store SSH keys in the Secure Enclave (see security/ssh-config IdentityAgent)
 cask "skim" # PDF reader (LaTeX preview)
 cask "tor-browser" # Privacy browser via Tor network
 cask "tropy" # research photo/source organizer

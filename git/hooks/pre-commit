@@ -1,0 +1,30 @@
+#!/bin/sh
+# Global pre-commit hook (wired via core.hooksPath = ~/.dotfiles/git/hooks).
+# Scans staged changes for secrets before they can be committed — the main
+# guard against `acp` / `git add . && git push` shipping a credential.
+#
+# Fail-open by design: if gitleaks isn't installed, warn loudly but allow the
+# commit. Fail-closed would block committing on any machine lacking gitleaks,
+# which is too disruptive for a tool meant to run everywhere. Install it with
+# `brew install gitleaks` (it's in the Brewfile) to get real protection.
+#
+# Bypass for a single commit with `git commit --no-verify` if a finding is a
+# confirmed false positive (or add a rule to .gitleaksignore / .gitleaks.toml).
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+    printf '\033[33mwarning:\033[0m gitleaks not installed — commit NOT scanned for secrets.\n' >&2
+    printf '         install it with: brew install gitleaks\n' >&2
+    exit 0
+fi
+
+gitleaks git --staged --redact --no-banner
+status=$?
+
+if [ "$status" -ne 0 ]; then
+    printf '\033[31mgitleaks blocked this commit:\033[0m staged changes look like they contain a secret.\n' >&2
+    printf 'Review the finding above. If it is a false positive, either add it to\n' >&2
+    printf '.gitleaksignore or bypass once with: git commit --no-verify\n' >&2
+    exit 1
+fi
+
+exit 0

@@ -12,6 +12,7 @@
 # Checks known prefixes in order: Apple Silicon, Intel Mac, Linux.
 set -gx HOMEBREW_NO_ENV_HINTS 1       # suppress hints in brew output
 set -gx HOMEBREW_NO_ANALYTICS 1       # disable telemetry
+set -gx HOMEBREW_NO_INSECURE_REDIRECT 1  # refuse http→https / cross-host download redirects
 if test -x /opt/homebrew/bin/brew
     /opt/homebrew/bin/brew shellenv fish | source
 else if test -x /usr/local/bin/brew
@@ -34,6 +35,13 @@ fish_add_path --global --prepend $HOME/.dotfiles/bin $HOME/.local/bin
 if test -t 0
     set -gx GPG_TTY (tty)
 end
+
+# --- umask --------------------------------------------------------------------
+# Default to owner-only permissions (0600 files / 0700 dirs) for anything created
+# without an explicit mode. Defense-in-depth on a single-user Mac. NOTE: this
+# applies to every fish session, scripts included — if a workflow needs group/
+# other read (e.g. files served by a local web root), chmod those explicitly.
+umask 077
 
 # --- Editors / pagers (mirrors zshenv) ----------------------------------------
 set -gx EDITOR nvim

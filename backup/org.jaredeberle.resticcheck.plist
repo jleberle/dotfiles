@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template: __HOMEBREW_PREFIX__ and __HOME__ are replaced by `make resticcheck`.
+     Runs `archbackup check` via fish so it inherits the ARCHIVE_RESTIC_REPO /
+     RESTIC_PASSWORD_FILE universal variables (any fish process loads them); the
+     function itself exits quietly when the external drive isn't mounted. -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.jaredeberle.resticcheck</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>__HOMEBREW_PREFIX__/bin/fish</string>
+        <string>-c</string>
+        <string>archbackup check</string>
+    </array>
+
+    <!-- Weekly: Sunday 10:00; runs on next wake if the Mac was asleep. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key><integer>0</integer>
+        <key>Hour</key><integer>10</integer>
+        <key>Minute</key><integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/.local/restic_check_logs.txt</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/.local/restic_check_logs.txt</string>
+</dict>
+</plist>
