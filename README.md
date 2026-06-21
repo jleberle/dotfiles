@@ -33,6 +33,8 @@ wired to work together.
   - [Launchd](#launchd)
   - [macOS Services](#macos-services)
 - [Security](#security)
+  - [SSH key custody (Secretive)](#ssh-key-custody-secretive)
+  - [Optional system hardening (separate targets)](#optional-system-hardening-separate-targets)
 - [Repository Layout](#repository-layout)
 - [Credits](#credits)
 
@@ -158,11 +160,11 @@ just prints a warning) so nothing destructive happens by accident.
 
 | Target             | What it does                                                                                        |
 |--------------------|-----------------------------------------------------------------------------------------------------|
-| `install`          | Runs `apps git shell security nvim vale neomutt brewauto` in order, then `doctor`                   |
+| `install`          | Runs `apps git shell security nvim vale neomutt services brewauto` in order, then `doctor`          |
 | `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
-| `git`              | Symlinks `gitconfig` → `~/.gitconfig`, `gitignore` → `~/.gitignore`, `gitmessage` → `~/.gitmessage`, lazygit config |
+| `git`              | Symlinks `gitconfig`/`gitignore`/`gitmessage` + lazygit config; makes the `git/hooks/pre-commit` (gitleaks) hook executable |
 | `shell`            | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                       |
-| `security`         | Symlinks SSH config + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms          |
+| `security`         | Symlinks SSH config + pinned `known_hosts` + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms |
 | `firefox`          | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) |
 | `betterfox-update` | Pulls latest Betterfox upstream into the submodule; re-run `make firefox` afterwards               |
 | `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)                 |
@@ -170,14 +172,21 @@ just prints a warning) so nothing destructive happens by accident.
 | `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir, runs `vale sync` |
 | `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs, scaffolds `~/.mbsyncrc` and `~/.notmuch-config` from templates if missing |
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
+| `resticcheck`      | Installs a launchd agent that runs `archbackup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
-| `macos-check`      | Reads every key set by `make macos` and warns on any that are missing or wrong value                |
+| `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |
+| `harden`           | **(sudo)** Enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |
+| `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
-| `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, GPG key, and that launchd agents are loaded |
+| `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
 | `clean`            | Removes stale directories left over from old repo layouts (`fish/`, `general/`)                    |
+
+`harden` and `touchid` are **not** part of `make install` — they touch system
+files under `sudo`, so run them deliberately. `resticcheck` is optional and only
+useful once `archbackup` is configured (see the Security section).
 
 ---
 
@@ -635,6 +644,15 @@ most-recent commit. A commit-message template (`git/gitmessage` →
 `~/.gitmessage`, via `commit.template`) prefills subject/body guidance for
 manual commits.
 
+**Security defaults:** `transfer/fetch/receive.fsckObjects = true` reject
+malformed/malicious objects on clone/fetch. `core.hooksPath = ~/.dotfiles/git/hooks`
+points every repo at a tracked `pre-commit` hook that runs `gitleaks git --staged`
+to block accidental secret commits (the guard for `acp`'s `git add . && git push`).
+The hook fails *open* if gitleaks isn't installed (warns, allows) so commits
+still work everywhere; `make apps` installs gitleaks. Bypass a false positive
+with `git commit --no-verify`. NOTE: a repo that sets its own `core.hooksPath`
+(e.g. husky) overrides this, so the scan won't run there.
+
 #### Git aliases
 
 | Alias         | Command                                                          |
@@ -771,8 +789,11 @@ substituted with your real home at install time):
 | `org.jaredeberle.brewupdate`      | Mondays 09:00   | `bin/homebrewupdate.sh`                                               |
 | `org.jaredeberle.brewlogclean`    | Mondays 08:00   | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
 | `org.jaredeberle.mailsync`        | Every 5 minutes | `bin/mailsync.sh`                                                     |
+| `org.jaredeberle.resticcheck`     | Sundays 10:00   | `archbackup check` (restic integrity; no-op if the drive is unmounted) |
 
-Logs: `~/.local/brew_update_logs.txt` (newest run first), `~/.local/mail_sync_logs.txt`. Trigger a run on demand:
+Installed by `make brewauto`, `make mailsync`, and `make resticcheck`
+respectively. Logs: `~/.local/brew_update_logs.txt` (newest run first),
+`~/.local/mail_sync_logs.txt`, `~/.local/restic_check_logs.txt`. Trigger a run on demand:
 
 ```sh
 launchctl kickstart -k gui/$(id -u)/org.jaredeberle.brewupdate
@@ -814,32 +835,78 @@ app (or `killall Finder`) if the Services menu doesn't refresh.
 
 ## Security
 
-Installed by `make security`.
+Configs symlinked by `make security`:
 
-- **SSH** (`security/ssh-config`): dedicated key per host (`id_github`,
-  `id_codeberg`), modern crypto only — hybrid post-quantum key exchange first
-  (ML-KEM / sntrup761 + x25519), AEAD-only ciphers (AES-256-GCM preferred,
-  ChaCha20-Poly1305 fallback), `IdentitiesOnly`, agent + Keychain integration,
-  strict host-key checking,
-  connection multiplexing for Codeberg (`ControlPath ~/.ssh/control/%C`,
-  persisted 10m), no agent/X11 forwarding. Includes a `github-443` fallback
-  host alias for networks that block port 22.
+- **SSH** (`security/ssh-config`): modern crypto only — hybrid post-quantum key
+  exchange first (ML-KEM / sntrup761 + x25519), AEAD-only ciphers (AES-256-GCM
+  preferred, ChaCha20-Poly1305 fallback), ETM MACs, `IdentitiesOnly`, agent +
+  Keychain integration, strict host-key checking, connection multiplexing for
+  Codeberg (`ControlPath ~/.ssh/control/%C`, persisted 10m), no agent/X11
+  forwarding, `github-443` fallback for networks that block port 22.
+  A key-algorithm floor (`PubkeyAcceptedAlgorithms`/`HostKeyAlgorithms` +
+  `RequiredRSASize 3072`) refuses `ssh-rsa`/SHA-1, DSA, and short RSA keys.
+  ECDSA P-256 is permitted (alongside Ed25519/RSA-SHA2) because Secure-Enclave
+  keys must be P-256 — see SSH key custody below.
+- **Pinned host keys** (`security/known_hosts` → `~/.ssh/known_hosts_pinned`):
+  GitHub/Codeberg host keys are pre-trusted via a second `UserKnownHostsFile`,
+  removing the trust-on-first-use prompt (and its MITM window) on a fresh
+  machine. Fingerprints are documented in-file; re-verify against the providers'
+  docs and update when they rotate.
 - **GPG** (`security/gpg.conf`, `gpg-agent.conf.tmpl`, `dirmngr.conf`, `common.conf`):
   hardened algorithm preferences (AES-256 / SHA-512), strong S2K, `pinentry-mac`,
   `import-minimal`/`export-minimal`, `no-allow-loopback-pinentry`, `use-keyboxd`
   (`common.conf`), privacy-conscious keyserver/dirmngr defaults (LDAP disabled).
-  Git commit and tag signing uses GPG (`gpg.format = openpgp`) — the same key
-  works across GitHub and Codeberg without cross-registering SSH keys.
+  `auto-key-locate local,wkd` omits keyservers so key lookups don't leak the
+  queried key ID. Git commit and tag signing uses GPG (`gpg.format = openpgp`) —
+  the same key works across GitHub and Codeberg without cross-registering SSH keys.
 - **GPG master key management**: `gpg-master-import` / `gpg-master-done` fish
   functions handle the import-edit-cleanup cycle for the offline master key.
-  `gpg-master-done` detects the machine (Leia/Ahsoka) and reimports only the
-  correct machine-specific subkeys.
+  `gpg-master-done` detects the machine (Leia/Ahsoka), reimports only the correct
+  machine-specific subkeys, and stages the export inside `~/.gnupg` under
+  `umask 077` (never a predictable `/tmp` path).
+- **Secret scanning + git integrity** (`git/hooks/pre-commit`, `gitconfig`):
+  a global `core.hooksPath` runs `gitleaks` on staged changes before every
+  commit, and `*.fsckObjects` reject malformed objects on fetch/clone. See the
+  [Git](#git) section.
+- **Shell/env hardening** (`shell/fish/conf.d/env.fish`): `umask 077` (owner-only
+  by default), `HOMEBREW_NO_INSECURE_REDIRECT`, and a
+  `fish_should_add_to_history` filter that keeps space-prefixed and
+  secret-bearing command lines out of shell history.
 - **Firefox** (`security/betterfox/` submodule + `security/user-overrides.js`):
   `make firefox` concatenates both into a single `user.js` written to the active
   Firefox profile. Personal overrides (Smoothfox scroll tuning, DoH/NextDNS,
   shutdown sanitizing, etc.) live in `user-overrides.js` — Betterfox itself is
   never edited. To update Betterfox: `make betterfox-update`, review the diff,
   then `make firefox`.
+
+### SSH key custody (Secretive)
+
+The `secretive` cask stores SSH keys in the **Secure Enclave**:
+non-exportable, hardware-bound, Touch-ID-gated. Keys are generated in the
+enclave (you cannot import existing keys) and are per-machine, so each Mac gets
+its own key registered with each provider. Because the enclave only supports
+NIST P-256, these are ECDSA keys — hence the `PubkeyAcceptedAlgorithms` allowance
+above. `env.fish` points `SSH_AUTH_SOCK` at Secretive's socket (guarded on its
+existence) so `ssh`, `git`, **and** `ssh-keygen` all use the enclave keys —
+the last matters for `ssh-keygen -Y sign` (Codeberg/Forgejo key verification),
+which ignores `ssh_config`'s `IdentityAgent`. Per-machine setup steps live in
+`security/ssh-config`.
+
+### Optional system hardening (separate targets)
+
+Not part of `make install` — each touches system state and most need `sudo`:
+
+- **`make harden`** (sudo): enables the application firewall + stealth mode,
+  automatic macOS security updates / security responses, and opts out of Apple
+  diagnostics submission.
+- **`make touchid`** (sudo): enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
+  (with `pam_reattach` ahead of `pam_tid` so it works inside tmux).
+- **FileVault**: not toggled here (enabling headless is unsafe), but
+  `make macos-check` / `make doctor` warn if full-disk encryption is off.
+- **Backup integrity**: `archbackup check` runs `restic check` on the encrypted
+  research-scan repo; `make resticcheck` schedules it weekly (see [Launchd](#launchd)).
+
+`make macos-check` verifies the `harden`/`touchid`/FileVault state.
 
 ---
 
@@ -849,11 +916,13 @@ Installed by `make security`.
 .dotfiles/
 ├── Makefile              # symlink/install targets
 ├── README.md
+├── backup/               # restic-check LaunchAgent plist template
 ├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup)
-├── security/             # ssh, gpg, dirmngr, firefox configs
+├── security/             # ssh, gpg, dirmngr, firefox configs + pinned known_hosts
 │   ├── betterfox/        # Betterfox submodule (upstream user.js — never edited)
 │   └── user-overrides.js # personal Firefox prefs appended on top of Betterfox
 ├── git/                  # gitconfig, gitignore, gitmessage, lazygit.yml
+│   └── hooks/            # pre-commit (gitleaks secret scan; via core.hooksPath)
 ├── homebrew/             # Brewfile + LaunchAgent plist templates
 ├── macos/                # macOS GUI artifacts
 │   └── services/         # Automator workflows symlinked into ~/Library/Services

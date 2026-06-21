@@ -5,6 +5,57 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-21 — Security hardening: secret scanning, key custody, backup integrity
+
+### Added
+- **Secret scanning**: a global `core.hooksPath` runs a tracked
+  `git/hooks/pre-commit` hook (`gitleaks git --staged`) before every commit,
+  guarding the `acp` / `git add . && git push` flow. Fails *open* if gitleaks
+  isn't installed (warns, allows). `gitleaks` added to the Brewfile; `make git`
+  makes the hook executable; `make doctor` verifies `hooksPath` + gitleaks.
+- **macOS system hardening** (new targets, both `sudo`): `make harden` enables
+  the application firewall + stealth mode, automatic security updates / security
+  responses, and opts out of Apple diagnostics submission; `make touchid` writes
+  `/etc/pam.d/sudo_local` for Touch-ID `sudo` (with `pam_reattach` ahead of
+  `pam_tid` so it works inside tmux). `pam-reattach` added to the Brewfile. Both
+  are intentionally excluded from `make install`.
+- **FileVault check**: `make macos-check` / `make doctor` warn if full-disk
+  encryption is off (not toggled automatically — headless enable is unsafe).
+- **Pinned SSH host keys**: `security/known_hosts` → `~/.ssh/known_hosts_pinned`
+  (a second `UserKnownHostsFile`) pre-trusts verified GitHub/Codeberg host keys,
+  removing the trust-on-first-use window on a fresh machine.
+- **SSH key custody via Secretive** (Secure Enclave): `secretive` cask added;
+  `env.fish` routes `SSH_AUTH_SOCK` to Secretive's socket (guarded) so `ssh`,
+  `git`, and `ssh-keygen` all use the enclave keys; `ssh-config` points
+  `IdentityFile` at per-machine Secretive public keys with `IdentityAgent`
+  enabled. Per-machine migration recipe documented in `ssh-config`.
+- **Backup integrity**: `archbackup check` subcommand runs `restic check` on the
+  encrypted research-scan repo; `make resticcheck` schedules it weekly via
+  `org.jaredeberle.resticcheck` (no-op when the drive is unmounted).
+- **Shell/env hardening**: `umask 077`, `HOMEBREW_NO_INSECURE_REDIRECT`, and a
+  `fish_should_add_to_history` filter that drops space-prefixed and
+  secret-bearing command lines from history.
+
+### Changed
+- **Git object integrity**: `transfer/fetch/receive.fsckObjects = true` reject
+  malformed/malicious objects on clone/fetch.
+- **SSH algorithm floor**: added `PubkeyAcceptedAlgorithms`/`HostKeyAlgorithms`
+  and `RequiredRSASize 3072` to refuse `ssh-rsa`/SHA-1, DSA, and short RSA.
+  Subsequently widened `PubkeyAcceptedAlgorithms` to include `ecdsa-sha2-nistp256`,
+  since Secure-Enclave (Secretive) keys are necessarily P-256.
+- **GPG keyserver privacy**: `auto-key-locate` drops `keyserver` (now
+  `local,wkd`) so key lookups don't leak the queried key ID.
+
+### Fixed
+- **`gpg-master-done`**: exported secret subkeys are now staged inside `~/.gnupg`
+  (mode 0700) under `umask 077` via `mktemp`, instead of a predictable
+  `/tmp/subkeys-<machine>.gpg` — closes a world-readable window and a
+  symlink-race on the shared, sticky `/tmp`.
+- **`ipic`**: API-supplied artwork/store URLs are now `html.escape`d, preventing
+  a stray quote from breaking out of the `href`/`src` attribute.
+
+---
+
 ## 2026-06-16 — Manage macOS Services; drop stale zsh submodules
 
 ### Added (macOS Services)
