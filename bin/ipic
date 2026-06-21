@@ -92,7 +92,11 @@ names = [ x[name] for x in results ]
   
   # Construct the HTML.
 linkFmt = '<a href="{1}"><img src="{0}" alt="{2}", title="{2}" /></a>'
-links = [linkFmt.format(x, y, html.escape(z, quote=True))
+# Escape every interpolated value, URLs included: an artwork/store URL with a
+# stray quote would otherwise break out of the href/src attribute.
+links = [linkFmt.format(html.escape(x, quote=True),
+                        html.escape(y, quote=True),
+                        html.escape(z, quote=True))
             for x, y, z in zip(turls, burls, names) ]
 safe_title = html.escape(searchterm)
 page = '''<html>

@@ -20,9 +20,34 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
         return 1
     end
 
+    # Stage the export inside ~/.gnupg (already mode 0700) under a private umask,
+    # not /tmp: a shared, sticky directory with a predictable filename invites a
+    # symlink race that would redirect secret key material to an attacker target.
+    set -l gnupghome (gpgconf --list-dirs homedir 2>/dev/null; or echo $HOME/.gnupg)
+    set -l old_umask (umask)
+    umask 077
+    set -l subkeys_tmp (mktemp "$gnupghome/subkeys-$machine.XXXXXX")
+    set -l mk_status $status
+    umask $old_umask
+    test $mk_status -eq 0
+    or return 1
+
+    # Run the migration; clean up the staged secret material no matter how it ends.
+    __gpg-master-done-run $fingerprint $usb $subkeys_tmp $subkey_ids
+    set -l rc $status
+    rm -f $subkeys_tmp
+    return $rc
+end
+
+function __gpg-master-done-run --description 'internal: gpg-master-done body (see wrapper for cleanup)'
+    set -l fingerprint $argv[1]
+    set -l usb $argv[2]
+    set -l subkeys_tmp $argv[3]
+    set -l subkey_ids $argv[4..]
+
     # Export a fresh copy of this machine's subkeys before wiping
-    echo "Exporting subkeys for $machine..."
-    gpg --export-secret-subkeys $subkey_ids > /tmp/subkeys-$machine.gpg
+    echo "Exporting subkeys..."
+    gpg --export-secret-subkeys $subkey_ids > $subkeys_tmp
     or return 1
 
     # Wipe entire keyring entry
@@ -35,12 +60,9 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
     gpg --import $usb/key.asc
     or return 1
 
-    echo "Reimporting subkeys for $machine..."
-    gpg --import /tmp/subkeys-$machine.gpg
+    echo "Reimporting subkeys..."
+    gpg --import $subkeys_tmp
     or return 1
-
-    # Cleanup temp file
-    rm /tmp/subkeys-$machine.gpg
 
     # Verify
     echo ""
