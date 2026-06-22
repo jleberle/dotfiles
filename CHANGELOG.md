@@ -89,6 +89,10 @@ clean.)
   `brewauto`, `mailsync`, and `resticcheck` now `$(call …)` it. Behavior
   unchanged (verified via `make -n`); ~25 fewer lines and one install procedure
   to maintain.
+- `tools-check` now loops over the tool list instead of 14 near-identical
+  `command -v` lines (`tectonic` kept separate for its specific message). Same
+  output, ~8 fewer lines. (The `macos`/`macos-check` enumeration was left inline
+  on purpose — a data-file rewrite would cost readability and self-containment.)
 
 ### Removed
 - Dropped `font-fira-code` and `font-inconsolata` from the Brewfile — unused

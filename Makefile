@@ -363,20 +363,12 @@ brew-drift :
 	@echo "to uninstall the drift instead, run: brew bundle cleanup --force --file=$(DOTFILES)/homebrew/brewfile"
 tools-check :
 	@echo "Checking tools..."
-	@command -v delta      >/dev/null 2>&1 || echo "WARNING: delta not found (run: make apps)"
-	@command -v vale       >/dev/null 2>&1 || echo "WARNING: vale not found (run: make apps)"
-	@command -v pandoc     >/dev/null 2>&1 || echo "WARNING: pandoc not found (run: make apps)"
-	@command -v pandoc-crossref >/dev/null 2>&1 || echo "WARNING: pandoc-crossref not found (run: make apps)"
-	@command -v tectonic   >/dev/null 2>&1 || echo "WARNING: tectonic not found — PDF export will fail (run: make apps)"
-	@command -v lazygit    >/dev/null 2>&1 || echo "WARNING: lazygit not found (run: make apps)"
-	@command -v lua-language-server >/dev/null 2>&1 || echo "WARNING: lua-language-server not found (run: make apps)"
-	@command -v pyright    >/dev/null 2>&1 || echo "WARNING: pyright not found (run: make apps)"
-	@command -v bash-language-server >/dev/null 2>&1 || echo "WARNING: bash-language-server not found (run: make apps)"
-	@command -v harper-ls  >/dev/null 2>&1 || echo "WARNING: harper-ls not found (run: make apps)"
-	@command -v marksman   >/dev/null 2>&1 || echo "WARNING: marksman not found (run: make apps)"
-	@command -v stylua     >/dev/null 2>&1 || echo "WARNING: stylua not found (run: make apps)"
-	@command -v black      >/dev/null 2>&1 || echo "WARNING: black not found (run: make apps)"
-	@command -v prettier   >/dev/null 2>&1 || echo "WARNING: prettier not found (run: make apps)"
+	@for t in delta vale pandoc pandoc-crossref lazygit lua-language-server \
+	          pyright bash-language-server harper-ls marksman stylua black prettier; do \
+	    command -v $$t >/dev/null 2>&1 || echo "WARNING: $$t not found (run: make apps)"; \
+	done
+	@# tectonic kept separate for its more specific consequence
+	@command -v tectonic >/dev/null 2>&1 || echo "WARNING: tectonic not found — PDF export will fail (run: make apps)"
 	@echo "Done."
 doctor :
 	@echo "Checking symlinks..."
