@@ -5,6 +5,22 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Bug hunt: words / wordfrequency latent fixes
+
+A full pass exercising each function with edge-case inputs (the runtime-logic
+audit that caught the newdoc frontmatter bug). `shellcheck` (bin scripts) and
+`luacheck` (nvim) are clean; two issues found and fixed.
+
+### Fixed
+- **`words`**: the "pandoc failed" branch was dead code. The count runs through
+  `pandoc | wc -w | string trim`, so the pipeline's *final* status (string trim)
+  is 0 even when pandoc fails — `or` never fired and a failed file was silently
+  reported as 0 words. Now checks `$pipestatus[1]` (pandoc's own status).
+- **`wordfrequency`**: a leading/trailing delimiter made `awk` emit an empty
+  field, so a blank "word" appeared in the frequency list. Now skips empties.
+
+---
+
 ## 2026-06-22 — Single-source the repo path; fix newdoc title corruption
 
 ### Changed

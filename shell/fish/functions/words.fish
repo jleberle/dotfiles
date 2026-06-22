@@ -17,7 +17,9 @@ function words --description 'Prose word count via pandoc (excludes frontmatter,
             continue
         end
         set -l n (pandoc $file -t plain 2>/dev/null | wc -w | string trim)
-        or begin
+        # Check pandoc itself via $pipestatus[1], not the pipeline's final status:
+        # `wc | string trim` returns 0 even when pandoc fails, so `or` would miss it.
+        if test $pipestatus[1] -ne 0
             echo "words: pandoc failed for $file" >&2
             continue
         end

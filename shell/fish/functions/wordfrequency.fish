@@ -3,7 +3,8 @@ function wordfrequency --description 'Count and sort word frequency from stdin'
        BEGIN { FS="[^a-zA-Z]+" } {
            for (i=1; i<=NF; i++) {
                word = tolower($i)
-               words[word]++
+               # Skip empties from a leading/trailing delimiter (FS splits there).
+               if (word != "") words[word]++
            }
        }
        END {
