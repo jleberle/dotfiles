@@ -23,7 +23,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -389,7 +389,11 @@ doctor :
 	@test -L "$(HOME)/Library/Application Support/lazygit/config.yml" || echo "WARNING: lazygit config not symlinked (run: make git)"
 	@test -L $(HOME)/.config/fish              || echo "WARNING: fish config not symlinked (run: make shell)"
 	@test -L "$(GHOSTTY_DIR)/config"           || echo "WARNING: ghostty config not symlinked (run: make shell)"
-	@HP=$$(git config --global core.hooksPath); [ "$$HP" = "$(HOME)/.dotfiles/git/hooks" ] || echo "WARNING: git core.hooksPath not set to dotfiles hooks (run: make git)"
+	@HP=$$(git config --global core.hooksPath); \
+	case "$$HP" in \
+	    "$(HOME)/.dotfiles/git/hooks"|"~/.dotfiles/git/hooks") ;; \
+	    *) echo "WARNING: git core.hooksPath not set to dotfiles hooks (run: make git)" ;; \
+	esac
 	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not installed — pre-commit secret scan inactive (run: make apps)"
 	@test -L $(HOME)/.tmux.conf               || echo "WARNING: .tmux.conf not symlinked (run: make shell)"
 	@test -L $(HOME)/.config/bat/config       || echo "WARNING: bat config not symlinked (run: make shell)"
@@ -435,3 +439,6 @@ doctor :
 	    fi; \
 	done
 	@echo "Done."
+check : doctor macos-check brew-check tools-check
+	@echo ""
+	@echo "All health checks complete. Run 'make brew-drift' to also list untracked installs."

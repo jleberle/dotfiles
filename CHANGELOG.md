@@ -5,6 +5,21 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — `make check` aggregate + doctor hooksPath false positive
+
+### Added
+- **`make check`** — runs all read-only health checks in one shot (`doctor` +
+  `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays separate. The
+  read-only counterpart to `make update`.
+
+### Fixed
+- **`make doctor` false positive on `core.hooksPath`.** The value is stored as
+  `~/.dotfiles/git/hooks` (git expands the tilde at runtime — the hook works),
+  but the check string-compared it against the absolute `$(HOME)/…` form and
+  warned. Now accepts both the tilde and absolute forms.
+
+---
+
 ## 2026-06-22 — Inspection follow-ups: gitleaks allowlist, shellcheck, cache cleanup
 
 A full-history `gitleaks` scan, startup profile, lint run, and orphan sweep

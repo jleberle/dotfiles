@@ -85,7 +85,9 @@ Then finish the per-app setup:
 ## Check System
 
 All check targets print `WARNING: ... (run: make <target>)` for anything
-missing or misconfigured. Use `dots <target>` to run from outside the
+missing or misconfigured. Run them all at once with **`make check`**
+(`doctor` + `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays
+separate since it's informational. Use `dots <target>` to run from outside the
 dotfiles directory (see [Fish → Functions](#fish)).
 
 ### Symlinks, keys, and shell
@@ -183,6 +185,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
+| `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` + `tools-check` |
 | `clean`            | Removes stale directories left over from old repo layouts (`fish/`, `general/`)                    |
 
 `harden` and `touchid` are **not** part of `make install` — they touch system
