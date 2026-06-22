@@ -235,9 +235,9 @@ macos-check :
 	@VAL=$$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate 2>/dev/null); \
 	echo "$$VAL" | grep -q "enabled" || echo "WARNING: application firewall not enabled (run: make harden)"
 	@VAL=$$(/usr/libexec/ApplicationFirewall/socketfilterfw --getstealthmode 2>/dev/null); \
-	echo "$$VAL" | grep -q "enabled" || echo "WARNING: firewall stealth mode not enabled (run: make harden)"
-	@VAL=$$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: automatic update checks not enabled (run: make harden)"
+	echo "$$VAL" | grep -qiw on || echo "WARNING: firewall stealth mode not enabled (run: make harden)"
+	@softwareupdate --schedule 2>/dev/null | grep -qi "turned on" || \
+	    echo "WARNING: automatic update checks not enabled (run: make harden)"
 	@VAL=$$(defaults read /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall 2>/dev/null); \
 	[ "$$VAL" = "1" ] || echo "WARNING: automatic security-response install not enabled (run: make harden)"
 	@[ -f /etc/pam.d/sudo_local ] && grep -q pam_tid.so /etc/pam.d/sudo_local || \
@@ -248,6 +248,7 @@ harden :
 	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
 	@echo "Enabling automatic macOS update checks + security-response installs"
+	sudo softwareupdate --schedule on
 	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
 	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
 	sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
@@ -262,6 +263,9 @@ touchid :
 	    echo "NOTE: pam-reattach not installed — Touch ID won't work inside tmux (run: make apps)"
 	@printf '# Managed by dotfiles `make touchid`. sudo_local survives OS updates.\n# pam_reattach must precede pam_tid so Touch ID works inside tmux.\nauth       optional       %s/lib/pam/pam_reattach.so\nauth       sufficient     pam_tid.so\n' \
 	    "$(HOMEBREW_PREFIX)" | sudo tee /etc/pam.d/sudo_local >/dev/null
+	@# Standard perms for a pam.d file (644) — not whatever umask 077 left it at,
+	@# which would also block `make macos-check` from reading it back.
+	sudo chmod 644 /etc/pam.d/sudo_local
 	@echo "Done. Open a new shell and run any 'sudo' command to test (Touch ID prompt)."
 nvim :
 	@echo "Symlinking nvim config"

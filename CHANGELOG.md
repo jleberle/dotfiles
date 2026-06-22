@@ -5,6 +5,27 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Fix macOS 26 hardening checks (false warnings)
+
+### Fixed
+- **`make macos-check` false negatives on macOS 26 (Tahoe).** The firewall,
+  auto-update, and Touch ID settings were applied correctly, but the checks
+  misreported them: the stealth check grepped for `"enabled"` while macOS prints
+  `"…is on"`; the auto-update check read the legacy `AutomaticCheckEnabled` key
+  that Tahoe no longer populates. Stealth now matches `on`; auto-update now reads
+  `softwareupdate --schedule`.
+- **`make touchid` left `/etc/pam.d/sudo_local` mode 600.** With `umask 077` in
+  effect, `sudo tee` created it owner-only — harmless to PAM (which reads it as
+  root, so Touch ID worked) but unreadable to the non-sudo `macos-check` grep.
+  Now `chmod 644` (standard pam.d perms).
+
+### Changed
+- **`make harden`** enables automatic update checks via the supported
+  `softwareupdate --schedule on` (the `AutomaticCheckEnabled` default is a no-op
+  on current macOS).
+
+---
+
 ## 2026-06-21 — Workflow: reading-note scaffolder, update target, centralized paths
 
 ### Added
