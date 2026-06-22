@@ -97,10 +97,11 @@ make doctor
 ```
 
 Checks every symlink created by `make install`, plus: SSH keys exist
-(`id_github`, `id_codeberg`), fish is set as the login shell, TPM is cloned,
-vale styles directory is populated, a GPG secret key is present, and any
-installed launchd agents (mailsync, brewupdate, brewlogclean) are actually
-loaded — not just that their plist files exist.
+(`id_github`, `id_codeberg`), `~/.ssh`/`~/.gnupg` and the private keys are
+owner-only (no group/other access), fish is set as the login shell, TPM is
+cloned, vale styles directory is populated, a GPG secret key is present, and any
+installed launchd agents (mailsync, brewupdate, brewlogclean, resticcheck) are
+actually loaded — not just that their plist files exist.
 
 ### macOS defaults
 
@@ -184,7 +185,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
-| `doctor`           | Checks symlinks, SSH keys, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
+| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
 | `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` + `tools-check` |
 | `clean`            | Removes stale directories left over from old repo layouts (`fish/`, `general/`)                    |
 

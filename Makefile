@@ -424,6 +424,20 @@ doctor :
 	@echo "Checking SSH keys..."
 	@test -f $(HOME)/.ssh/id_github           || echo "WARNING: ~/.ssh/id_github not found — generate or copy your key"
 	@test -f $(HOME)/.ssh/id_codeberg        || echo "WARNING: ~/.ssh/id_codeberg not found — generate or copy your key"
+	@echo "Checking permissions (no group/other access on keys + secret dirs)..."
+	@# %Lp = octal permission bits; owner-only means the group+other digits are 0
+	@# (mode ends in "00"), e.g. 700, 600, 400 — anything else grants access.
+	@for p in $(HOME)/.ssh $(HOME)/.gnupg $(HOME)/.config/restic/archive.pass; do \
+	    [ -e "$$p" ] || continue; \
+	    M=$$(stat -f '%Lp' "$$p"); \
+	    case "$$M" in *00) ;; *) echo "WARNING: $$p is mode $$M — group/other access; tighten with: chmod go= $$p" ;; esac; \
+	done
+	@for k in $(HOME)/.ssh/id_*; do \
+	    case "$$k" in *.pub) continue ;; esac; \
+	    [ -f "$$k" ] || continue; \
+	    M=$$(stat -f '%Lp' "$$k"); \
+	    case "$$M" in *00) ;; *) echo "WARNING: private key $$k is mode $$M — want 600 (chmod 600 $$k)" ;; esac; \
+	done
 	@echo "Checking shell..."
 	@dscl . -read /Users/$(USER) UserShell 2>/dev/null | grep -qF "$(HOMEBREW_PREFIX)/bin/fish" || \
 	    echo "WARNING: fish is not the login shell (run: make chsh)"

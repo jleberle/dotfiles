@@ -11,6 +11,9 @@ individual commit — the git log has the full detail.
 - **`make check`** — runs all read-only health checks in one shot (`doctor` +
   `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays separate. The
   read-only counterpart to `make update`.
+- **Permission check in `doctor`** — warns if `~/.ssh`/`~/.gnupg`, the SSH
+  private keys, or `~/.config/restic/archive.pass` grant any group/other access
+  (owner-only = mode ends in `00`). Rides along in `make check`.
 
 ### Fixed
 - **`make doctor` false positive on `core.hooksPath`.** The value is stored as
