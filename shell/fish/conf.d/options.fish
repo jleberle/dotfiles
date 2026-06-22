@@ -26,7 +26,7 @@
 # zsh: EXTENDED_GLOB
 # fish: recursive `**` globbing and rich expansion are built in; a non-matching
 #       glob is an error in command position but expands to nothing in `set`,
-#       `for`, and `count` (relied on by the `fn` function).
+#       `for`, and `count`.
 
 # --- Misc ---------------------------------------------------------------------
 # INTERACTIVE_COMMENTS  -> fish supports `#` comments interactively by default.

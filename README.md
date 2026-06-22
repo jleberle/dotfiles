@@ -584,7 +584,6 @@ Autoloaded — call them like commands.
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
-| `fn <text>`             | List files whose name contains `<text>` (recursive glob)                              |
 | `fuck`                  | Re-run the previous command under `sudo`                                              |
 | `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |
 | `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only                          |

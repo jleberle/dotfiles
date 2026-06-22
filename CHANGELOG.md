@@ -19,6 +19,9 @@ individual commit — the git log has the full detail.
   after standardizing the terminal on JetBrainsMono Nerd Font and BBEdit on IBM
   Plex Mono. (Already-installed copies aren't auto-removed; `make brew-drift`
   now lists them, or `brew uninstall --cask font-fira-code font-inconsolata`.)
+- Removed the `fn` function — a pre-`fd` port from the zsh era, ~90% redundant
+  with the `findf`/`findd` (`fd`) aliases but slower and not `.gitignore`-aware.
+  Use `findf`/`findd`, or `fd <name>` for files + dirs in one call.
 
 ---
 
