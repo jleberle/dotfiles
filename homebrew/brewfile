@@ -17,6 +17,7 @@ brew "black"              # python formatter (conform)
 brew "harper"             # grammar LSP for markdown (harper_ls; vale covers style, vim spell covers spelling)
 brew "lua-language-server" # lua_ls
 brew "luacheck"           # Lua linter (CI lint workflow)
+brew "shellcheck"         # shell-script linter (CI lint workflow; bin/ scripts)
 brew "marksman"           # markdown LSP (cross-document links/headings navigation)
 brew "prettier"           # markdown formatter (conform)
 brew "pyright"             # python LSP

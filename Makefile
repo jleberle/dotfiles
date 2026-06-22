@@ -348,6 +348,10 @@ clean :
 	@[ -d $(HOME)/.dotfiles/general ] && \
 	    echo "Removing stale general/ at repo root" && \
 	    rm -rf $(HOME)/.dotfiles/general || true
+	@# Python bytecode cache left by running bin/ scripts (ipic/waybackup via uv)
+	@[ -d $(HOME)/.dotfiles/bin/__pycache__ ] && \
+	    echo "Removing bin/__pycache__" && \
+	    rm -rf $(HOME)/.dotfiles/bin/__pycache__ || true
 	@echo "Done."
 brew-check :
 	@echo "Checking Brewfile packages..."

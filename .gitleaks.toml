@@ -1,0 +1,15 @@
+# Gitleaks config for this repo. Extends the built-in ruleset and adds one
+# allowlist: the GPG `signingkey` line in git/gitconfig is a PUBLIC key
+# fingerprint (the same id published on GitHub/Codeberg), not a secret, but the
+# generic-api-key rule flags the 40-hex string. Allowlisting it means a full
+# `gitleaks git` scan returns 0 — so any future finding is genuinely real — and
+# the git/hooks/pre-commit hook won't false-trip if that line is ever re-staged.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "GPG signing-key fingerprints are public, not secrets"
+regexTarget = "line"
+regexes = [
+  '''signingkey\s*=\s*[A-Fa-f0-9]{40}''',
+]

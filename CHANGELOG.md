@@ -5,6 +5,28 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Inspection follow-ups: gitleaks allowlist, shellcheck, cache cleanup
+
+A full-history `gitleaks` scan, startup profile, lint run, and orphan sweep
+surfaced these. (No real secret was ever committed — the two history "leaks"
+were the public GPG signing-key fingerprint; startup is ~50ms; Lua/fish lint
+clean.)
+
+### Added
+- `.gitleaks.toml` allowlisting the public GPG `signingkey` fingerprint line, so
+  a full `gitleaks git` scan returns 0 instead of 2 false positives — any future
+  finding is then genuinely real, and the pre-commit hook won't false-trip if
+  that line is re-staged.
+- `shellcheck` to the Brewfile — the CI lint workflow references it but it was
+  never installed locally (and CI has no runners), so `bin/` scripts went
+  unlinted everywhere.
+
+### Changed
+- `make clean` now also removes `bin/__pycache__` (Python bytecode left by
+  running `ipic`/`waybackup` via uv).
+
+---
+
 ## 2026-06-22 — Streamline: dedupe LaunchAgent installs, prune unused fonts
 
 ### Changed
