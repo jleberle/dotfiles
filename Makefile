@@ -2,11 +2,8 @@ LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
 
-# Detect Homebrew prefix (Apple Silicon vs Intel Mac).
-HOMEBREW_PREFIX := $(shell \
-	if [ -x /opt/homebrew/bin/brew ]; then echo /opt/homebrew; \
-	elif [ -x /usr/local/bin/brew ]; then echo /usr/local; \
-	else brew --prefix 2>/dev/null || echo /usr/local; fi)
+# Homebrew prefix (Apple Silicon).
+HOMEBREW_PREFIX := /opt/homebrew
 
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services

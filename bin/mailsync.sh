@@ -2,7 +2,7 @@
 # mailsync — sync mail from Proton Bridge and update notmuch index
 # Invoked by launchd (org.jaredeberle.mailsync); logs to ~/.local/mail_sync_logs.txt
 
-HOMEBREW_PREFIX="$([ -d /opt/homebrew ] && echo /opt/homebrew || echo /usr/local)"
+HOMEBREW_PREFIX="/opt/homebrew"
 LOG="$HOME/.local/mail_sync_logs.txt"
 mkdir -p "$HOME/.local"
 

@@ -6,7 +6,7 @@ comes up the same as the old one. The editor (Neovim), terminal (Ghostty),
 multiplexer (tmux), shell (fish), and color theme (**Nord**) are all
 wired to work together.
 
-> **Platform:** macOS only (Apple Silicon or Intel Homebrew). It uses
+> **Platform:** macOS only, Apple Silicon (Homebrew at `/opt/homebrew`). It uses
 > `pbcopy`/`pbpaste`, `launchd`, `osascript`, Automator services, and symlinks
 > Ghostty into `~/Library/Application Support`.
 

@@ -5,15 +5,16 @@ individual commit — the git log has the full detail.
 
 ---
 
-## 2026-06-22 — Commit to macOS-only: drop Linux fallbacks
+## 2026-06-22 — Commit to macOS / Apple Silicon only: drop Linux + Intel fallbacks
 
 ### Removed
-- Stripped the `linuxbrew` (`/home/linuxbrew/.linuxbrew`) prefix branch from the
-  Homebrew detection in `conf.d/env.fish`, `config.fish`, `bin/homebrewupdate.sh`,
-  and the Makefile, plus the "Linux"/cross-architecture wording in comments and
-  the README platform note. The two **macOS** prefixes — Apple Silicon
-  (`/opt/homebrew`) and Intel (`/usr/local`) — remain; the repo is macOS-only by
-  design (`pbcopy`, `launchd`, `osascript`, Automator, `Library/Application Support`).
+- Stripped the `linuxbrew` (`/home/linuxbrew/.linuxbrew`) **and** Intel
+  (`/usr/local`) Homebrew-prefix fallbacks from `conf.d/env.fish`, `config.fish`,
+  `bin/homebrewupdate.sh`, `bin/mailsync.sh`, and the Makefile (now a flat
+  `HOMEBREW_PREFIX := /opt/homebrew`), plus the cross-architecture wording in
+  comments and the README platform note. The repo now targets **Apple Silicon
+  macOS** only (`pbcopy`, `launchd`, `osascript`, Automator, `Library/Application
+  Support`); Intel-Mac users adapt it themselves.
 
 ---
 

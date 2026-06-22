@@ -39,8 +39,7 @@ if status is-interactive
     set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --color=bg+:#3B4252,bg:#2E3440,spinner:#81A1C1,hl:#616E88 --color=fg:#D8DEE9,header:#616E88,info:#81A1C1,pointer:#81A1C1 --color=marker:#81A1C1,fg+:#D8DEE9,prompt:#81A1C1,hl+:#81A1C1 --color=border:#4C566A"
 
     # Cache `fzf --fish` output; rebuild if the fzf binary is newer than cache.
-    # Uses $HOMEBREW_PREFIX (set by `brew shellenv` in conf.d/env.fish) so this
-    # works on Apple Silicon (/opt/homebrew) and Intel (/usr/local).
+    # Uses $HOMEBREW_PREFIX (set by `brew shellenv` in conf.d/env.fish; /opt/homebrew).
     # Guarded so a machine mid-bootstrap (no brew/fzf yet) still gets a shell.
     set -l fzf_cache $cache/fzf.fish
     set -l fzf_bin $HOMEBREW_PREFIX/bin/fzf
