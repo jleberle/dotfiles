@@ -6,7 +6,13 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
     end
 
     set -l filename $argv[1]
-    set -l title (test (count $argv) -ge 2; and string join " " $argv[2..-1]; or echo "Untitled")
+    # Default to Untitled; join any remaining args into the title. (Don't fold
+    # this into one `string join … or echo` — string join returns non-zero when
+    # there's a single element to join, which would wrongly append "Untitled".)
+    set -l title Untitled
+    if test (count $argv) -ge 2
+        set title (string join " " $argv[2..-1])
+    end
 
     # Append .md if no extension given
     if not string match -q '*.*' $filename
@@ -25,7 +31,7 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
     # frontmatter to ...-17th-edition.csl for journals still on 17e. Keep this
     # default in sync with writing/pandoc/metadata.yaml — the CSL must live in
     # document metadata, not defaults.yaml (defaults override frontmatter).
-    printf '---\ntitle: "%s"\nauthor: "%s"\ndate: %s\n\nbibliography:\n  - %s\n\ncsl: %s/.dotfiles/writing/pandoc/chicago-notes-bibliography-18th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/.dotfiles/writing/pandoc/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $author $today $ZOTERO_LIBRARY_JSON $HOME $HOME > $filename
+    printf '---\ntitle: "%s"\nauthor: "%s"\ndate: %s\n\nbibliography:\n  - %s\n\ncsl: %s/writing/pandoc/chicago-notes-bibliography-18th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/writing/pandoc/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $author $today $ZOTERO_LIBRARY_JSON $DOTFILES_DIR $DOTFILES_DIR > $filename
 
     nvim $filename
 end

@@ -29,7 +29,7 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
         end
 
         pushd (path dirname $file)
-        if pandoc -d ~/.dotfiles/writing/pandoc/defaults.yaml $name -o $out $meta_args
+        if pandoc -d $DOTFILES_DIR/writing/pandoc/defaults.yaml $name -o $out $meta_args
             echo "Exported "(path dirname $file)/$out
         else
             echo "mdexport: pandoc failed for $file" >&2

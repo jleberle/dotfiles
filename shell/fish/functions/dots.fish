@@ -1,3 +1,3 @@
 function dots --description 'Run a dotfiles make target from anywhere'
-    make -C $HOME/.dotfiles $argv
+    make -C $DOTFILES_DIR $argv
 end

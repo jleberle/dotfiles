@@ -7,7 +7,7 @@ function valeinit --description 'Scaffold a per-project .vale.ini from the dotfi
         return 1
     end
 
-    cp ~/.dotfiles/writing/vale/vale-project.ini .vale.ini
+    cp $DOTFILES_DIR/writing/vale/vale-project.ini .vale.ini
     mkdir -p .vale/styles
     echo "Wrote .vale.ini (StylesPath: .vale/styles)"
     echo "Edit BasedOnStyles to taste; run 'vale sync' if you add Packages."

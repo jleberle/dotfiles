@@ -154,6 +154,23 @@ Removes stale directories left over from old repo layouts (`fish/` and
 Run this once on any machine that had the repo checked out before the
 2026-06-08 restructure.
 
+### Changing values (where things live)
+
+Most repeated paths are single-sourced; a few constants live in multiple
+config languages that can't share a variable. If you change one of these, edit:
+
+| To change… | Edit |
+|---|---|
+| **Repo location** | `Makefile` (`DOTFILES`) and `shell/fish/conf.d/paths.fish` (`DOTFILES_DIR`) — plus two that can't use the var: `git/gitconfig` `hooksPath` and the `gitup` alias in `aliases.fish` |
+| **Workflow paths** (Zotero library, notes, archives, website) | `shell/fish/conf.d/paths.fish` only |
+| **GPG key** (fingerprint / key id) | `git/gitconfig` (`signingkey`), `security/gpg.conf` (`default-key`), `writing/neomutt/gpg.rc` (`pgp_default_key`), `shell/fish/functions/gpg-master-done.fish` (`fingerprint` + subkey ids) |
+| **Name / email / GitHub user** | `git/gitconfig` |
+| **A new machine** (beyond Leia/Ahsoka) | `gpg-master-done.fish` (`switch $machine`) |
+| **Homebrew prefix** | hardcoded `/opt/homebrew` (Apple Silicon) in `Makefile`, `conf.d/env.fish`, `config.fish`, `bin/homebrewupdate.sh`, `bin/mailsync.sh` |
+
+The Nord palette is likewise repeated across `fish_prompt`, the FZF options,
+`lazygit.yml`, ghostty, and nvim — different formats with no shared source.
+
 ---
 
 ## Makefile Options

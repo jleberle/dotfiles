@@ -5,6 +5,29 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Single-source the repo path; fix newdoc title corruption
+
+### Changed
+- Centralized the repo location: `DOTFILES := $(HOME)/.dotfiles` in the Makefile
+  (replacing 45 literal `$(HOME)/.dotfiles` uses) and a guarded `DOTFILES_DIR`
+  var in `conf.d/paths.fish`, used by `newdoc`, `valeinit`, `mdexport`, and
+  `dots`. Relocating the repo is now ~2 edits instead of ~50.
+
+### Fixed
+- **`newdoc "Quoted Title"` produced corrupted frontmatter** (every field shifted
+  by one — author became "Untitled", date got the author, the CSL path got the
+  bibliography, etc.). `string join` returns non-zero when there's a single
+  element to join, so the `… or echo "Untitled"` fallback fired *in addition to*
+  the title, making `$title` two list elements and misaligning every subsequent
+  `printf` arg. Replaced the one-liner with an explicit default + conditional join.
+
+### Added
+- README "Changing values" map — where each repeated constant lives and exactly
+  what to edit when it changes (repo path, GPG key, identity, machine, Homebrew
+  prefix), including the cross-format ones that can't be DRY'd.
+
+---
+
 ## 2026-06-22 — Commit to macOS / Apple Silicon only: drop Linux + Intel fallbacks
 
 ### Removed
