@@ -191,6 +191,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `nvim`             | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                           |
 | `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir, runs `vale sync` |
 | `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs, scaffolds `~/.mbsyncrc` and `~/.notmuch-config` from templates if missing |
+| `services`         | Symlinks the Automator workflows in `macos/services/` into `~/Library/Services` (run by `make install`; see [macOS Services](#macos-services)) |
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `resticcheck`      | Installs a launchd agent that runs `archbackup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |

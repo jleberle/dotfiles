@@ -5,6 +5,25 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Fresh-install bootstrap fix + doc-table gap
+
+From a documentation-accuracy sweep and a `make install` ordering analysis.
+(Every function is documented; `.PHONY` matches the target list exactly; no
+README `make` reference points to a missing target.)
+
+### Fixed
+- **Fresh-machine `make apps` bootstrap.** After the Homebrew installer runs, the
+  bare `brew bundle` on the next recipe line would fail — the official installer
+  doesn't add brew to the *current* process PATH. Now calls
+  `$(HOMEBREW_PREFIX)/bin/brew` by absolute path, which works whether brew was
+  pre-installed or just installed.
+
+### Added
+- `services` row in the README Makefile Options table (the target existed and had
+  its own section, but was missing from the quick-reference table).
+
+---
+
 ## 2026-06-22 — Bug hunt: words / wordfrequency latent fixes
 
 A full pass exercising each function with edge-case inputs (the runtime-logic

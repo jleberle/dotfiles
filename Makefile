@@ -127,7 +127,9 @@ apps :
 		echo "Homebrew not found. Installing..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	}
-	brew bundle install --file=$(DOTFILES)/homebrew/brewfile
+	@# Absolute path, not bare `brew`: the official installer doesn't add brew to
+	@# the current process PATH, so a fresh-machine first run would otherwise fail.
+	$(HOMEBREW_PREFIX)/bin/brew bundle install --file=$(DOTFILES)/homebrew/brewfile
 brewauto :
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
