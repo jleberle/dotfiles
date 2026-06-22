@@ -5,6 +5,23 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Streamline: dedupe LaunchAgent installs, prune unused fonts
+
+### Changed
+- Collapsed the repeated LaunchAgent install dance (template → `plutil -lint` →
+  `bootout` → `bootstrap`) into a single `install_agent` Make canned recipe;
+  `brewauto`, `mailsync`, and `resticcheck` now `$(call …)` it. Behavior
+  unchanged (verified via `make -n`); ~25 fewer lines and one install procedure
+  to maintain.
+
+### Removed
+- Dropped `font-fira-code` and `font-inconsolata` from the Brewfile — unused
+  after standardizing the terminal on JetBrainsMono Nerd Font and BBEdit on IBM
+  Plex Mono. (Already-installed copies aren't auto-removed; `make brew-drift`
+  now lists them, or `brew uninstall --cask font-fira-code font-inconsolata`.)
+
+---
+
 ## 2026-06-22 — Fix macOS 26 hardening checks (false warnings)
 
 ### Fixed

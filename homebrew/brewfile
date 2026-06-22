@@ -111,11 +111,9 @@ mas "ublock origin lite", id:6745342698 # Ad Blocker
 mas "Vinegar", id:1591303229 # Replace Youtube Player
 
 # Fonts
-cask "font-fira-code" # monospace font with programming ligatures
-cask "font-ibm-plex-mono" # IBM Plex Mono
+cask "font-ibm-plex-mono" # IBM Plex Mono (BBEdit editor font)
 cask "font-ibm-plex-sans" # IBM Plex Sans type
 cask "font-ibm-plex-serif" # IBM Plex Serif
-cask "font-inconsolata" # monospace font
 cask "font-jetbrains-mono-nerd-font" # terminal/editor font referenced by ghostty config
 cask "font-source-sans-3" # humanist sans-serif (prose/document body text)
 cask "font-tex-gyre-schola" # Century Schoolbook-style serif (TeX Gyre; document/PDF body text)

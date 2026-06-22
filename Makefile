@@ -12,6 +12,17 @@ HOMEBREW_PREFIX := $(shell \
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
+# Canned recipe: $(call install_agent,<source plist path>) — template __HOME__ /
+# __HOMEBREW_PREFIX__ into ~/Library/LaunchAgents, lint, and (re)load it. The
+# launchd label is the plist filename without its .plist suffix. Used by the
+# brewauto / mailsync / resticcheck targets so the install dance lives once.
+define install_agent
+sed -e 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' -e 's|__HOME__|$(HOME)|g' $(1) > $(LAUNCH_AGENTS)/$(notdir $(1))
+plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
+-launchctl bootout gui/$(LAUNCHD_UID)/$(basename $(notdir $(1))) 2>/dev/null
+launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
+endef
+
 .PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor brew-check brew-drift tools-check clean
 
 default :
@@ -124,14 +135,8 @@ brewauto :
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
-	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/homebrew/org.jaredeberle.brewupdate.plist > $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
-	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/homebrew/org.jaredeberle.brewlogclean.plist > $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
-	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
-	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
-	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate 2>/dev/null
-	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.brewlogclean 2>/dev/null
-	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewupdate.plist
-	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.brewlogclean.plist
+	$(call install_agent,$(HOME)/.dotfiles/homebrew/org.jaredeberle.brewupdate.plist)
+	$(call install_agent,$(HOME)/.dotfiles/homebrew/org.jaredeberle.brewlogclean.plist)
 	@echo "Installed. Logs at $(HOME)/.local/brew_update_logs.txt (newest run first)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
 macos :
@@ -306,23 +311,14 @@ mailsync :
 	@echo "Installing mail sync LaunchAgent"
 	mkdir -p $(LAUNCH_AGENTS)
 	chmod +x $(HOME)/.dotfiles/bin/mailsync.sh
-	sed 's|__HOME__|$(HOME)|g' $(HOME)/.dotfiles/writing/neomutt/org.jaredeberle.mailsync.plist \
-	    > $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
-	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
-	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.mailsync 2>/dev/null
-	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist
+	$(call install_agent,$(HOME)/.dotfiles/writing/neomutt/org.jaredeberle.mailsync.plist)
 	@echo "Mail sync running every 5 minutes."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.mailsync"
 resticcheck :
 	@echo "Installing weekly restic integrity-check LaunchAgent"
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
-	sed -e 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' -e 's|__HOME__|$(HOME)|g' \
-	    $(HOME)/.dotfiles/backup/org.jaredeberle.resticcheck.plist \
-	    > $(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist
-	plutil -lint $(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist
-	-launchctl bootout gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck 2>/dev/null
-	launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist
+	$(call install_agent,$(HOME)/.dotfiles/backup/org.jaredeberle.resticcheck.plist)
 	@echo "Runs 'archbackup check' every Sunday 10:00 (no-op when the drive is unmounted)."
 	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
