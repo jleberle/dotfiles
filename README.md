@@ -6,9 +6,9 @@ comes up the same as the old one. The editor (Neovim), terminal (Ghostty),
 multiplexer (tmux), shell (fish), and color theme (**Nord**) are all
 wired to work together.
 
-> **Platform:** macOS only. It assumes Apple Silicon Homebrew (`/opt/homebrew`),
-> uses `pbcopy`/`pbpaste`, `launchd`, `osascript`, and symlinks Ghostty into
-> `~/Library/Application Support`. It will not work as-is on Linux.
+> **Platform:** macOS only (Apple Silicon or Intel Homebrew). It uses
+> `pbcopy`/`pbpaste`, `launchd`, `osascript`, Automator services, and symlinks
+> Ghostty into `~/Library/Application Support`.
 
 **Note**: I had Claude write this up largely so I know where to look when something breaks or I forget a command, if something doesn't make sense, it's probably really internal for my system. Feel free to reach out but all of this is beyond my abilities to troubleshoot.
 

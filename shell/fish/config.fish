@@ -40,7 +40,7 @@ if status is-interactive
 
     # Cache `fzf --fish` output; rebuild if the fzf binary is newer than cache.
     # Uses $HOMEBREW_PREFIX (set by `brew shellenv` in conf.d/env.fish) so this
-    # works on Apple Silicon (/opt/homebrew), Intel (/usr/local), and Linux.
+    # works on Apple Silicon (/opt/homebrew) and Intel (/usr/local).
     # Guarded so a machine mid-bootstrap (no brew/fzf yet) still gets a shell.
     set -l fzf_cache $cache/fzf.fish
     set -l fzf_bin $HOMEBREW_PREFIX/bin/fzf

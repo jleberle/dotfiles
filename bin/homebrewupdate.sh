@@ -7,10 +7,9 @@ trap 'rm -f "$TMPFILE"' EXIT
 {
     set -euo pipefail
 
-    # Resolve brew regardless of architecture (Apple Silicon, Intel, Linux).
+    # Resolve brew on either Mac architecture (Apple Silicon, Intel).
     if   [[ -x /opt/homebrew/bin/brew ]]; then BREW=/opt/homebrew/bin/brew
     elif [[ -x /usr/local/bin/brew    ]]; then BREW=/usr/local/bin/brew
-    elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then BREW=/home/linuxbrew/.linuxbrew/bin/brew
     else BREW=$(command -v brew)
     fi
 

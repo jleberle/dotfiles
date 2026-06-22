@@ -5,6 +5,18 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — Commit to macOS-only: drop Linux fallbacks
+
+### Removed
+- Stripped the `linuxbrew` (`/home/linuxbrew/.linuxbrew`) prefix branch from the
+  Homebrew detection in `conf.d/env.fish`, `config.fish`, `bin/homebrewupdate.sh`,
+  and the Makefile, plus the "Linux"/cross-architecture wording in comments and
+  the README platform note. The two **macOS** prefixes — Apple Silicon
+  (`/opt/homebrew`) and Intel (`/usr/local`) — remain; the repo is macOS-only by
+  design (`pbcopy`, `launchd`, `osascript`, Automator, `Library/Application Support`).
+
+---
+
 ## 2026-06-22 — `make check` aggregate + doctor hooksPath false positive
 
 ### Added
