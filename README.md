@@ -88,8 +88,8 @@ All check targets print `WARNING: ... (run: make <target>)` for anything
 missing or misconfigured. Run them all at once with **`make check`**
 (`doctor` + `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays
 separate since it's informational. Run **`make lint`** for repo-level static
-checks (shellcheck + fish syntax + luacheck). Use `dots <target>` to run from
-outside the dotfiles directory (see [Fish → Functions](#fish)).
+checks (shellcheck + fish syntax + luacheck + gitleaks). Use `dots <target>` to
+run from outside the dotfiles directory (see [Fish → Functions](#fish)).
 
 ### Symlinks, keys, and shell
 
@@ -202,7 +202,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
-| `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, and luacheck for nvim Lua |
+| `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-luacheck`/`lint-secrets` |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |

@@ -5,7 +5,30 @@ individual commit — the git log has the full detail.
 
 ---
 
-## 2026-06-22 — `make lint`, gitup function, nvim path resolution
+## 2026-06-23 — Switch CI to Woodpecker, harden the lint pipeline
+
+The Forgejo Actions workflow never actually ran — Codeberg has no shared
+runners, so it was dead config kept as a placeholder. Woodpecker replaces it
+with a pipeline that executes.
+
+### Added
+- **`make lint-shellcheck` / `lint-fish` / `lint-luacheck` / `lint-secrets`** —
+  `make lint` now composes these four standalone targets instead of one
+  monolithic recipe. `lint-secrets` runs a full-history `gitleaks git` scan as
+  a fail-closed backstop: the local `git/hooks/pre-commit` gitleaks check
+  fails *open* when gitleaks isn't installed, so CI is the only place a missing
+  scan is guaranteed to be caught.
+- **`.woodpecker/lint.yaml`** splits the single `lint` step into four
+  (`shellcheck`, `fish-syntax`, `luacheck`, `secrets`) so a failure in one
+  check is visible on its own in the Woodpecker UI instead of buried inside a
+  combined log. The base image is pinned by digest
+  (`debian@sha256:49ba34...`) rather than the floating `bookworm` tag, and
+  `gitleaks` is fetched as a checksum-verified release tarball (v8.30.1)
+  rather than relying on an image's entrypoint.
+
+### Removed
+- **`.forgejo/workflows/lint.yml`** — superseded by Woodpecker.
+
 
 ### Added
 - **`make lint`** — runs shellcheck + fish syntax + luacheck from one target

@@ -24,7 +24,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check lint brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -344,19 +344,26 @@ update :
 	@echo "  * Homebrew updates weekly via launchd — run 'brewup' to update now."
 	@echo "  * Betterfox is review-gated — run 'make betterfox-update', review, then 'make firefox'."
 	@echo "Review and commit writing/nvim/lazy-lock.json if Lazy changed it."
-lint :
+lint : lint-shellcheck lint-fish lint-luacheck lint-secrets
+	@echo "Done."
+lint-shellcheck :
 	@echo "Running shellcheck..."
 	@command -v shellcheck >/dev/null 2>&1 || { echo "ERROR: shellcheck not found — install it first (make apps)"; exit 1; }
 	@shellcheck $(SHELLCHECK_FILES)
+lint-fish :
 	@echo "Checking fish syntax..."
 	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }
 	@for f in $(FISH_FILES); do \
 	    fish --no-execute "$$f" || exit 1; \
 	done
+lint-luacheck :
 	@echo "Running luacheck..."
 	@command -v luacheck >/dev/null 2>&1 || { echo "ERROR: luacheck not found — install it first (make apps)"; exit 1; }
 	@luacheck $(LUACHECK_DIR)/ --globals vim --no-unused-args
-	@echo "Done."
+lint-secrets :
+	@echo "Running gitleaks (full history)..."
+	@command -v gitleaks >/dev/null 2>&1 || { echo "ERROR: gitleaks not found — install it first (make apps)"; exit 1; }
+	@gitleaks git --no-banner
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
