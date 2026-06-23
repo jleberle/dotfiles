@@ -18,18 +18,5 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y shellcheck fish lua5.4 luarocks && sudo luarocks install luacheck
 
-      - name: shellcheck (bin scripts + git hooks)
-        run: |
-          shellcheck bin/homebrewupdate.sh
-          shellcheck bin/homebrewlogclean.sh
-          shellcheck bin/mailsync.sh
-          shellcheck git/hooks/pre-commit
-
-      - name: fish syntax check
-        run: |
-          for f in shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish; do
-            fish --no-execute "$f" || exit 1
-          done
-
-      - name: luacheck (nvim lua)
-        run: luacheck writing/nvim/lua/ --globals vim --no-unused-args
+      - name: Run repo lint target
+        run: make lint

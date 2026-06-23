@@ -9,6 +9,10 @@ HOMEBREW_PREFIX := /opt/homebrew
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
+SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh git/hooks/pre-commit
+FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish
+LUACHECK_DIR := writing/nvim/lua
+
 # Canned recipe: $(call install_agent,<source plist path>) — template __HOME__ /
 # __HOMEBREW_PREFIX__ into ~/Library/LaunchAgents, lint, and (re)load it. The
 # launchd label is the plist filename without its .plist suffix. Used by the
@@ -20,7 +24,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check lint brew-check brew-drift tools-check clean
 
 default :
 	@echo "There is no default for your own safety."
@@ -28,6 +32,7 @@ default :
 install : apps git shell security nvim vale neomutt services brewauto
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
+	@echo "If you use NeoMutt, finish setup with: make mailsync"
 	@echo "Optional system hardening (each needs sudo): make harden, make touchid"
 	@echo "Optional backup integrity check: make resticcheck (after archbackup is set up)"
 	@echo ""
@@ -70,6 +75,8 @@ shell :
 	ln -sf $(DOTFILES)/shell/bat/config $(HOME)/.config/bat/config
 security :
 	@echo "Creating SSH ControlPath directory"
+	mkdir -p $(HOME)/.ssh
+	chmod 700 $(HOME)/.ssh
 	mkdir -p $(HOME)/.ssh/control
 	chmod 700 $(HOME)/.ssh/control
 	@echo "Symlinking SSH Configurations"
@@ -337,6 +344,19 @@ update :
 	@echo "  * Homebrew updates weekly via launchd — run 'brewup' to update now."
 	@echo "  * Betterfox is review-gated — run 'make betterfox-update', review, then 'make firefox'."
 	@echo "Review and commit writing/nvim/lazy-lock.json if Lazy changed it."
+lint :
+	@echo "Running shellcheck..."
+	@command -v shellcheck >/dev/null 2>&1 || { echo "ERROR: shellcheck not found — install it first (make apps)"; exit 1; }
+	@shellcheck $(SHELLCHECK_FILES)
+	@echo "Checking fish syntax..."
+	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }
+	@for f in $(FISH_FILES); do \
+	    fish --no-execute "$$f" || exit 1; \
+	done
+	@echo "Running luacheck..."
+	@command -v luacheck >/dev/null 2>&1 || { echo "ERROR: luacheck not found — install it first (make apps)"; exit 1; }
+	@luacheck $(LUACHECK_DIR)/ --globals vim --no-unused-args
+	@echo "Done."
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
@@ -397,7 +417,6 @@ doctor :
 	@test -L $(HOME)/.config/neomutt/neomuttrc || echo "WARNING: neomuttrc not symlinked (run: make neomutt)"
 	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
 	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"
-	@test -f $(LAUNCH_AGENTS)/org.jaredeberle.mailsync.plist || echo "WARNING: mail sync LaunchAgent not installed (run: make mailsync)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
 	@test -d $(HOME)/.local/share/vale/styles && \
 	    ls $(HOME)/.local/share/vale/styles | grep -q . || \

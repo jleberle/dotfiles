@@ -89,8 +89,5 @@ abbr -a gund 'git reset --soft HEAD~1'
 abbr -a gus  'git restore --staged'
 abbr -a glst 'git log -1 HEAD'
 
-# Gitup with bookmarks file
-alias gitup 'gitup -b ~/.dotfiles/git/gitup-bookmarks'
-
 # Website tasks (serve, new post, preflight, theme update, …) are handled by
 # the `site` function — see shell/fish/functions/site.fish

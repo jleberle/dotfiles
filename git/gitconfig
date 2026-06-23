@@ -51,6 +51,7 @@
 	fsckObjects = true
 [fetch]
 	fsckObjects = true
+	prune = true
 [receive]
 	fsckObjects = true
 
@@ -87,9 +88,6 @@
 [rebase]
 	autoStash = true
 	updateRefs = true
-
-[fetch]
-	prune = true
 
 [rerere]
 	enabled = true

@@ -5,6 +5,30 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-22 — `make lint`, gitup function, nvim path resolution
+
+### Added
+- **`make lint`** — runs shellcheck + fish syntax + luacheck from one target
+  (file lists in `SHELLCHECK_FILES`/`FISH_FILES`/`LUACHECK_DIR`). The Forgejo CI
+  workflow now calls `make lint` instead of duplicating the steps — one source of
+  truth for linting, reproducible locally.
+- **`gitup` is now a function** (was an alias) so it can use `$DOTFILES_DIR` for
+  the bookmarks path; `command gitup` prevents recursion.
+
+### Changed
+- **nvim** resolves the pandoc-defaults path via `$DOTFILES_DIR` → the resolved
+  (symlinked) config root → `~/.dotfiles` fallback, instead of a hardcoded path.
+- **`make security`** now ensures `~/.ssh` itself is `700` (not just `~/.ssh/control`).
+- **gitconfig**: merged the duplicate `[fetch]` section (`prune` + `fsckObjects`).
+- **`gitup-bookmarks`**: `~`-relative path + trailing newline; `site.fish`
+  comments/echo use `$WEBSITE_REPO`/`$repo`.
+- **`doctor`**: dropped the mailsync-plist absence warning (mailsync is optional,
+  not in `make install`; the agents loop still verifies it when present), and
+  `make install` prints a NeoMutt/`make mailsync` hint instead.
+- **`.gitignore`**: `bin/__pycache__/`.
+
+---
+
 ## 2026-06-22 — Fresh-install bootstrap fix + doc-table gap
 
 From a documentation-accuracy sweep and a `make install` ordering analysis.

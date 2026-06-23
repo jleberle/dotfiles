@@ -87,8 +87,9 @@ Then finish the per-app setup:
 All check targets print `WARNING: ... (run: make <target>)` for anything
 missing or misconfigured. Run them all at once with **`make check`**
 (`doctor` + `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays
-separate since it's informational. Use `dots <target>` to run from outside the
-dotfiles directory (see [Fish → Functions](#fish)).
+separate since it's informational. Run **`make lint`** for repo-level static
+checks (shellcheck + fish syntax + luacheck). Use `dots <target>` to run from
+outside the dotfiles directory (see [Fish → Functions](#fish)).
 
 ### Symlinks, keys, and shell
 
@@ -161,7 +162,7 @@ config languages that can't share a variable. If you change one of these, edit:
 
 | To change… | Edit |
 |---|---|
-| **Repo location** | `Makefile` (`DOTFILES`) and `shell/fish/conf.d/paths.fish` (`DOTFILES_DIR`) — plus two that can't use the var: `git/gitconfig` `hooksPath` and the `gitup` alias in `aliases.fish` |
+| **Repo location** | `Makefile` (`DOTFILES`) and `shell/fish/conf.d/paths.fish` (`DOTFILES_DIR`) — plus one that can't use the var: `git/gitconfig` `hooksPath` |
 | **Workflow paths** (Zotero library, notes, archives, website) | `shell/fish/conf.d/paths.fish` only |
 | **GPG key** (fingerprint / key id) | `git/gitconfig` (`signingkey`), `security/gpg.conf` (`default-key`), `writing/neomutt/gpg.rc` (`pgp_default_key`), `shell/fish/functions/gpg-master-done.fish` (`fingerprint` + subkey ids) |
 | **Name / email / GitHub user** | `git/gitconfig` |
@@ -201,6 +202,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
+| `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, and luacheck for nvim Lua |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
@@ -607,6 +609,7 @@ Autoloaded — call them like commands.
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
 | `fuck`                  | Re-run the previous command under `sudo`                                              |
+| `gitup`                 | Run `gitup` over the tracked bookmarks file (`git/gitup-bookmarks`)                   |
 | `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |
 | `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only                          |
 | `mkd <dir>`             | `mkdir -p` then `cd` into it                                                          |

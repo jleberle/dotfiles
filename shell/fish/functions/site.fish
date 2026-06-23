@@ -1,5 +1,5 @@
 function site --description 'Run website (jaredeberle.org) tasks from anywhere'
-    # Pure dispatch — all logic lives in ~/git/website/scripts/, which stays
+    # Pure dispatch — all logic lives in $WEBSITE_REPO/scripts/, which stays
     # canonical. This just removes the `cd`.
     set -l repo $WEBSITE_REPO
 
@@ -68,7 +68,7 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         case theme
             git submodule update --remote themes/PaperMod
             set rc $status
-            test $rc -eq 0; and echo "PaperMod updated — review: git -C ~/git/website diff themes/PaperMod"
+            test $rc -eq 0; and echo "PaperMod updated — review: git -C $repo diff themes/PaperMod"
         case '*'
             echo "site: unknown command: $cmd (run 'site' for usage)" >&2
             set rc 1
