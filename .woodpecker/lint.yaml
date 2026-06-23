@@ -1,0 +1,15 @@
+when:
+  - event: push
+    branch: main
+  - event: pull_request
+    branch: main
+
+steps:
+  - name: lint
+    image: debian:bookworm
+    pull: true
+    commands:
+      - apt-get update
+      - env DEBIAN_FRONTEND=noninteractive apt-get install -y fish lua5.4 luarocks make shellcheck
+      - luarocks install luacheck
+      - make lint
