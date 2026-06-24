@@ -19,6 +19,13 @@ GitHub mirror where hosted Linux and macOS runners are available.
 - **`.github/dependabot.yml`** — Dependabot on the private GitHub mirror now
   proposes weekly GitHub Actions updates and a monthly Betterfox submodule bump,
   keeping dependency PRs low-trust and review-gated.
+- **`depmerge <pr-number>`** — fish helper for the Codeberg-canonical /
+  GitHub-mirror workflow: fast-forward `main` from Codeberg, fetch the exact
+  Dependabot PR head from GitHub, merge locally, push once to both remotes, and
+  delete the temporary branch.
+- **Scheduled CI issue reporting** — the monthly GitHub Actions run now opens or
+  updates a `Scheduled CI failure` issue on breakage and closes it
+  automatically once the scheduled run recovers.
 - **`make lint-plists`** — `plutil -lint` over tracked LaunchAgents and
   Automator workflow files; only practical on macOS runners / your local Mac.
 - **`make nvim-check`** — headless Neovim startup smoke test in a temporary XDG

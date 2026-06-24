@@ -710,6 +710,16 @@ git remote set-url --add --push origin git@github.com:jleberle/dotfiles.git
 GitHub Dependabot on the private mirror watches the GitHub Actions workflow pins
 weekly and the Betterfox submodule monthly via [.github/dependabot.yml](/Users/jaredeberle/.dotfiles/.github/dependabot.yml). That keeps update PRs reviewable in GitHub without changing Codeberg's role as the canonical public remote.
 
+**Dependabot merge workflow:** review the PR on GitHub, but merge it locally so
+Codeberg and GitHub do not diverge. The `depmerge <pr-number>` fish helper:
+switches to `main`, fast-forwards it from Codeberg, fetches the exact PR head
+from GitHub, fast-forward merges it locally, pushes once to both remotes, then
+deletes its temporary branch. It refuses a dirty worktree.
+
+**Scheduled CI failures:** the monthly GitHub Actions run opens or updates a
+`Scheduled CI failure` issue if either the Linux or macOS job breaks. When a
+later monthly run succeeds again, that issue is closed automatically.
+
 #### Git aliases
 
 | Alias         | Command                                                          |
