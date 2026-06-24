@@ -5,6 +5,34 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-24 — Move CI from Woodpecker to GitHub Actions, add macOS-native checks
+
+Codeberg remains the public canonical repo, but CI now runs from a private
+GitHub mirror where hosted Linux and macOS runners are available.
+
+### Added
+- **`.github/workflows/ci.yml`** — replaces the Woodpecker pipeline with GitHub
+  Actions jobs for:
+  - Linux repo checks (`shellcheck`, fish syntax, `luacheck`,
+    `writing-check`, `gitleaks`)
+  - macOS-native checks (`lint-plists`, `writing-check`, `nvim-check`)
+- **`.github/dependabot.yml`** — Dependabot on the private GitHub mirror now
+  proposes weekly GitHub Actions updates and a monthly Betterfox submodule bump,
+  keeping dependency PRs low-trust and review-gated.
+- **`make lint-plists`** — `plutil -lint` over tracked LaunchAgents and
+  Automator workflow files; only practical on macOS runners / your local Mac.
+- **`make nvim-check`** — headless Neovim startup smoke test in a temporary XDG
+  tree, exercising the real config without polluting your normal cache/state.
+
+### Removed
+- **`.woodpecker/lint.yaml`** — superseded by GitHub Actions.
+
+### Changed
+- README CI / Git docs now describe the private GitHub mirror setup: Codeberg
+  stays canonical, GitHub runs the checks.
+
+---
+
 ## 2026-06-24 — Writing workflow hardening: citation edge cases, recursive notes, fixture-backed checks
 
 This pass tightened the scholarly-writing workflow around the places most

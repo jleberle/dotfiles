@@ -90,8 +90,11 @@ missing or misconfigured. Run them all at once with **`make check`**
 separate since it's informational. Run **`make lint`** for repo-level static
 checks (shellcheck + fish syntax + luacheck + gitleaks), and **`make writing-check`**
 for fixture-backed smoke tests of the scholarly writing helpers (`citecheck`,
-`zotcheck`, `readnote`). Use `dots <target>` to run from outside the dotfiles
-directory (see [Fish → Functions](#fish)).
+`zotcheck`, `readnote`). macOS-specific assets have their own checks:
+**`make lint-plists`** validates tracked LaunchAgents and Automator workflows,
+and **`make nvim-check`** runs a headless Neovim smoke test in a temporary XDG
+tree. Use `dots <target>` to run from outside the dotfiles directory (see
+[Fish → Functions](#fish)).
 
 ### Symlinks, keys, and shell
 
@@ -205,7 +208,9 @@ just prints a warning) so nothing destructive happens by accident.
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-luacheck`/`lint-secrets` |
+| `lint-plists`      | macOS-only: `plutil -lint` over tracked LaunchAgents and Automator workflow files                    |
 | `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`) |
+| `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
@@ -690,6 +695,21 @@ still work everywhere; `make apps` installs gitleaks. Bypass a false positive
 with `git commit --no-verify`. NOTE: a repo that sets its own `core.hooksPath`
 (e.g. husky) overrides this, so the scan won't run there.
 
+**Dotfiles remotes / CI mirror:** Codeberg stays the public canonical remote for
+this repo, but CI runs on a private GitHub mirror. In this clone, `origin`
+should fetch from Codeberg and push to both Codeberg and GitHub, so a normal
+`git push` updates the canonical repo and triggers GitHub Actions on the mirror.
+For a fresh clone:
+
+```sh
+git remote set-url origin codeberg:jle/dotfiles.git
+git remote set-url --push origin codeberg:jle/dotfiles.git
+git remote set-url --add --push origin git@github.com:jleberle/dotfiles.git
+```
+
+GitHub Dependabot on the private mirror watches the GitHub Actions workflow pins
+weekly and the Betterfox submodule monthly via [.github/dependabot.yml](/Users/jaredeberle/.dotfiles/.github/dependabot.yml). That keeps update PRs reviewable in GitHub without changing Codeberg's role as the canonical public remote.
+
 #### Git aliases
 
 | Alias         | Command                                                          |
@@ -914,7 +934,9 @@ Configs symlinked by `make security`:
   Firefox profile. Personal overrides (Smoothfox scroll tuning, DoH/NextDNS,
   shutdown sanitizing, etc.) live in `user-overrides.js` — Betterfox itself is
   never edited. To update Betterfox: `make betterfox-update`, review the diff,
-  then `make firefox`.
+  then `make firefox`. The private GitHub mirror also gets a monthly Dependabot
+  PR for the submodule so upstream changes are surfaced even if you do not pull
+  them manually.
 
 ### SSH key custody (Secretive)
 

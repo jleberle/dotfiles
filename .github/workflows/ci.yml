@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-checks:
+    name: Linux checks
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update -o Acquire::Retries=3
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            make \
+            shellcheck \
+            fish \
+            python3 \
+            curl \
+            lua5.4 \
+            luarocks
+          sudo luarocks install luacheck 1.2.0
+
+      - name: Shellcheck
+        run: make lint-shellcheck
+
+      - name: Fish syntax
+        run: make lint-fish
+
+      - name: Luacheck
+        run: make lint-luacheck
+
+      - name: Writing workflow checks
+        run: make writing-check
+
+      - name: Install gitleaks
+        run: |
+          curl -fsSLO https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks_8.30.1_linux_x64.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks_8.30.1_linux_x64.tar.gz gitleaks
+          sudo mv gitleaks /usr/local/bin/gitleaks
+
+      - name: Secret scan
+        run: make lint-secrets
+
+  macos-checks:
+    name: macOS-native checks
+    runs-on: macos-14
+
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install macOS dependencies
+        run: brew install fish neovim
+
+      - name: plist / workflow lint
+        run: make lint-plists
+
+      - name: Writing workflow checks
+        run: make writing-check
+
+      - name: Headless Neovim smoke test
+        run: make nvim-check
