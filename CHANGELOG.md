@@ -37,6 +37,9 @@ GitHub mirror where hosted Linux and macOS runners are available.
 ### Changed
 - README CI / Git docs now describe the private GitHub mirror setup: Codeberg
   stays canonical, GitHub runs the checks.
+- GitHub Actions workflow steps now pin reusable actions by full commit SHA,
+  while Dependabot continues opening weekly PRs to roll those pins forward on
+  the private GitHub mirror.
 
 ---
 

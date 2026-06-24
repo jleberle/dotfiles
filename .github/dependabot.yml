@@ -3,6 +3,7 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
+    # Keep SHA-pinned workflow actions current with reviewable PRs.
     schedule:
       interval: "weekly"
       day: "monday"

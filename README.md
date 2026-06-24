@@ -707,8 +707,11 @@ git remote set-url --push origin codeberg:jle/dotfiles.git
 git remote set-url --add --push origin git@github.com:jleberle/dotfiles.git
 ```
 
-GitHub Dependabot on the private mirror watches the GitHub Actions workflow pins
-weekly and the Betterfox submodule monthly via [.github/dependabot.yml](/Users/jaredeberle/.dotfiles/.github/dependabot.yml). That keeps update PRs reviewable in GitHub without changing Codeberg's role as the canonical public remote.
+GitHub Dependabot on the private mirror watches the SHA-pinned GitHub Actions
+workflow refs weekly and the Betterfox submodule monthly via
+[.github/dependabot.yml](/Users/jaredeberle/.dotfiles/.github/dependabot.yml).
+That keeps update PRs reviewable in GitHub without changing Codeberg's role as
+the canonical public remote.
 
 **Dependabot merge workflow:** review the PR on GitHub, but merge it locally so
 Codeberg and GitHub do not diverge. The `depmerge <pr-number>` fish helper:
