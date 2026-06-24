@@ -3,7 +3,9 @@ function readnote --description 'Scaffold a reading note from a Zotero citekey (
     # Creates <citekey>.md in $READING_NOTES_DIR with frontmatter pulled from the
     # Zotero CSL JSON export, in the exact shape zotcheck reconciles — so a
     # "Zotero item with no note yet" becomes a real note in one step. Defaults the
-    # source tag to secondary; pass --primary for a primary source.
+    # source tag to secondary; pass --primary for a primary source. The body
+    # opens with a history-oriented scaffold plus any archival metadata Zotero
+    # already knows.
     argparse primary -- $argv
     or return 1
 
@@ -41,6 +43,13 @@ item = next((i for i in lib if i.get("id") == key), None)
 if item is None:
     sys.exit("readnote: citekey not in library: " + key)
 
+def first_value(*names):
+    for name in names:
+        value = item.get(name)
+        if value not in (None, ""):
+            return value
+    return ""
+
 auth = []
 for a in item.get("author", []):
     if a.get("literal"):
@@ -56,8 +65,36 @@ try:
 except Exception:
     year = ""
 
+container = first_value("container-title")
+archive = first_value("archive")
+archive_collection = first_value("archive_collection", "archive-collection")
+archive_location = first_value("archive_location", "archive-location")
+archive_place = first_value("archive-place", "archive_place")
+url = first_value("URL")
+abstract = first_value("abstract")
+
 J = lambda s: json.dumps(s, ensure_ascii=False)   # safe YAML double-quoted scalar
 zot = "zotero://select/items/@" + key
+evidence = []
+if archive:
+    evidence.append(f"- Repository: {archive}")
+if archive_collection:
+    evidence.append(f"- Collection: {archive_collection}")
+if archive_location:
+    evidence.append(f"- Locator: {archive_location}")
+if archive_place:
+    evidence.append(f"- Place: {archive_place}")
+if container:
+    evidence.append(f"- Container / series: {container}")
+if url:
+    evidence.append(f"- URL: {url}")
+if not evidence:
+    evidence.append("- Repository / collection:")
+    evidence.append("- Locator / pages:")
+
+context = [abstract] if abstract else ["- Position this source in the historiography, archive, or primary-source context."]
+context_block = "\n".join(context)
+evidence_block = "\n".join(evidence)
 with open(outpath, "w") as f:
     f.write(
         "---\n"
@@ -73,10 +110,27 @@ with open(outpath, "w") as f:
         "  - zotero\n"
         f"  - source/{source}\n"
         "---\n\n"
+        "## Summary\n\n"
+        "## Argument / Content\n\n"
+        "## Historiography / Context\n\n"
+        + context_block
+        + "\n\n"
+        "## Evidence / Archival Notes\n"
+        + evidence_block
+        + "\n\n"
+        "## Key Quotations\n"
+        "- p. :\n\n"
+        "## Project Use\n"
+        "- Claim:\n"
+        "- Chapter / section:\n\n"
+        "## Follow-up\n"
+        "- [ ]\n"
     )
 ' $key $source $ZOTERO_LIBRARY_JSON $file
     or return 1
 
     echo "readnote: created "(string replace $HOME '~' $file)
-    nvim $file
+    if status --is-interactive
+        nvim $file
+    end
 end

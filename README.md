@@ -88,8 +88,10 @@ All check targets print `WARNING: ... (run: make <target>)` for anything
 missing or misconfigured. Run them all at once with **`make check`**
 (`doctor` + `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays
 separate since it's informational. Run **`make lint`** for repo-level static
-checks (shellcheck + fish syntax + luacheck + gitleaks). Use `dots <target>` to
-run from outside the dotfiles directory (see [Fish → Functions](#fish)).
+checks (shellcheck + fish syntax + luacheck + gitleaks), and **`make writing-check`**
+for fixture-backed smoke tests of the scholarly writing helpers (`citecheck`,
+`zotcheck`, `readnote`). Use `dots <target>` to run from outside the dotfiles
+directory (see [Fish → Functions](#fish)).
 
 ### Symlinks, keys, and shell
 
@@ -203,6 +205,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-luacheck`/`lint-secrets` |
+| `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`) |
 | `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
@@ -234,7 +237,8 @@ This setup is tuned for academic / long-form writing in Markdown.
   A curated **`Academic` vocabulary** (`writing/vale/vocab/Academic/`) is
   tracked in the repo and symlinked into the styles dir by `make vale`
   (`Vocab = Academic`), so proper nouns / domain terms are exempt from any
-  spelling or terminology rule and the allowlist syncs across machines.
+  spelling or terminology rule and the allowlist syncs across machines. It now
+  includes common historiographical / archival terms as well as tool names.
 - **Templates** in `writing/pandoc/`:
   - `metadata.yaml` — Pandoc metadata block (title, author, `bibliography`,
     `geometry`, `fontsize`, `linestretch`). The `bibliography` points at the
@@ -420,9 +424,9 @@ like commands. (General-purpose shell functions are listed under [Fish](#fish).)
 | `archcheck`             | List archival PDFs with no OCR text layer (run `ocrmypdf` on those)                    |
 | `archverify [--update]` | SHA-256 manifest of the scans; detects corruption / bit-rot                           |
 | `archbackup [snapshots]`| `restic` versioned, encrypted snapshot of the archive to an external HD               |
-| `citecheck <md…>`       | Validate every `@citekey` in a draft against `Library.json` before export            |
-| `zotcheck [--list]`     | Reconcile notes vs Zotero — orphaned citekeys, and items lacking a note                |
-| `readnote <key> [--primary]` | Scaffold a reading note for a Zotero citekey (metadata from `Library.json`); closes a `zotcheck` gap |
+| `citecheck <md…>`       | Validate every `@citekey` / `-@citekey` in a draft against `Library.json` before export |
+| `zotcheck [--list]`     | Reconcile notes vs Zotero recursively — orphaned citekeys, and items lacking a note   |
+| `readnote <key> [--primary]` | Scaffold a history-oriented reading note for a Zotero citekey (metadata from `Library.json` + archival fields when present); closes a `zotcheck` gap |
 
 **Bibliography sources.** Pandoc *rendering* (`newdoc`, `metadata.yaml`) reads
 the Better CSL JSON export (`~/Documents/Library/Library.json`), which preserves
@@ -439,7 +443,8 @@ operate on `~/Notes/03 Research/Archives` (the Obsidian vault, outside this repo
 library, notes trees, research archives, website repo) are defined once in
 `shell/fish/conf.d/paths.fish` (`ZOTERO_LIBRARY_JSON`, `READING_NOTES_DIR`,
 `RESEARCH_ARCHIVES_DIR`, …) rather than hardcoded per function. Each is
-`set -q`-guarded, so a per-machine `set -Ux` override wins.
+`set -q`-guarded, so a per-machine `set -Ux` override wins. Neovim's
+Telescope bibtex picker resolves the same tracked `ZOTERO_LIBRARY_BIB` path.
 
 **Aliases**
 

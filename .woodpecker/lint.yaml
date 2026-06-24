@@ -31,8 +31,16 @@ steps:
     commands:
       - apt-get update -o Acquire::Retries=3
       - env DEBIAN_FRONTEND=noninteractive apt-get install -y make lua5.4 luarocks
-      - luarocks install luacheck
+      - luarocks install luacheck 1.2.0
       - make lint-luacheck
+
+  - name: writing-check
+    image: debian@sha256:49ba348354a28e39c70beffd6cf43bdb8d55d81ce4b746b0428717d054b8bbc4
+    pull: true
+    commands:
+      - apt-get update -o Acquire::Retries=3
+      - env DEBIAN_FRONTEND=noninteractive apt-get install -y make fish python3
+      - make writing-check
 
   # Fail-closed secret scan backstop: the local `git/hooks/pre-commit` gitleaks
   # check fails *open* if gitleaks isn't installed on the dev's machine, so CI

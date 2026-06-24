@@ -5,6 +5,45 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-24 — Writing workflow hardening: citation edge cases, recursive notes, fixture-backed checks
+
+This pass tightened the scholarly-writing workflow around the places most
+likely to drift silently over time: citation parsing, note reconciliation,
+editor path resolution, and note scaffolding.
+
+### Added
+- **`make writing-check`** — fixture-backed smoke tests for the writing helpers:
+  `citecheck` must catch both `@citekey` and suppressed-author `-@citekey`,
+  `zotcheck` must recurse into nested note trees, and `readnote` must scaffold
+  a history-oriented note body with archival metadata when present.
+- **`tests/writing-check.sh`** — the checked-in harness behind `make writing-check`;
+  added to `shellcheck` coverage and to the Woodpecker pipeline as its own step.
+- **`writing/nvim/lua/config/paths.lua`** — shared Neovim path resolver for the
+  dotfiles root and workflow paths, so editor-side writing features can follow
+  the same tracked defaults as the fish functions.
+
+### Fixed
+- **`citecheck`** now validates suppressed-author Pandoc citations (`-@citekey`)
+  instead of silently skipping them.
+- **`zotcheck`** now walks reading/research note trees recursively rather than
+  only the top level, so nested note structures are fully audited.
+- **Telescope bibtex** no longer hardcodes `~/Documents/Library/Library.bib`;
+  it resolves `ZOTERO_LIBRARY_BIB` from the centralized workflow-path config
+  (env override first, tracked default second).
+
+### Changed
+- **`readnote`** now writes an expanded, history-oriented scaffold
+  (summary/argument/context/evidence/quotations/project use/follow-up) and
+  carries archival metadata / abstracts from the Zotero CSL JSON into the note
+  body when available. In non-interactive runs it skips opening Neovim, which
+  keeps `writing-check` automation headless-safe.
+- **Vale `Academic` vocabulary** now includes common historiographical and
+  archival terms (`antebellum`, `historiography`, `prosopography`, etc.) so
+  projects that re-enable spelling/terminology checks need less local allowlist
+  churn.
+
+---
+
 ## 2026-06-23 — Switch CI to Woodpecker, harden the lint pipeline
 
 The Forgejo Actions workflow never actually ran — Codeberg has no shared
@@ -22,33 +61,13 @@ with a pipeline that executes.
   (`shellcheck`, `fish-syntax`, `luacheck`, `secrets`) so a failure in one
   check is visible on its own in the Woodpecker UI instead of buried inside a
   combined log. The base image is pinned by digest
-  (`debian@sha256:49ba34...`) rather than the floating `bookworm` tag, and
-  `gitleaks` is fetched as a checksum-verified release tarball (v8.30.1)
-  rather than relying on an image's entrypoint.
+  (`debian@sha256:49ba34...`) rather than the floating `bookworm` tag,
+  `luacheck` is pinned to v1.2.0 in LuaRocks, and `gitleaks` is fetched as a
+  checksum-verified release tarball (v8.30.1) rather than relying on an image's
+  entrypoint.
 
 ### Removed
 - **`.forgejo/workflows/lint.yml`** — superseded by Woodpecker.
-
-
-### Added
-- **`make lint`** — runs shellcheck + fish syntax + luacheck from one target
-  (file lists in `SHELLCHECK_FILES`/`FISH_FILES`/`LUACHECK_DIR`). The Forgejo CI
-  workflow now calls `make lint` instead of duplicating the steps — one source of
-  truth for linting, reproducible locally.
-- **`gitup` is now a function** (was an alias) so it can use `$DOTFILES_DIR` for
-  the bookmarks path; `command gitup` prevents recursion.
-
-### Changed
-- **nvim** resolves the pandoc-defaults path via `$DOTFILES_DIR` → the resolved
-  (symlinked) config root → `~/.dotfiles` fallback, instead of a hardcoded path.
-- **`make security`** now ensures `~/.ssh` itself is `700` (not just `~/.ssh/control`).
-- **gitconfig**: merged the duplicate `[fetch]` section (`prune` + `fsckObjects`).
-- **`gitup-bookmarks`**: `~`-relative path + trailing newline; `site.fish`
-  comments/echo use `$WEBSITE_REPO`/`$repo`.
-- **`doctor`**: dropped the mailsync-plist absence warning (mailsync is optional,
-  not in `make install`; the agents loop still verifies it when present), and
-  `make install` prints a NeoMutt/`make mailsync` hint instead.
-- **`.gitignore`**: `bin/__pycache__/`.
 
 ---
 

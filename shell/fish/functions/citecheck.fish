@@ -2,6 +2,7 @@ function citecheck --description 'Check every @citekey in a draft exists in the 
     # usage: citecheck <file.md> [more.md ...]
     # Catches broken pandoc citations (typos, deleted items, key drift) before
     # export — otherwise they render as "???" or silently vanish in the PDF.
+    # Supports both normal @citekey and suppressed-author -@citekey forms.
     if test (count $argv) -eq 0
         echo "usage: citecheck <file.md> [more.md ...]" >&2
         return 1
@@ -15,7 +16,7 @@ function citecheck --description 'Check every @citekey in a draft exists in the 
     python3 -c '
 import json, re, sys
 ids = {i.get("id") for i in json.load(open(sys.argv[1]))}
-cite = re.compile(r"(?:^|[\s\[;])@([A-Za-z0-9][\w:.#&+/-]*)")
+cite = re.compile(r"(?:^|[\s\[;])-?@([A-Za-z0-9][\w:.#&+/-]*)")
 bad = 0
 for path in sys.argv[2:]:
     try:

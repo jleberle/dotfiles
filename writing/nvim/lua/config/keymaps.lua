@@ -1,4 +1,5 @@
 local map = vim.keymap.set
+local paths = require("config.paths")
 
 -- Diagnostics
 map("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostic" })
@@ -47,21 +48,7 @@ map("n", "-", "<cmd>Oil<cr>")
 -- the editor stays responsive during slow PDF/LaTeX builds; notifies on
 -- completion. Runs from the document's own directory so relative paths in
 -- metadata.yaml (bibliography, CSL) and relative image/links resolve.
-local function dotfiles_dir()
-	if vim.env.DOTFILES_DIR and vim.fn.isdirectory(vim.env.DOTFILES_DIR) == 1 then
-		return vim.env.DOTFILES_DIR
-	end
-
-	local resolved_config = vim.fn.resolve(vim.fn.stdpath("config"))
-	local inferred_root = vim.fs.dirname(vim.fs.dirname(resolved_config))
-	if vim.fn.isdirectory(inferred_root .. "/writing/pandoc") == 1 then
-		return inferred_root
-	end
-
-	return vim.fn.expand("~/.dotfiles")
-end
-
-local pandoc_defaults = dotfiles_dir() .. "/writing/pandoc/defaults.yaml"
+local pandoc_defaults = paths.dotfiles_dir() .. "/writing/pandoc/defaults.yaml"
 
 local function pandoc_export(ext)
 	vim.cmd.update() -- write the buffer first (only if modified)

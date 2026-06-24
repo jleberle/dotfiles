@@ -20,13 +20,15 @@ dirs = [d for d in sys.argv[2:] if os.path.isdir(d)]
 
 notes = {}
 for d in dirs:
-    for fn in os.listdir(d):
-        if not fn.endswith(".md"):
-            continue
-        text = open(os.path.join(d, fn)).read()
-        m = re.search(r"^citekey:\s*(\S+)", text, re.M)
-        key = m.group(1).strip() if m else fn[:-3]
-        notes[key] = fn
+    for root, _, files in os.walk(d):
+        for fn in files:
+            if not fn.endswith(".md"):
+                continue
+            path = os.path.join(root, fn)
+            text = open(path).read()
+            m = re.search(r"^citekey:\s*(\S+)", text, re.M)
+            key = m.group(1).strip() if m else fn[:-3]
+            notes[key] = os.path.relpath(path, d)
 
 orphans = sorted(k for k in notes if k not in ids)
 missing = sorted(i for i in ids if i not in notes)

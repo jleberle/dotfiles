@@ -12,6 +12,7 @@ return {
 			"nvim-lua/plenary.nvim",
 		},
 		config = function()
+			local paths = require("config.paths")
 			require("telescope").setup({
 				defaults = {
 					layout_strategy = "horizontal",
@@ -23,7 +24,7 @@ return {
 					-- Stays on .bib (not the .json pandoc renders from):
 					-- telescope-bibtex parses BibTeX syntax and can't read CSL JSON.
 					bibtex = {
-						global_files = { vim.fn.expand("~/Documents/Library/Library.bib") },
+						global_files = { paths.zotero_library_bib() },
 					},
 				},
 			})
