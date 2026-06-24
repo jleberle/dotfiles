@@ -614,7 +614,7 @@ Autoloaded — call them like commands.
 | Function                | Usage / behavior                                                                      |
 |-------------------------|---------------------------------------------------------------------------------------|
 | `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
-| `site <cmd> [args]`     | Website (jaredeberle.org) tasks from anywhere — pure dispatch to `~/git/website/scripts/`: `new`/`images`/`preflight`/`push`/`serve`/`archive`/`sync-hugo`/`csp`/`theme` |
+| `site <cmd> [args]`     | Website (jaredeberle.org) tasks from anywhere — pure dispatch to `~/git/website/scripts/`: `new`/`publish`/`images`/`preflight`/`push`/`serve`/`archive`/`sync-hugo`/`csp`/`theme` |
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |

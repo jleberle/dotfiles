@@ -10,8 +10,9 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
 
     if test (count $argv) -eq 0
         echo "usage: site <command> [args]" >&2
-        echo "  new <article|review|quote> [--cover] [title]  scaffold a post (newpost.sh)" >&2
+        echo "  new <article|review|quote> [--cover] [title]  create ignored draft (newpost.sh)" >&2
         echo "  images <post-dir> [--cover] <img...>          convert + attach images (add-images.sh)" >&2
+        echo "  publish <draft>                              publish draft into content (publish-draft.sh)" >&2
         echo "  preflight [--strict]                          build + CSP + link gate (preflight.sh)" >&2
         echo "  push [--strict]                               preflight, then git push" >&2
         echo "  serve                                         hugo server -D --navigateToChanged" >&2
@@ -45,6 +46,9 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
             set rc $status
         case images
             ./scripts/add-images.sh $args
+            set rc $status
+        case publish
+            ./scripts/publish-draft.sh $args
             set rc $status
         case preflight
             ./scripts/preflight.sh $args
