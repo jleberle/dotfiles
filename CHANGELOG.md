@@ -40,6 +40,9 @@ GitHub mirror where hosted Linux and macOS runners are available.
 - GitHub Actions workflow steps now pin reusable actions by full commit SHA,
   while Dependabot continues opening weekly PRs to roll those pins forward on
   the private GitHub mirror.
+- Shared workflow paths now live in tracked `paths.env`, with fish and Neovim
+  both reading that file directly so path edits stay centralized without Lua
+  parsing fish config.
 
 ---
 

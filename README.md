@@ -167,8 +167,8 @@ config languages that can't share a variable. If you change one of these, edit:
 
 | To change… | Edit |
 |---|---|
-| **Repo location** | `Makefile` (`DOTFILES`) and `shell/fish/conf.d/paths.fish` (`DOTFILES_DIR`) — plus one that can't use the var: `git/gitconfig` `hooksPath` |
-| **Workflow paths** (Zotero library, notes, archives, website) | `shell/fish/conf.d/paths.fish` only |
+| **Repo location** | `Makefile` (`DOTFILES`) and `paths.env` (`DOTFILES_DIR`) — plus one that can't use the var: `git/gitconfig` `hooksPath` |
+| **Workflow paths** (Zotero library, notes, archives, website) | `paths.env` only |
 | **GPG key** (fingerprint / key id) | `git/gitconfig` (`signingkey`), `security/gpg.conf` (`default-key`), `writing/neomutt/gpg.rc` (`pgp_default_key`), `shell/fish/functions/gpg-master-done.fish` (`fingerprint` + subkey ids) |
 | **Name / email / GitHub user** | `git/gitconfig` |
 | **A new machine** (beyond Leia/Ahsoka) | `gpg-master-done.fish` (`switch $machine`) |
@@ -446,10 +446,12 @@ operate on `~/Notes/03 Research/Archives` (the Obsidian vault, outside this repo
 
 **Workflow paths.** The personal locations these functions touch (Zotero
 library, notes trees, research archives, website repo) are defined once in
-`shell/fish/conf.d/paths.fish` (`ZOTERO_LIBRARY_JSON`, `READING_NOTES_DIR`,
-`RESEARCH_ARCHIVES_DIR`, …) rather than hardcoded per function. Each is
-`set -q`-guarded, so a per-machine `set -Ux` override wins. Neovim's
-Telescope bibtex picker resolves the same tracked `ZOTERO_LIBRARY_BIB` path.
+[`paths.env`](/Users/jaredeberle/.dotfiles/paths.env) (`ZOTERO_LIBRARY_JSON`,
+`READING_NOTES_DIR`, `RESEARCH_ARCHIVES_DIR`, …) rather than hardcoded per
+function. Fish exports from that file, and Neovim reads the same tracked values
+directly, so path edits stay in one place. Per-machine `set -Ux` overrides
+still win. Neovim's Telescope bibtex picker resolves the same tracked
+`ZOTERO_LIBRARY_BIB` path.
 
 **Aliases**
 
