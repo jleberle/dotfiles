@@ -5,6 +5,17 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-26 — Extract embedded Python from the writing-check functions
+
+### Changed
+- **`citecheck`/`zotcheck`/`readnote`** (`shell/fish/functions/`) no longer embed
+  their logic as `python3 -c '...'` heredocs. The logic now lives in
+  `bin/citecheck.py`, `bin/zotcheck.py`, and `bin/readnote.py`; the fish
+  functions are thin wrappers that validate args/env and invoke the script.
+  Same behavior — `make writing-check` (`tests/writing-check.sh`) passes
+  unchanged — but the logic is now syntax-highlighted, independently
+  runnable, and not quoted through a shell string.
+
 ## 2026-06-24 — Move CI from Woodpecker to GitHub Actions, add macOS-native checks
 
 Codeberg remains the public canonical repo, but CI now runs from a private
