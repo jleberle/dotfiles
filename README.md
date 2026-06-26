@@ -721,9 +721,11 @@ switches to `main`, fast-forwards it from Codeberg, fetches the exact PR head
 from GitHub, fast-forward merges it locally, pushes once to both remotes, then
 deletes its temporary branch. It refuses a dirty worktree.
 
-**Scheduled CI failures:** the monthly GitHub Actions run opens or updates a
-`Scheduled CI failure` issue if either the Linux or macOS job breaks. When a
-later monthly run succeeds again, that issue is closed automatically.
+**Scheduled CI:** GitHub Actions still runs the full check suite monthly (catches
+drift from upstream tool/package changes between pushes), but it no longer
+files or closes issues on the result — that required `issues: write`, and CI's
+permissions are read-only (`contents: read`). Check the Actions tab for the
+monthly run's status.
 
 #### Git aliases
 

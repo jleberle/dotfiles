@@ -5,6 +5,16 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-26 — Drop the scheduled-CI issue reporter to keep Actions read-only
+
+### Removed
+- **`scheduled-failure-issue`/`scheduled-failure-close`** jobs in
+  `.github/workflows/ci.yml` — they were the only thing requiring
+  `issues: write`. The monthly scheduled run still executes (so drift between
+  pushes is still caught), but a failure now only shows up in the Actions tab
+  instead of opening a GitHub issue. CI now only ever needs the top-level
+  `contents: read` permission.
+
 ## 2026-06-26 — Extract embedded Python from the writing-check functions
 
 ### Changed
