@@ -5,6 +5,25 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-06-26 — Remove the duplicate paths.env parser from Neovim
+
+`writing/nvim/lua/config/paths.lua` used to re-implement the same `paths.env`
+parser (trim, skip comments, split on `=`, strip quotes, expand `$HOME`)
+already written once in `shell/fish/conf.d/paths.fish`. Two parsers for one
+7-line config file meant two places that could drift, and the Lua one mostly
+duplicated work Neovim already inherits for free from its parent fish shell.
+
+### Changed
+- **`paths.lua`** now only reads the env vars `paths.fish` already exported
+  (the normal case for any Neovim launched from a fish shell), with a small
+  hardcoded fallback table for the rare case it isn't. No file I/O, no
+  parsing, in Lua at all — `paths.env` is genuinely the only file to edit now,
+  not just by convention.
+- **`make nvim-check`** launches its headless smoke test through `fish -c
+  'source .../paths.fish; nvim ...'` instead of hand-passing one `DOTFILES_DIR`
+  override. The test now exercises the real `paths.env` → fish → Neovim
+  pipeline end to end, rather than a synthetic substitute for it.
+
 ## 2026-06-26 — Drop the scheduled-CI issue reporter to keep Actions read-only
 
 ### Removed

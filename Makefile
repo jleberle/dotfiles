@@ -376,13 +376,13 @@ writing-check :
 nvim-check :
 	@echo "Running headless Neovim smoke test..."
 	@command -v nvim >/dev/null 2>&1 || { echo "ERROR: nvim not found — install it first (make apps)"; exit 1; }
+	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }
 	@tmp=$$(mktemp -d); \
 	    trap 'rm -rf "$$tmp"' EXIT; \
 	    mkdir -p "$$tmp/config" "$$tmp/data" "$$tmp/state" "$$tmp/cache"; \
 	    cp -R "$(DOTFILES)/writing/nvim" "$$tmp/config/nvim"; \
 	    XDG_CONFIG_HOME="$$tmp/config" XDG_DATA_HOME="$$tmp/data" XDG_STATE_HOME="$$tmp/state" XDG_CACHE_HOME="$$tmp/cache" \
-	        DOTFILES_DIR="$(DOTFILES)" \
-	        nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa
+	        fish -c 'source $(DOTFILES)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
 clean :
 	@echo "Removing stale artifacts from old repo layouts..."
 	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
