@@ -13,13 +13,12 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         echo "  new <article|review|quote> [--cover] [title]  create ignored draft (newpost.sh)" >&2
         echo "  images <post-dir> [--cover] <img...>          convert + attach images (add-images.sh)" >&2
         echo "  publish <draft>                              publish draft into content (publish-draft.sh)" >&2
-        echo "  preflight [--strict]                          build + CSP + link gate (preflight.sh)" >&2
-        echo "  push [--strict]                               preflight, then git push" >&2
+        echo "  preflight [--strict] [--full]                 build + CSP + reference gate; --full adds html-validate/a11y/lychee (preflight.sh)" >&2
+        echo "  push [--strict] [--full]                      preflight, then git push" >&2
         echo "  serve                                         hugo server -D --navigateToChanged" >&2
         echo "  archive [--dry-run] [--all|files...]          replace dead links (archive-links.sh)" >&2
         echo "  sync-hugo [--dry-run]                         sync CI Hugo version (sync-hugo-version.sh)" >&2
         echo "  csp                                           check CSP hashes (csp-hashes.sh --check)" >&2
-        echo "  theme                                         update PaperMod submodule" >&2
         return 1
     end
 
@@ -69,10 +68,6 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         case csp
             ./scripts/csp-hashes.sh --check $args
             set rc $status
-        case theme
-            git submodule update --remote themes/PaperMod
-            set rc $status
-            test $rc -eq 0; and echo "PaperMod updated — review: git -C $repo diff themes/PaperMod"
         case '*'
             echo "site: unknown command: $cmd (run 'site' for usage)" >&2
             set rc 1
