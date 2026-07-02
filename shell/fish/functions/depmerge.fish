@@ -1,8 +1,7 @@
 function depmerge --description 'Rebase and merge a GitHub Dependabot PR into Codeberg + GitHub'
     # usage: depmerge <pr-number>
-    # For repos that fetch from Codeberg (canonical) but push to both Codeberg
-    # and a private GitHub mirror. Rebases the PR through GitHub, waits for its
-    # checks, fast-forwards local main, then pushes it to both hosts.
+    # Codeberg is canonical and the only pull source. GitHub is a private CI
+    # mirror that hosts Dependabot PRs and Actions checks.
     if test (count $argv) -ne 1
         echo "usage: depmerge <pr-number>" >&2
         return 1
@@ -18,7 +17,8 @@ function depmerge --description 'Rebase and merge a GitHub Dependabot PR into Co
         return 1
     end
 
-    if not git diff --quiet; or not git diff --cached --quiet
+    set -l untracked (git ls-files --others --exclude-standard)
+    if not git diff --quiet; or not git diff --cached --quiet; or test (count $untracked) -gt 0
         echo "depmerge: working tree is not clean; commit/stash first" >&2
         return 1
     end
@@ -43,8 +43,24 @@ function depmerge --description 'Rebase and merge a GitHub Dependabot PR into Co
     set -l pr $argv[1]
     set -l github_repo (string replace -r '^github:|^(ssh://)?git@github\.com[:/]|^https?://github\.com/' '' -- $github_remote | string replace -r '\.git$' '')
 
+    set -l pr_author (gh pr view --repo $github_repo $pr --json author --jq '.author.login'); or return 1
+    set -l pr_base (gh pr view --repo $github_repo $pr --json baseRefName --jq '.baseRefName'); or return 1
+    set -l pr_state (gh pr view --repo $github_repo $pr --json state --jq '.state'); or return 1
+    if not contains -- $pr_author app/dependabot dependabot 'dependabot[bot]'
+        echo "depmerge: PR #$pr is not authored by Dependabot" >&2
+        return 1
+    end
+    if test "$pr_base" != main; or test "$pr_state" != OPEN
+        echo "depmerge: PR #$pr must be open and target main" >&2
+        return 1
+    end
+
     git switch main; or return 1
     git pull --ff-only $codeberg_remote main; or return 1
+
+    # Dependabot rebases against GitHub's main, so synchronize the private
+    # mirror with canonical Codeberg before asking GitHub to update the PR.
+    git push $github_remote main:main; or return 1
 
     gh pr update-branch --rebase --repo $github_repo $pr; or return 1
     gh pr checks --watch --fail-fast --repo $github_repo $pr; or return 1
