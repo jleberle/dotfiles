@@ -717,9 +717,9 @@ the canonical public remote.
 
 **Dependabot merge workflow:** review the PR on GitHub, but merge it locally so
 Codeberg and GitHub do not diverge. The `depmerge <pr-number>` fish helper:
-switches to `main`, fast-forwards it from Codeberg, fetches the exact PR head
-from GitHub, fast-forward merges it locally, pushes once to both remotes, then
-deletes its temporary branch. It refuses a dirty worktree.
+switches to `main`, fast-forwards it from Codeberg, asks GitHub to rebase the PR,
+waits for its checks, fetches the resulting PR head, fast-forwards locally, and
+pushes `main` explicitly to both hosts. It refuses a dirty worktree.
 
 **Scheduled CI:** GitHub Actions still runs the full check suite monthly (catches
 drift from upstream tool/package changes between pushes), but it no longer

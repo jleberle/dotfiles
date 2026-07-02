@@ -34,6 +34,7 @@ brew "eza" # modern ls replacement (aliased to ls/ll/la/lt)
 brew "fd" # fast find replacement (used by fzf and findd/findf)
 brew "fish"   # primary shell (config in fish/)
 brew "fzf" # fuzzy finder (Ctrl-R/Ctrl-T/Alt-C keybindings)
+brew "gh" # GitHub CLI (used by the depmerge function)
 brew "ghostscript" # PostScript/PDF engine (CV, syllabi PDF builds; website image processing)
 brew "git" # version control
 brew "git-delta" # diff pager (used by git and lazygit)
