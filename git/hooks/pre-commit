@@ -1,24 +1,6 @@
 #!/bin/sh
-# Global pre-commit hook (wired via core.hooksPath = ~/.dotfiles/git/hooks).
-# Scans staged changes for secrets, then delegates to a repository-specific
-# tracked hook when scripts/pre-commit.sh exists and is executable.
+# Optional personal secret scan before committing.
 
-if ! command -v gitleaks >/dev/null 2>&1; then
-    printf '\033[33mwarning:\033[0m gitleaks not installed — commit NOT scanned for secrets.\n' >&2
-    printf '         install it with: brew install gitleaks\n' >&2
-else
-    if ! gitleaks git --staged --redact --no-banner; then
-        printf '\033[31mgitleaks blocked this commit:\033[0m staged changes look like they contain a secret.\n' >&2
-        printf 'Review the finding above. If it is a false positive, either add it to\n' >&2
-        printf '.gitleaksignore or bypass once with: git commit --no-verify\n' >&2
-        exit 1
-    fi
+if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks git --staged --redact --no-banner || exit 1
 fi
-
-repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
-repo_hook="$repo_root/scripts/pre-commit.sh"
-if [ -x "$repo_hook" ]; then
-    "$repo_hook" || exit $?
-fi
-
-exit 0
