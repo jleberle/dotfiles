@@ -13,6 +13,42 @@ SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.s
 FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish
 LUACHECK_DIR := writing/nvim/lua
 
+# Managed macOS defaults, one row per line: domain|key|type|value.
+# `make macos` writes every row; `make macos-check` reads each back and warns
+# on drift — edit only this table to change either. Bools are written as
+# true/false but read back as 1/0; the check target translates. Values must
+# not contain `|` or spaces (rows are split on whitespace, then on `|`).
+define MACOS_DEFAULTS
+NSGlobalDomain|ApplePressAndHoldEnabled|bool|false
+NSGlobalDomain|KeyRepeat|int|2
+NSGlobalDomain|InitialKeyRepeat|int|15
+NSGlobalDomain|AppleShowAllExtensions|bool|true
+com.apple.finder|ShowPathbar|bool|true
+com.apple.finder|ShowStatusBar|bool|true
+com.apple.finder|_FXSortFoldersFirst|bool|true
+com.apple.finder|FXDefaultSearchScope|string|SCcf
+com.apple.finder|FXEnableExtensionChangeWarning|bool|false
+com.apple.desktopservices|DSDontWriteNetworkStores|bool|true
+com.apple.desktopservices|DSDontWriteUSBStores|bool|true
+com.apple.dock|autohide|bool|true
+com.apple.dock|show-recents|bool|false
+com.apple.dock|minimize-to-application|bool|true
+com.apple.screencapture|location|string|$(HOME)/Desktop/Screenshots
+com.apple.screencapture|disable-shadow|bool|true
+NSGlobalDomain|NSNavPanelExpandedStateForSaveMode|bool|true
+NSGlobalDomain|NSNavPanelExpandedStateForSaveMode2|bool|true
+NSGlobalDomain|PMPrintingExpandedStateForPrint|bool|true
+NSGlobalDomain|PMPrintingExpandedStateForPrint2|bool|true
+NSGlobalDomain|NSDocumentSaveNewDocumentsToCloud|bool|false
+NSGlobalDomain|NSAutomaticQuoteSubstitutionEnabled|bool|false
+NSGlobalDomain|NSAutomaticDashSubstitutionEnabled|bool|false
+com.apple.screensaver|askForPassword|int|1
+com.apple.screensaver|askForPasswordDelay|int|0
+endef
+# Newlines collapsed to spaces so the rows can be spliced into a recipe line.
+# (Apple's make 3.81 cannot export a multi-line variable to recipe shells.)
+MACOS_DEFAULT_ROWS := $(strip $(MACOS_DEFAULTS))
+
 # Canned recipe: $(call install_agent,<source plist path>) — template __HOME__ /
 # __HOMEBREW_PREFIX__ into ~/Library/LaunchAgents, lint, and (re)load it. The
 # launchd label is the plist filename without its .plist suffix. Used by the
@@ -24,7 +60,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift tools-check clean
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift tools-check
 
 default :
 	@echo "There is no default for your own safety."
@@ -146,100 +182,31 @@ brewauto :
 	@echo "Installed. Logs at $(HOME)/.local/brew_update_logs.txt (newest run first)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
 macos :
-	@echo "Keyboard"
-	defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-	defaults write NSGlobalDomain KeyRepeat -int 2
-	defaults write NSGlobalDomain InitialKeyRepeat -int 15
-	@echo "Finder"
-	defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-	defaults write com.apple.finder ShowPathbar -bool true
-	defaults write com.apple.finder ShowStatusBar -bool true
-	defaults write com.apple.finder _FXSortFoldersFirst -bool true
-	defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-	defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-	defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-	defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-	@echo "Dock"
-	defaults write com.apple.dock autohide -bool true
-	defaults write com.apple.dock show-recents -bool false
-	defaults write com.apple.dock minimize-to-application -bool true
-	@echo "Screenshots"
+	@echo "Writing macOS defaults (MACOS_DEFAULTS table)..."
 	mkdir -p $(HOME)/Desktop/Screenshots
-	defaults write com.apple.screencapture location -string "$(HOME)/Desktop/Screenshots"
-	defaults write com.apple.screencapture disable-shadow -bool true
-	@echo "System"
-	defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
-	defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
-	defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
-	defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
-	defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-	defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-	defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-	defaults write com.apple.screensaver askForPassword -int 1
-	defaults write com.apple.screensaver askForPasswordDelay -int 0
+	@for row in $(foreach r,$(MACOS_DEFAULT_ROWS),'$(r)'); do \
+	    IFS='|'; set -- $$row; unset IFS; \
+	    echo "  $$1 $$2 = $$4"; \
+	    defaults write "$$1" "$$2" "-$$3" "$$4"; \
+	done
 	@echo "Applying changes..."
 	killall Finder
 	killall Dock
 	killall SystemUIServer
 	@echo "Done. Some keyboard changes require a logout to take effect."
 macos-check :
-	@echo "Checking macOS defaults..."
-	@echo "  Keyboard"
-	@VAL=$$(defaults read NSGlobalDomain ApplePressAndHoldEnabled 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: press-and-hold not disabled (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain KeyRepeat 2>/dev/null); \
-	[ "$$VAL" = "2" ] || echo "WARNING: KeyRepeat not set to 2 (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain InitialKeyRepeat 2>/dev/null); \
-	[ "$$VAL" = "15" ] || echo "WARNING: InitialKeyRepeat not set to 15 (run: make macos)"
-	@echo "  Finder"
-	@VAL=$$(defaults read NSGlobalDomain AppleShowAllExtensions 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: show all extensions not enabled (run: make macos)"
-	@VAL=$$(defaults read com.apple.finder ShowPathbar 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: Finder path bar not shown (run: make macos)"
-	@VAL=$$(defaults read com.apple.finder ShowStatusBar 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: Finder status bar not shown (run: make macos)"
-	@VAL=$$(defaults read com.apple.finder _FXSortFoldersFirst 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: Finder folders not sorted first (run: make macos)"
-	@VAL=$$(defaults read com.apple.finder FXDefaultSearchScope 2>/dev/null); \
-	[ "$$VAL" = "SCcf" ] || echo "WARNING: Finder search scope not set to current folder (run: make macos)"
-	@VAL=$$(defaults read com.apple.finder FXEnableExtensionChangeWarning 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: Finder extension change warning not disabled (run: make macos)"
-	@VAL=$$(defaults read com.apple.desktopservices DSDontWriteNetworkStores 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: .DS_Store on network volumes not disabled (run: make macos)"
-	@VAL=$$(defaults read com.apple.desktopservices DSDontWriteUSBStores 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: .DS_Store on USB volumes not disabled (run: make macos)"
-	@echo "  Dock"
-	@VAL=$$(defaults read com.apple.dock autohide 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: Dock autohide not enabled (run: make macos)"
-	@VAL=$$(defaults read com.apple.dock show-recents 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: Dock recent apps not hidden (run: make macos)"
-	@VAL=$$(defaults read com.apple.dock minimize-to-application 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: Dock minimize-to-app not enabled (run: make macos)"
-	@echo "  Screenshots"
+	@echo "Checking macOS defaults (MACOS_DEFAULTS table)..."
+	@for row in $(foreach r,$(MACOS_DEFAULT_ROWS),'$(r)'); do \
+	    IFS='|'; set -- $$row; unset IFS; \
+	    expected="$$4"; \
+	    if [ "$$3" = "bool" ]; then \
+	        case "$$4" in true) expected=1 ;; false) expected=0 ;; esac; \
+	    fi; \
+	    actual=$$(defaults read "$$1" "$$2" 2>/dev/null); \
+	    [ "$$actual" = "$$expected" ] || \
+	        echo "WARNING: $$1 $$2 is '$${actual:-<unset>}' — want '$$expected' (run: make macos)"; \
+	done
 	@test -d $(HOME)/Desktop/Screenshots || echo "WARNING: Screenshots folder missing (run: make macos)"
-	@VAL=$$(defaults read com.apple.screencapture location 2>/dev/null); \
-	[ "$$VAL" = "$(HOME)/Desktop/Screenshots" ] || echo "WARNING: screenshot location not set (run: make macos)"
-	@VAL=$$(defaults read com.apple.screencapture disable-shadow 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: screenshot shadow not disabled (run: make macos)"
-	@echo "  System"
-	@VAL=$$(defaults read NSGlobalDomain NSNavPanelExpandedStateForSaveMode 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: save panel not expanded by default (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: save panel (2) not expanded by default (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain PMPrintingExpandedStateForPrint 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: print panel not expanded by default (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain PMPrintingExpandedStateForPrint2 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: print panel (2) not expanded by default (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain NSDocumentSaveNewDocumentsToCloud 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: new documents saving to iCloud not disabled (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: smart quotes not disabled (run: make macos)"
-	@VAL=$$(defaults read NSGlobalDomain NSAutomaticDashSubstitutionEnabled 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: smart dashes not disabled (run: make macos)"
-	@VAL=$$(defaults read com.apple.screensaver askForPassword 2>/dev/null); \
-	[ "$$VAL" = "1" ] || echo "WARNING: screensaver password not required (run: make macos)"
-	@VAL=$$(defaults read com.apple.screensaver askForPasswordDelay 2>/dev/null); \
-	[ "$$VAL" = "0" ] || echo "WARNING: screensaver password delay not set to 0 (run: make macos)"
 	@echo "  Security"
 	@fdesetup status 2>/dev/null | grep -q "FileVault is On" || \
 	    echo "WARNING: FileVault is OFF — enable full-disk encryption in System Settings > Privacy & Security"
@@ -383,21 +350,6 @@ nvim-check :
 	    cp -R "$(DOTFILES)/writing/nvim" "$$tmp/config/nvim"; \
 	    XDG_CONFIG_HOME="$$tmp/config" XDG_DATA_HOME="$$tmp/data" XDG_STATE_HOME="$$tmp/state" XDG_CACHE_HOME="$$tmp/cache" \
 	        fish -c 'source $(DOTFILES)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
-clean :
-	@echo "Removing stale artifacts from old repo layouts..."
-	@# fish/ at root — predates shell/fish/ (renamed 2026-06-08)
-	@[ -d $(DOTFILES)/fish ] && \
-	    echo "Removing stale fish/ at repo root" && \
-	    rm -rf $(DOTFILES)/fish || true
-	@# general/ — renamed to security/ (2026-06-08); gpg-agent.conf was gitignored
-	@[ -d $(DOTFILES)/general ] && \
-	    echo "Removing stale general/ at repo root" && \
-	    rm -rf $(DOTFILES)/general || true
-	@# Python bytecode cache left by running bin/ scripts (ipic/waybackup via uv)
-	@[ -d $(DOTFILES)/bin/__pycache__ ] && \
-	    echo "Removing bin/__pycache__" && \
-	    rm -rf $(DOTFILES)/bin/__pycache__ || true
-	@echo "Done."
 brew-check :
 	@echo "Checking Brewfile packages..."
 	@brew bundle check --file=$(DOTFILES)/homebrew/brewfile --no-upgrade || \
