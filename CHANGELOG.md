@@ -5,6 +5,51 @@ individual commit — the git log has the full detail.
 
 ---
 
+## 2026-07-08 — Wire the reading workflow end to end, split the README into docs/
+
+The reading pipeline (Zotero → Obsidian vault note → website reading ledger)
+previously required hand-chaining commands across two repos; `site` now
+dispatches every user-facing website script and `newreading` collapses the
+always-paired start step into one command. The 1,000-line README became a
+short daily-setup page with the deep documentation broken out by topic.
+
+### Added
+- **`newreading <citekey> [book|article] [--primary]`**
+  (`shell/fish/functions/`) — runs `readnote` (vault note from Zotero), then
+  `site sync-reading` (website reading-ledger entry from Zotero + that note),
+  so starting a Zotero-backed source is one command. Stops cleanly if the note
+  already exists.
+- **`site` subcommands** for the rest of the website scripts: `ship`
+  (preflight + commit + push), `cite-refs`, `to-avif`, `sync-reading`,
+  `newsource`/`newbook`, `finishsource`/`finishbook`.
+- **`docs/`** — the README's deep documentation, split by topic: `writing.md`
+  (Pandoc/Vale/Neovim + the reading workflow), `shell.md` (Ghostty/fish/tmux),
+  `git.md`, `mail.md`, `automation.md`, `security.md`, and `maintenance.md`
+  (checks + full Makefile reference). Rewritten in passes for readability;
+  absolute-path links fixed to relative so they work on Codeberg/GitHub.
+
+### Changed
+- **`README.md`** is now a short "daily setup" page: quick start, per-app
+  one-time steps, daily-use command tables, repo layout, and a docs index.
+- **`make macos` / `make macos-check`** are driven by a single
+  `MACOS_DEFAULTS` table (`domain|key|type|value`) instead of two
+  hand-mirrored ~25-key recipes — adding a default is now a one-line edit both
+  targets pick up. (Apple's make 3.81 can't export multi-line variables to
+  recipe shells, so the table is spliced inline with each row quoted.)
+
+### Removed
+- **`site csp` / `site sync-hugo`** — rarely used directly; still available as
+  `scripts/csp-hashes.sh` / `scripts/sync-hugo-version.sh` in the website repo.
+- **`site push`** — superseded by `site ship`, which adds the commit step and
+  a file-list confirmation.
+- **`make clean`** — the 2026-06-08 stale-layout cleanups have run everywhere
+  they were needed.
+- Stale machine-local universal variables (`ARCHIVERESTICREPO`,
+  `RESTICPASSWORDFILE` — pre-rename leftovers; the underscored versions are
+  the real ones).
+
+---
+
 ## 2026-06-26 — Remove the duplicate paths.env parser from Neovim
 
 `writing/nvim/lua/config/paths.lua` used to re-implement the same `paths.env`
