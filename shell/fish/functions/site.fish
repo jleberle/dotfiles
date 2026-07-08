@@ -14,11 +14,16 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         echo "  images <post-dir> [--cover] <img...>          convert + attach images (add-images.sh)" >&2
         echo "  publish <draft>                              publish draft into content (publish-draft.sh)" >&2
         echo "  preflight [--strict] [--full]                 build + CSP + reference gate; --full adds html-validate/a11y/lychee (preflight.sh)" >&2
-        echo "  push [--strict] [--full]                      preflight, then git push" >&2
+        echo "  ship [--full] [--yes] [message]               preflight, commit -A, push (ship.sh)" >&2
         echo "  serve                                         hugo server -D --navigateToChanged" >&2
         echo "  archive [--dry-run] [--all|files...]          replace dead links (archive-links.sh)" >&2
-        echo "  sync-hugo [--dry-run]                         sync CI Hugo version (sync-hugo-version.sh)" >&2
-        echo "  csp                                           check CSP hashes (csp-hashes.sh --check)" >&2
+        echo "  cite-refs --keys|--bibliography FILE          citation helpers for drafts (cite-refs.sh)" >&2
+        echo "  to-avif [flags] <img...>                      convert images to avif/jpg (to-avif.sh)" >&2
+        echo "  sync-reading <citekey> [book|article]          scaffold a reading-ledger entry (sync-reading.sh)" >&2
+        echo "  newsource [book|article] [title]              new reading-ledger entry (newsource.sh)" >&2
+        echo "  newbook [title]                               new book ledger entry (newbook.sh)" >&2
+        echo "  finishsource [--push] [slug]                  mark a reading-ledger entry finished (finishsource.sh)" >&2
+        echo "  finishbook [--push] [slug]                    mark a book ledger entry finished (finishbook.sh)" >&2
         return 1
     end
 
@@ -52,9 +57,8 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         case preflight
             ./scripts/preflight.sh $args
             set rc $status
-        case push
-            # The ritual preflight.sh's own header prescribes.
-            ./scripts/preflight.sh $args; and git push
+        case ship
+            ./scripts/ship.sh $args
             set rc $status
         case serve
             hugo server -D --navigateToChanged
@@ -62,11 +66,26 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         case archive
             ./scripts/archive-links.sh $args
             set rc $status
-        case sync-hugo
-            ./scripts/sync-hugo-version.sh $args
+        case cite-refs
+            ./scripts/cite-refs.sh $args
             set rc $status
-        case csp
-            ./scripts/csp-hashes.sh --check $args
+        case to-avif
+            ./scripts/to-avif.sh $args
+            set rc $status
+        case sync-reading
+            ./scripts/sync-reading.sh $args
+            set rc $status
+        case newsource
+            ./scripts/newsource.sh $args
+            set rc $status
+        case newbook
+            ./scripts/newbook.sh $args
+            set rc $status
+        case finishsource
+            ./scripts/finishsource.sh $args
+            set rc $status
+        case finishbook
+            ./scripts/finishbook.sh $args
             set rc $status
         case '*'
             echo "site: unknown command: $cmd (run 'site' for usage)" >&2
