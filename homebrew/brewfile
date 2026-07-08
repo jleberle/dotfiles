@@ -88,7 +88,6 @@ cask "rectangle" # window snapping / management
 cask "secretive" # store SSH keys in the Secure Enclave (see security/ssh-config IdentityAgent)
 cask "skim" # PDF reader (LaTeX preview)
 cask "tor-browser" # Privacy browser via Tor network
-cask "tropy" # research photo/source organizer
 cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager
 mas "acorn", id:6737921844 # image editor
