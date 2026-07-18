@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template: __HOME__ is replaced with $(HOME) by `make decksync`.
+     Unlike the other agents here, this one is WatchPaths-triggered rather
+     than calendar/interval: it fires whenever anything under /Volumes
+     changes (a drive mounting or unmounting), and the script itself is a
+     no-op unless the "Slides" flash drive specifically is what appeared.
+     Keeps .pptx exports of the Keynote (.key) lecture decks in
+     ~/Library/Mobile Documents/com~apple~Keynote/Documents/1493 - U.S.
+     Since 1865 current on that drive, since the lecture hall computers
+     only have PowerPoint. See that folder's theme-system/README.txt and
+     CLAUDE.md for the full workflow this supports. -->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.jaredeberle.decksync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__HOME__/Library/Mobile Documents/com~apple~Keynote/Documents/1493 - U.S. Since 1865/theme-system/sync_slides_drive.sh</string>
+    </array>
+
+    <key>WatchPaths</key>
+    <array>
+        <string>/Volumes</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>__HOME__/Library/Logs/deck-sync-launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/Library/Logs/deck-sync-launchd.log</string>
+</dict>
+</plist>

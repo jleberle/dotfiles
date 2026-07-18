@@ -31,8 +31,8 @@ Checks every symlink created by `make install`, plus: SSH keys exist
 (`id_github`, `id_codeberg`), `~/.ssh`/`~/.gnupg` and the private keys are
 owner-only (no group/other access), fish is set as the login shell, TPM is
 cloned, vale styles directory is populated, a GPG secret key is present, and any
-installed launchd agents (mailsync, brewupdate, brewlogclean, resticcheck) are
-actually loaded — not just that their plist files exist.
+installed launchd agents (mailsync, brewupdate, brewlogclean, resticcheck,
+decksync) are actually loaded — not just that their plist files exist.
 
 ### macOS defaults
 
@@ -113,6 +113,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `services`         | Symlinks the Automator workflows in `macos/services/` into `~/Library/Services` (run by `make install`; see [Automation → macOS Services](automation.md#macos-services)) |
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `resticcheck`      | Installs a launchd agent that runs `archbackup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
+| `decksync`         | Installs a `WatchPaths` launchd agent that syncs the Keynote lecture decks to the "Slides" flash drive whenever a volume mounts; no-op unless that drive appeared |
 | `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |

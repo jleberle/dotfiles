@@ -60,7 +60,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift tools-check
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift tools-check
 
 default :
 	@echo "There is no default for your own safety."
@@ -295,6 +295,13 @@ resticcheck :
 	@echo "Runs 'archbackup check' every Sunday 10:00 (no-op when the drive is unmounted)."
 	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
+decksync :
+	@echo "Installing Keynote deck -> Slides flash drive sync LaunchAgent"
+	mkdir -p $(LAUNCH_AGENTS)
+	$(call install_agent,$(DOTFILES)/keynote/org.jaredeberle.decksync.plist)
+	@echo "Fires whenever a volume is mounted; no-op unless it's the 'Slides' drive."
+	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.decksync"
+	@echo "Logs: ~/Library/Logs/deck-sync.log (script) and deck-sync-launchd.log (launchd)"
 update :
 	@echo "Updating Neovim plugins (Lazy sync)..."
 	@if command -v nvim >/dev/null 2>&1; then nvim --headless "+Lazy! sync" +qa; \
@@ -334,7 +341,7 @@ lint-secrets :
 lint-plists :
 	@echo "Linting macOS plist/workflow files..."
 	@command -v plutil >/dev/null 2>&1 || { echo "ERROR: plutil not found — macOS only"; exit 1; }
-	@find backup homebrew macos/services -type f \( -name '*.plist' -o -name '*.wflow' \) -print0 | xargs -0 -n1 plutil -lint
+	@find backup homebrew keynote macos/services -type f \( -name '*.plist' -o -name '*.wflow' \) -print0 | xargs -0 -n1 plutil -lint
 writing-check :
 	@echo "Running writing workflow checks..."
 	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }
@@ -434,7 +441,7 @@ doctor :
 	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
 	    echo "WARNING: no GPG secret key found — import your key"
 	@echo "Checking background agents..."
-	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.brewlogclean org.jaredeberle.resticcheck; do \
+	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.brewlogclean org.jaredeberle.resticcheck org.jaredeberle.decksync; do \
 	    if [ -f "$(LAUNCH_AGENTS)/$$agent.plist" ]; then \
 	        launchctl print gui/$(LAUNCHD_UID)/$$agent >/dev/null 2>&1 || \
 	            echo "WARNING: $$agent plist installed but not loaded (run: launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$$agent.plist)"; \
