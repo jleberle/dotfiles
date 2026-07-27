@@ -4,12 +4,14 @@
      Unlike the other agents here, this one is WatchPaths-triggered rather
      than calendar/interval: it fires whenever anything under /Volumes
      changes (a drive mounting or unmounting), and the script itself is a
-     no-op unless the "Slides" flash drive specifically is what appeared.
-     Keeps .pptx exports of the Keynote (.key) lecture decks in
-     ~/Library/Mobile Documents/com~apple~Keynote/Documents/1493 - U.S.
-     Since 1865 current on that drive, since the lecture hall computers
-     only have PowerPoint. See that folder's theme-system/README.txt and
-     CLAUDE.md for the full workflow this supports. -->
+     no-op unless the "R2-D2" flash drive specifically is what appeared.
+     Keeps .pptx + PDF exports of every course's Keynote (.key) lecture
+     decks under ~/Documents/Classes/Slides current on that drive, since
+     the lecture hall computers only have PowerPoint. Courses are
+     auto-discovered from that folder (see sync_slides_drive.sh's own
+     header comment); there's no per-course list to maintain here. See
+     ~/Documents/Classes/Slides/theme-system/README.txt for the full
+     normalization workflow this supports. -->
 <plist version="1.0">
 <dict>
     <key>Label</key>
@@ -18,7 +20,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>__HOME__/Library/Mobile Documents/com~apple~Keynote/Documents/1493 - U.S. Since 1865/theme-system/sync_slides_drive.sh</string>
+        <string>__HOME__/Documents/Classes/Slides/theme-system/sync_slides_drive.sh</string>
     </array>
 
     <key>WatchPaths</key>

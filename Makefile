@@ -299,7 +299,7 @@ decksync :
 	@echo "Installing Keynote deck -> Slides flash drive sync LaunchAgent"
 	mkdir -p $(LAUNCH_AGENTS)
 	$(call install_agent,$(DOTFILES)/keynote/org.jaredeberle.decksync.plist)
-	@echo "Fires whenever a volume is mounted; no-op unless it's the 'Slides' drive."
+	@echo "Fires whenever a volume is mounted; no-op unless it's the 'R2-D2' drive."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.decksync"
 	@echo "Logs: ~/Library/Logs/deck-sync.log (script) and deck-sync-launchd.log (launchd)"
 update :
