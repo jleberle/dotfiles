@@ -51,17 +51,10 @@ make brew-check
 ```
 
 Runs `brew bundle check` to verify every package in the Brewfile is installed.
-Fast way to spot drift after `brew cleanup` or a fresh clone.
-
-### Tool binaries
-
-```sh
-make tools-check
-```
-
-Verifies that `delta`, `vale`, `pandoc`, `pandoc-crossref`, `tectonic`, `lazygit`, `harper-ls`,
-`marksman`, `lua-language-server`, `pyright`, `bash-language-server`, `stylua`, `black`,
-and `prettier` are all on `PATH`.
+Fast way to spot drift after `brew cleanup` or a fresh clone. This also covers
+the CLI tools the rest of the setup depends on — delta, vale, pandoc, tectonic,
+lazygit, the LSP servers, and the formatters are all Brewfile entries, so the
+Brewfile stays the single list to keep current.
 
 ### Brewfile drift (reverse direction)
 
@@ -125,10 +118,9 @@ just prints a warning) so nothing destructive happens by accident.
 | `lint-plists`      | macOS-only: `plutil -lint` over tracked LaunchAgents and Automator workflow files                    |
 | `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`) |
 | `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
-| `tools-check`      | Verifies key binaries are on `PATH`: delta, vale, pandoc, lazygit, LSP servers, and formatters      |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
 | `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
-| `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` + `tools-check` |
+| `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` |
 
 `harden` and `touchid` are **not** part of `make install` — they touch system
 files under `sudo`, so run them deliberately. `resticcheck` is optional and only

@@ -49,6 +49,52 @@ endef
 # (Apple's make 3.81 cannot export a multi-line variable to recipe shells.)
 MACOS_DEFAULT_ROWS := $(strip $(MACOS_DEFAULTS))
 
+# Managed dotfiles symlinks, one row per line: group|source|target. `group` is
+# the owning target's name (git, shell, security, nvim, neomutt) — each of
+# those targets calls $(call install_symlinks,<group>) to create just its own
+# rows, and `make doctor` loops over every row to check they're all still in
+# place. Edit only this table to add, move, or remove a symlink; sources are
+# relative to $(DOTFILES).
+#
+# Two destinations are deliberately NOT here (Ghostty, lazygit — both land
+# under "Application Support"): this table is split on whitespace the same
+# way MACOS_DEFAULTS is, so a literal space in a field would corrupt the
+# split. Those two stay hand-written in the `shell`/`git` targets and in
+# `doctor` below.
+define SYMLINKS
+git|git/gitconfig|$(HOME)/.gitconfig
+git|git/gitignore|$(HOME)/.gitignore
+git|git/gitmessage|$(HOME)/.gitmessage
+shell|shell/fish|$(HOME)/.config/fish
+shell|shell/tmux.conf|$(HOME)/.tmux.conf
+shell|shell/bat/config|$(HOME)/.config/bat/config
+security|security/ssh-config|$(HOME)/.ssh/config
+security|security/known_hosts|$(HOME)/.ssh/known_hosts_pinned
+security|security/gpg.conf|$(HOME)/.gnupg/gpg.conf
+security|security/dirmngr.conf|$(HOME)/.gnupg/dirmngr.conf
+security|security/common.conf|$(HOME)/.gnupg/common.conf
+nvim|writing/nvim|$(HOME)/.config/nvim
+neomutt|writing/neomutt/neomuttrc|$(HOME)/.config/neomutt/neomuttrc
+neomutt|writing/neomutt/gpg.rc|$(HOME)/.config/neomutt/gpg.rc
+neomutt|writing/neomutt/colors.rc|$(HOME)/.config/neomutt/colors.rc
+neomutt|writing/neomutt/mailcap|$(HOME)/.config/neomutt/mailcap
+endef
+SYMLINK_ROWS := $(strip $(SYMLINKS))
+
+# Canned recipe: $(call install_symlinks,<group>) — creates every SYMLINKS row
+# tagged with <group> (ln -sfn handles both file and directory targets, and
+# mkdir -p covers a parent dir that doesn't exist yet, e.g. a clean ~/.config).
+define install_symlinks
+@for row in $(foreach r,$(SYMLINK_ROWS),'$(r)'); do \
+    IFS='|'; set -- $$row; unset IFS; \
+    if [ "$$1" = "$(1)" ]; then \
+        mkdir -p "$$(dirname "$$3")"; \
+        ln -sfn "$(DOTFILES)/$$2" "$$3"; \
+        echo "  $$2 -> $$3"; \
+    fi; \
+done
+endef
+
 # Canned recipe: $(call install_agent,<source plist path>) — template __HOME__ /
 # __HOMEBREW_PREFIX__ into ~/Library/LaunchAgents, lint, and (re)load it. The
 # launchd label is the plist filename without its .plist suffix. Used by the
@@ -60,7 +106,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift tools-check
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
 
 default :
 	@echo "There is no default for your own safety."
@@ -76,9 +122,7 @@ install : apps git shell security nvim vale neomutt services brewauto
 
 git :
 	@echo "Symlinking Git files"
-	ln -sf $(DOTFILES)/git/gitconfig $(HOME)/.gitconfig
-	ln -sf $(DOTFILES)/git/gitignore $(HOME)/.gitignore
-	ln -sf $(DOTFILES)/git/gitmessage $(HOME)/.gitmessage
+	$(call install_symlinks,git)
 	@echo "Symlinking lazygit config"
 	mkdir -p "$(HOME)/Library/Application Support/lazygit"
 	ln -sf $(DOTFILES)/git/lazygit.yml "$(HOME)/Library/Application Support/lazygit/config.yml"
@@ -95,36 +139,27 @@ chsh :
 	      sudo dscl . -create /Users/$(USER) UserShell "$(HOMEBREW_PREFIX)/bin/fish" && \
 	      echo "Done — open a new terminal to start using fish"; }
 shell :
-	@echo "Symlinking fish config"
-	mkdir -p $(HOME)/.config
-	ln -sfn $(DOTFILES)/shell/fish $(HOME)/.config/fish
+	@echo "Symlinking fish, tmux, and bat config"
+	$(call install_symlinks,shell)
 	@echo "Run 'make chsh' to set fish as your login shell (requires sudo)"
+	@echo "Cloning tmux plugin manager (TPM)"
+	mkdir -p $(HOME)/.tmux
+	[ -d $(HOME)/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm $(HOME)/.tmux/plugins/tpm
 	@echo "Symlinking Ghostty config"
 	mkdir -p "$(GHOSTTY_DIR)"
 	ln -sf $(DOTFILES)/shell/ghostty/config "$(GHOSTTY_DIR)/config"
-	@echo "Symlinking tmux config"
-	mkdir -p $(HOME)/.tmux
-	[ -d $(HOME)/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm $(HOME)/.tmux/plugins/tpm
-	ln -sf $(DOTFILES)/shell/tmux.conf $(HOME)/.tmux.conf
-	@echo "Symlinking bat config"
-	mkdir -p $(HOME)/.config/bat
-	ln -sf $(DOTFILES)/shell/bat/config $(HOME)/.config/bat/config
 security :
 	@echo "Creating SSH ControlPath directory"
 	mkdir -p $(HOME)/.ssh
 	chmod 700 $(HOME)/.ssh
 	mkdir -p $(HOME)/.ssh/control
 	chmod 700 $(HOME)/.ssh/control
-	@echo "Symlinking SSH Configurations"
-	ln -sf $(DOTFILES)/security/ssh-config $(HOME)/.ssh/config
-	@echo "Symlinking pinned known_hosts (GitHub/Codeberg host keys)"
-	ln -sf $(DOTFILES)/security/known_hosts $(HOME)/.ssh/known_hosts_pinned
 	@echo "Creating GPG home directory"
 	@[ ! -L "$(HOME)/.gnupg" ] || { echo "Removing broken .gnupg symlink"; rm "$(HOME)/.gnupg"; }
 	mkdir -p $(HOME)/.gnupg
 	chmod 700 $(HOME)/.gnupg
-	@echo "Symlinking GPG Files"
-	ln -sf $(DOTFILES)/security/gpg.conf $(HOME)/.gnupg/gpg.conf
+	@echo "Symlinking SSH/GPG config files"
+	$(call install_symlinks,security)
 	@echo "Writing gpg-agent.conf (pinentry path depends on Homebrew prefix: $(HOMEBREW_PREFIX))"
 	@[ -f "$(DOTFILES)/security/gpg-agent.conf.tmpl" ] || \
 	    { echo "ERROR: gpg-agent.conf.tmpl not found — run: git pull"; exit 1; }
@@ -133,8 +168,6 @@ security :
 	rm -f $(HOME)/.gnupg/gpg-agent.conf
 	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(DOTFILES)/security/gpg-agent.conf.tmpl > $(HOME)/.gnupg/gpg-agent.conf
 	chmod 600 $(HOME)/.gnupg/gpg-agent.conf
-	ln -sf $(DOTFILES)/security/dirmngr.conf $(HOME)/.gnupg/dirmngr.conf
-	ln -sf $(DOTFILES)/security/common.conf $(HOME)/.gnupg/common.conf
 firefox :
 	@PROFILE=$$(awk -F= '/^Default=/{print $$2; exit}' \
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null) && \
@@ -247,7 +280,7 @@ touchid :
 	@echo "Done. Open a new shell and run any 'sudo' command to test (Touch ID prompt)."
 nvim :
 	@echo "Symlinking nvim config"
-	ln -sfn $(DOTFILES)/writing/nvim $(HOME)/.config/nvim
+	$(call install_symlinks,nvim)
 vale :
 	@command -v vale >/dev/null 2>&1 || { echo "ERROR: vale not found — install it first (make apps)"; exit 1; }
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
@@ -265,10 +298,7 @@ neomutt :
 	mkdir -p $(HOME)/.cache/neomutt/headers
 	mkdir -p $(HOME)/.cache/neomutt/messages
 	mkdir -p $(HOME)/.mail/proton
-	ln -sf $(DOTFILES)/writing/neomutt/neomuttrc $(HOME)/.config/neomutt/neomuttrc
-	ln -sf $(DOTFILES)/writing/neomutt/gpg.rc    $(HOME)/.config/neomutt/gpg.rc
-	ln -sf $(DOTFILES)/writing/neomutt/colors.rc $(HOME)/.config/neomutt/colors.rc
-	ln -sf $(DOTFILES)/writing/neomutt/mailcap   $(HOME)/.config/neomutt/mailcap
+	$(call install_symlinks,neomutt)
 	@[ -f "$(HOME)/.config/neomutt/accounts/local.rc" ] || \
 	    { printf '# NeoMutt account config — fill in your details.\n# See ~/.dotfiles/writing/neomutt/accounts/example.rc\n' \
 	        > "$(HOME)/.config/neomutt/accounts/local.rc"; \
@@ -374,22 +404,13 @@ brew-drift :
 	@echo ""
 	@echo "Nothing listed above = no drift. To add a package, edit the Brewfile;"
 	@echo "to uninstall the drift instead, run: brew bundle cleanup --force --file=$(DOTFILES)/homebrew/brewfile"
-tools-check :
-	@echo "Checking tools..."
-	@for t in delta vale pandoc pandoc-crossref lazygit lua-language-server \
-	          pyright bash-language-server harper-ls marksman stylua black prettier; do \
-	    command -v $$t >/dev/null 2>&1 || echo "WARNING: $$t not found (run: make apps)"; \
-	done
-	@# tectonic kept separate for its more specific consequence
-	@command -v tectonic >/dev/null 2>&1 || echo "WARNING: tectonic not found — PDF export will fail (run: make apps)"
-	@echo "Done."
 doctor :
 	@echo "Checking symlinks..."
-	@test -L $(HOME)/.gitconfig                || echo "WARNING: .gitconfig not symlinked (run: make git)"
-	@test -L $(HOME)/.gitignore                || echo "WARNING: .gitignore not symlinked (run: make git)"
-	@test -L $(HOME)/.gitmessage               || echo "WARNING: .gitmessage not symlinked (run: make git)"
+	@for row in $(foreach r,$(SYMLINK_ROWS),'$(r)'); do \
+	    IFS='|'; set -- $$row; unset IFS; \
+	    test -L "$$3" || echo "WARNING: $$3 not symlinked (run: make $$1)"; \
+	done
 	@test -L "$(HOME)/Library/Application Support/lazygit/config.yml" || echo "WARNING: lazygit config not symlinked (run: make git)"
-	@test -L $(HOME)/.config/fish              || echo "WARNING: fish config not symlinked (run: make shell)"
 	@test -L "$(GHOSTTY_DIR)/config"           || echo "WARNING: ghostty config not symlinked (run: make shell)"
 	@HP=$$(git config --global core.hooksPath); \
 	case "$$HP" in \
@@ -397,15 +418,7 @@ doctor :
 	    *) echo "WARNING: git core.hooksPath not set to dotfiles hooks (run: make git)" ;; \
 	esac
 	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not installed — pre-commit secret scan inactive (run: make apps)"
-	@test -L $(HOME)/.tmux.conf               || echo "WARNING: .tmux.conf not symlinked (run: make shell)"
-	@test -L $(HOME)/.config/bat/config       || echo "WARNING: bat config not symlinked (run: make shell)"
-	@test -L $(HOME)/.ssh/config              || echo "WARNING: ssh config not symlinked (run: make security)"
-	@test -L $(HOME)/.ssh/known_hosts_pinned  || echo "WARNING: pinned known_hosts not symlinked (run: make security)"
-	@test -L $(HOME)/.gnupg/gpg.conf          || echo "WARNING: gpg.conf not symlinked (run: make security)"
 	@if [ -L "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf is a broken symlink (run: make security)"; elif [ ! -f "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf not written (run: make security)"; fi
-	@test -L $(HOME)/.gnupg/common.conf       || echo "WARNING: common.conf not symlinked (run: make security)"
-	@test -L $(HOME)/.config/nvim             || echo "WARNING: nvim config not symlinked (run: make nvim)"
-	@test -L $(HOME)/.config/neomutt/neomuttrc || echo "WARNING: neomuttrc not symlinked (run: make neomutt)"
 	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
 	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
@@ -423,8 +436,8 @@ doctor :
 	        echo "WARNING: Service '$$name' not symlinked (run: make services)"; \
 	done
 	@echo "Checking SSH keys..."
-	@test -f $(HOME)/.ssh/id_github           || echo "WARNING: ~/.ssh/id_github not found — generate or copy your key"
-	@test -f $(HOME)/.ssh/id_codeberg        || echo "WARNING: ~/.ssh/id_codeberg not found — generate or copy your key"
+	@test -f $(HOME)/.ssh/secretive_github.pub   || echo "WARNING: ~/.ssh/secretive_github.pub not found — ssh-config points at it; export this machine's Secretive key (see security/ssh-config)"
+	@test -f $(HOME)/.ssh/secretive_codeberg.pub || echo "WARNING: ~/.ssh/secretive_codeberg.pub not found — ssh-config points at it; export this machine's Secretive key (see security/ssh-config)"
 	@echo "Checking permissions (no group/other access on keys + secret dirs)..."
 	@# %Lp = octal permission bits; owner-only means the group+other digits are 0
 	@# (mode ends in "00"), e.g. 700, 600, 400 — anything else grants access.
@@ -454,6 +467,6 @@ doctor :
 	    fi; \
 	done
 	@echo "Done."
-check : doctor macos-check brew-check tools-check
+check : doctor macos-check brew-check
 	@echo ""
 	@echo "All health checks complete. Run 'make brew-drift' to also list untracked installs."

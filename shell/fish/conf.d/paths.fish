@@ -13,6 +13,11 @@ set -l __dotfiles_paths_script (path resolve -- (status filename))
 set -l __dotfiles_repo_dir (path normalize -- (path dirname -- $__dotfiles_paths_script)/../../..)
 set -l __dotfiles_paths_file "$__dotfiles_repo_dir/paths.env"
 
+# paths.env is tracked in the repo alongside this file, so a missing one means a
+# broken checkout — there is no fallback worth carrying for that case. Only
+# DOTFILES_DIR is defaulted, since it is what would point you back at the repo.
+set -q DOTFILES_DIR; or set -gx DOTFILES_DIR "$__dotfiles_repo_dir"
+
 if test -f "$__dotfiles_paths_file"
     while read -l __dotfiles_line
         set __dotfiles_line (string trim -- "$__dotfiles_line")
@@ -46,14 +51,6 @@ if test -f "$__dotfiles_paths_file"
 
         set -q $__dotfiles_key; or set -gx $__dotfiles_key "$__dotfiles_value"
     end < "$__dotfiles_paths_file"
-else
-    set -q DOTFILES_DIR;           or set -gx DOTFILES_DIR           "$__dotfiles_repo_dir"
-    set -q ZOTERO_LIBRARY_JSON;    or set -gx ZOTERO_LIBRARY_JSON    "$HOME/Documents/Library/Library.json"
-    set -q ZOTERO_LIBRARY_BIB;     or set -gx ZOTERO_LIBRARY_BIB     "$HOME/Documents/Library/Library.bib"
-    set -q READING_NOTES_DIR;      or set -gx READING_NOTES_DIR      "$HOME/Notes/02 Notes/01 Reading Notes"
-    set -q RESEARCH_NOTES_DIR;     or set -gx RESEARCH_NOTES_DIR     "$HOME/Notes/02 Notes/02 Research Notes"
-    set -q RESEARCH_ARCHIVES_DIR;  or set -gx RESEARCH_ARCHIVES_DIR  "$HOME/Notes/03 Research/Archives"
-    set -q WEBSITE_REPO;           or set -gx WEBSITE_REPO           "$HOME/git/website"
 end
 
 set -e __dotfiles_line __dotfiles_parts __dotfiles_key __dotfiles_value

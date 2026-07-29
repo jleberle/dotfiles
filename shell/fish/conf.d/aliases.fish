@@ -47,8 +47,9 @@ if test (uname) = Darwin
     alias showfiles 'defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
     alias hidefiles 'defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
     alias flushdns 'sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
-    alias pubkey-github 'pbcopy < ~/.ssh/id_github.pub && echo "=> GitHub public key copied to pasteboard."'
-    alias pubkey-codeberg 'pbcopy < ~/.ssh/id_codeberg.pub && echo "=> Codeberg public key copied to pasteboard."'
+    # ssh-config points each host at the Secretive (Secure Enclave) pubkey, not id_*.
+    alias pubkey-github 'pbcopy < ~/.ssh/secretive_github.pub && echo "=> GitHub public key copied to pasteboard."'
+    alias pubkey-codeberg 'pbcopy < ~/.ssh/secretive_codeberg.pub && echo "=> Codeberg public key copied to pasteboard."'
     alias cb 'pbcopy'        # pipe into clipboard:  echo hi | cb
     alias cv 'pbpaste'       # paste from clipboard
     alias marked 'open -a "Marked 2"'   # markdown preview (shell twin of nvim <leader>pv)

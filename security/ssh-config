@@ -75,24 +75,19 @@ Host *
     # Logging
     LogLevel INFO
 
-    # --- Optional: Secure Enclave–backed keys (Secretive) -----------------------
-    # The cask is in the Brewfile. Secretive keys are GENERATED inside the Secure
-    # Enclave and never leave it: you cannot import id_github/id_codeberg — you
-    # create NEW keys, and because the key is bound to one Mac's enclave it can't
-    # sync, so EACH machine (Leia, Ahsoka) needs its own key registered separately.
+    # --- Secure Enclave–backed keys (Secretive) ---------------------------------
+    # Live: each host block above already points IdentityFile at the Secretive
+    # PUBLIC key (secretive_github.pub / secretive_codeberg.pub), and this
+    # IdentityAgent line is active — the old id_github/id_codeberg on-disk
+    # private keys are no longer used for auth (ssh-config sets `IdentitiesOnly
+    # yes`, so only the named IdentityFile is offered).
     #
-    # Migration gotcha: this config sets `IdentitiesOnly yes`, so ssh uses only the
-    # key named by IdentityFile. Just adding IdentityAgent is NOT enough — ssh would
-    # keep using the on-disk file. You must also repoint each host's IdentityFile at
-    # the Secretive PUBLIC key. Use a stable path each machine fills with its own
-    # pubkey (not secret, kept out of the repo); register every machine's pubkey
-    # with the provider.
-    #
-    # Per machine, once: create keys in Secretive → export each public key to
-    # ~/.ssh/secretive_github.pub and ~/.ssh/secretive_codeberg.pub → add them to
-    # GitHub/Codeberg → `ssh -T git@github` to verify → then remove the old keys
-    # from the providers and disk. To switch over, uncomment IdentityAgent here and
-    # change the per-host `IdentityFile ~/.ssh/id_<host>` to the matching
-    # `~/.ssh/secretive_<host>.pub`. Left off by default so on-disk keys keep working.
+    # Secretive keys are GENERATED inside the Secure Enclave and never leave
+    # it — you cannot import id_github/id_codeberg into it, and because a key
+    # is bound to one Mac's enclave it can't sync, so a NEW machine needs its
+    # own key generated and registered separately:
+    # create a key in Secretive → export the public key to
+    # ~/.ssh/secretive_github.pub and ~/.ssh/secretive_codeberg.pub → add them
+    # to GitHub/Codeberg → `ssh -T git@github` to verify.
 IdentityAgent ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
 

@@ -71,7 +71,7 @@ names the problem and the fix.
 
 | Command          | Purpose                                                                    |
 |------------------|-----------------------------------------------------------------------------|
-| `make check`     | All read-only health checks (`doctor` + `macos-check` + `brew-check` + `tools-check`) |
+| `make check`     | All read-only health checks (`doctor` + `macos-check` + `brew-check`)      |
 | `make lint`      | Repo static checks (shellcheck, fish syntax, luacheck, gitleaks)            |
 | `make update`    | Update the non-brew toolchain (Neovim plugins, TPM, vale styles)            |
 | `brewup`         | Update Homebrew now (it also updates itself weekly via launchd)             |

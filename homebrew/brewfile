@@ -8,9 +8,6 @@ brew "bash" # Modern bash (macOS ships 3.2; 4+ needed for mapfile, etc.)
 brew "lua" # Lua interpreter
 brew "node" # Node.js runtime (also powers prettier, bash-language-server)
 
-# Language tools
-brew "uv" # runs bin/ python scripts via inline PEP 723 deps
-
 # Neovim LSPs, formatters, linters (referenced by nvim/lua/plugins/*)
 brew "bash-language-server" # bashls
 brew "black"              # python formatter (conform)

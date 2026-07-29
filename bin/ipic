@@ -1,86 +1,56 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.9"
-# dependencies = ["requests", "docopt-ng"]
-# ///
+#!/usr/bin/env python3
 # encoding: utf8
 
 # Credit: Dr Drang https://github.com/drdrang/ipic. I've updated the script to work with depends and clean up output HTML to correctly display utf-8 characters
 
-import requests
-import docopt
-import os
+import argparse
 import html
+import json
+import os
 import re
 import subprocess
 import sys
-  
+import urllib.parse
+import urllib.request
+
 # You may want to change these.
 myDir = os.environ['HOME'] + '/Downloads/'    # directory for HTML file
 browser = 'com.apple.Safari'                # browser bundle identifier
-  
-usage = '''Generate and open a web page of thumbnail images and links to larger
-images for items in the iTunes/App/Mac App Stores. Only one option is
-allowed. The HTML file is saved on your Downloads folder.
 
-Usage:
-  ipic (-i | -m | -a | -f | -t | -b) SEARCHTERM
-  ipic -h
+# flag -> (size, media, entity, name-field-in-the-iTunes-API-result)
+MEDIA_OPTIONS = {
+    'ios':   (512, 'software', 'software',    'trackName'),
+    'mac':   (512, 'software', 'macSoftware', 'trackName'),
+    'album': (600, 'music',    'album',       'collectionName'),
+    'film':  (600, 'movie',    'movie',       'trackName'),
+    'tv':    (600, 'tvShow',   'tvSeason',    'collectionName'),
+    'book':  (600, 'ebook',    'ebook',       'trackName'),
+}
 
-Options:
-  -i  iOS app
-  -m  Mac app
-  -a  album
-  -f  film
-  -t  TV show
-  -b  book
-  -h  show this help message'''
-  
-  # Handle the command line.
-args = docopt.docopt(usage)
-searchterm = args['SEARCHTERM']
-if args['-i']:
-    size = 512
-    media = 'software'
-    entity = 'software'
-    name = 'trackName'
-elif args['-m']:
-    size = 512
-    media = 'software'
-    entity = 'macSoftware'
-    name = 'trackName'
-elif args['-a']:
-    size = 600
-    media = 'music'
-    entity = 'album'
-    name = 'collectionName'
-elif args['-f']:
-    size = 600
-    media = 'movie'
-    entity = 'movie'
-    name = 'trackName'
-elif args['-t']:
-    size = 600
-    media = 'tvShow'
-    entity = 'tvSeason'
-    name = 'collectionName'
-elif args['-b']:
-    size = 600
-    media = 'ebook'
-    entity = 'ebook'
-    name = 'trackName'
-else:
-    size = 600
-    media = ''
-    entity = ''
-    name = ''
-  
-  # Make the iTunes search call and collect the thumbnail and large image URLs.
+# Handle the command line.
+parser = argparse.ArgumentParser(
+    description='Generate and open a web page of thumbnail images and links '
+                 'to larger images for items in the iTunes/App/Mac App Stores.'
+)
+kind = parser.add_mutually_exclusive_group(required=True)
+kind.add_argument('-i', dest='kind', action='store_const', const='ios',   help='iOS app')
+kind.add_argument('-m', dest='kind', action='store_const', const='mac',   help='Mac app')
+kind.add_argument('-a', dest='kind', action='store_const', const='album', help='album')
+kind.add_argument('-f', dest='kind', action='store_const', const='film',  help='film')
+kind.add_argument('-t', dest='kind', action='store_const', const='tv',    help='TV show')
+kind.add_argument('-b', dest='kind', action='store_const', const='book', help='book')
+parser.add_argument('searchterm', metavar='SEARCHTERM')
+args = parser.parse_args()
+
+searchterm = args.searchterm
+size, media, entity, name = MEDIA_OPTIONS[args.kind]
+
+# Make the iTunes search call and collect the thumbnail and large image URLs.
 iURL = 'https://itunes.apple.com/search'
 parameters = {'term': searchterm, 'media': media, 'entity': entity}
-r = requests.get(iURL, params=parameters)
-r.raise_for_status()
-results = r.json()['results']
+query = urllib.parse.urlencode(parameters)
+with urllib.request.urlopen(f'{iURL}?{query}') as response:
+    results = json.load(response)['results']
 
 if not results:
     print(f"No results found for '{searchterm}'.", file=sys.stderr)
@@ -89,9 +59,9 @@ if not results:
 turls = [ x['artworkUrl100'] for x in results ]
 burls = [ x.replace('100x100', '{0}x{0}'.format(size)) for x in turls ]
 names = [ x[name] for x in results ]
-  
-  # Construct the HTML.
-linkFmt = '<a href="{1}"><img src="{0}" alt="{2}", title="{2}" /></a>'
+
+# Construct the HTML.
+linkFmt = '<a href="{1}"><img src="{0}" alt="{2}" title="{2}" /></a>'
 # Escape every interpolated value, URLs included: an artwork/store URL with a
 # stray quote would otherwise break out of the href/src attribute.
 links = [linkFmt.format(html.escape(x, quote=True),
@@ -102,17 +72,17 @@ safe_title = html.escape(searchterm)
 page = '''<html>
 <head><meta charset="utf-8"><title>{0} pictures</title></head>
 <body>
-<h1>”{0}” pictures</h1>
+<h1>“{0}” pictures</h1>
 {1}
 </body>
 </html>'''.format(safe_title, '\n'.join(links))
-  
-  # Create an HTML file and open it.
+
+# Create an HTML file and open it.
 # Sanitize the search term: strip path separators and characters that are
 # invalid or problematic in macOS filenames (:, *, ?, ", <, >, |, NUL).
 safeName = re.sub(r'[^\w\s-]', '_', searchterm).strip() or 'ipic'
 htmlFile = os.path.join(myDir, safeName + '.html')
 with open(htmlFile, 'w', encoding='utf-8') as f:
     f.write(page)
-  
+
 subprocess.check_call(['open', '-b', browser, htmlFile])

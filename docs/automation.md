@@ -7,11 +7,11 @@ workflows that add entries to the macOS Services menu.
 
 ## Bin
 
-Scripts in `bin/` are on `PATH` via `shell/fish/conf.d/env.fish`. The
-standalone Python scripts (`ipic`, `waybackup`) use
-[`uv`](https://docs.astral.sh/uv/)'s inline (PEP 723) dependencies — no venv to
-manage. `citecheck.py` / `zotcheck.py` / `readnote.py` are the extracted logic
-behind the same-named fish functions (see
+Scripts in `bin/` are on `PATH` via `shell/fish/conf.d/env.fish`. Every Python
+script here (`ipic`, `waybackup`, `citecheck.py`, `zotcheck.py`, `readnote.py`)
+is stdlib-only — no third-party packages, no venv, no `uv`. `citecheck.py` /
+`zotcheck.py` / `readnote.py` are the extracted logic behind the same-named
+fish functions (see
 [Writing](writing.md#writing-functions-and-aliases-fish)) — the fish wrappers
 validate args/env and invoke them.
 

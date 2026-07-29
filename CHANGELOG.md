@@ -1,1095 +1,327 @@
 # Changelog
 
 All notable changes to this dotfiles repo. Grouped by milestone rather than
-individual commit — the git log has the full detail.
+individual commit — the git log has the full detail. Entries from the
+2026-05-29–2026-07-08 rewrite are consolidated by theme rather than by day;
+everything since is one entry per real milestone.
 
 ---
 
-## 2026-07-08 — Wire the reading workflow end to end, split the README into docs/
+## 2026-07-08 — Wire the reading workflow end to end, split docs from README
 
-The reading pipeline (Zotero → Obsidian vault note → website reading ledger)
-previously required hand-chaining commands across two repos; `site` now
-dispatches every user-facing website script and `newreading` collapses the
-always-paired start step into one command. The 1,000-line README became a
-short daily-setup page with the deep documentation broken out by topic.
-
-### Added
-- **`newreading <citekey> [book|article] [--primary]`**
-  (`shell/fish/functions/`) — runs `readnote` (vault note from Zotero), then
-  `site sync-reading` (website reading-ledger entry from Zotero + that note),
-  so starting a Zotero-backed source is one command. Stops cleanly if the note
-  already exists.
-- **`site` subcommands** for the rest of the website scripts: `ship`
-  (preflight + commit + push), `cite-refs`, `to-avif`, `sync-reading`,
-  `newsource`/`newbook`, `finishsource`/`finishbook`.
-- **`docs/`** — the README's deep documentation, split by topic: `writing.md`
-  (Pandoc/Vale/Neovim + the reading workflow), `shell.md` (Ghostty/fish/tmux),
-  `git.md`, `mail.md`, `automation.md`, `security.md`, and `maintenance.md`
-  (checks + full Makefile reference). Rewritten in passes for readability;
-  absolute-path links fixed to relative so they work on Codeberg/GitHub.
-
-### Changed
-- **`README.md`** is now a short "daily setup" page: quick start, per-app
-  one-time steps, daily-use command tables, repo layout, and a docs index.
-- **`make macos` / `make macos-check`** are driven by a single
-  `MACOS_DEFAULTS` table (`domain|key|type|value`) instead of two
-  hand-mirrored ~25-key recipes — adding a default is now a one-line edit both
-  targets pick up. (Apple's make 3.81 can't export multi-line variables to
-  recipe shells, so the table is spliced inline with each row quoted.)
-
-### Removed
-- **`site csp` / `site sync-hugo`** — rarely used directly; still available as
-  `scripts/csp-hashes.sh` / `scripts/sync-hugo-version.sh` in the website repo.
-- **`site push`** — superseded by `site ship`, which adds the commit step and
-  a file-list confirmation.
-- **`make clean`** — the 2026-06-08 stale-layout cleanups have run everywhere
-  they were needed.
-- Stale machine-local universal variables (`ARCHIVERESTICREPO`,
-  `RESTICPASSWORDFILE` — pre-rename leftovers; the underscored versions are
-  the real ones).
+- `newreading <citekey> [book|article] [--primary]` — runs `readnote` (vault
+  note from Zotero), then `site sync-reading` (website reading-ledger entry),
+  so starting a Zotero-backed source is one command.
+- `site` gained subcommands for the rest of the website scripts (`ship`,
+  `cite-refs`, `to-avif`, `sync-reading`, `newsource`/`newbook`,
+  `finishsource`/`finishbook`); dropped `site csp`/`sync-hugo`/`push` in favor
+  of running those scripts directly or via `ship`.
+- README split: the ~1,000-line file became a short daily-setup page, with
+  the deep documentation broken out into `docs/*.md` by topic.
+- `make macos`/`make macos-check` unified onto one `MACOS_DEFAULTS` table
+  (`domain|key|type|value`) instead of two hand-mirrored recipes.
 
 ---
 
-## 2026-06-26 — Remove the duplicate paths.env parser from Neovim
+## 2026-06-26 — CI permissions, path-parser dedup, writing-check refactor
 
-`writing/nvim/lua/config/paths.lua` used to re-implement the same `paths.env`
-parser (trim, skip comments, split on `=`, strip quotes, expand `$HOME`)
-already written once in `shell/fish/conf.d/paths.fish`. Two parsers for one
-7-line config file meant two places that could drift, and the Lua one mostly
-duplicated work Neovim already inherits for free from its parent fish shell.
-
-### Changed
-- **`paths.lua`** now only reads the env vars `paths.fish` already exported
-  (the normal case for any Neovim launched from a fish shell), with a small
-  hardcoded fallback table for the rare case it isn't. No file I/O, no
-  parsing, in Lua at all — `paths.env` is genuinely the only file to edit now,
-  not just by convention.
-- **`make nvim-check`** launches its headless smoke test through `fish -c
-  'source .../paths.fish; nvim ...'` instead of hand-passing one `DOTFILES_DIR`
-  override. The test now exercises the real `paths.env` → fish → Neovim
-  pipeline end to end, rather than a synthetic substitute for it.
-
-## 2026-06-26 — Drop the scheduled-CI issue reporter to keep Actions read-only
-
-### Removed
-- **`scheduled-failure-issue`/`scheduled-failure-close`** jobs in
-  `.github/workflows/ci.yml` — they were the only thing requiring
-  `issues: write`. The monthly scheduled run still executes (so drift between
-  pushes is still caught), but a failure now only shows up in the Actions tab
-  instead of opening a GitHub issue. CI now only ever needs the top-level
-  `contents: read` permission.
-
-## 2026-06-26 — Extract embedded Python from the writing-check functions
-
-### Changed
-- **`citecheck`/`zotcheck`/`readnote`** (`shell/fish/functions/`) no longer embed
-  their logic as `python3 -c '...'` heredocs. The logic now lives in
-  `bin/citecheck.py`, `bin/zotcheck.py`, and `bin/readnote.py`; the fish
-  functions are thin wrappers that validate args/env and invoke the script.
-  Same behavior — `make writing-check` (`tests/writing-check.sh`) passes
-  unchanged — but the logic is now syntax-highlighted, independently
-  runnable, and not quoted through a shell string.
-
-## 2026-06-24 — Move CI from Woodpecker to GitHub Actions, add macOS-native checks
-
-Codeberg remains the public canonical repo, but CI now runs from a private
-GitHub mirror where hosted Linux and macOS runners are available.
-
-### Added
-- **`.github/workflows/ci.yml`** — replaces the Woodpecker pipeline with GitHub
-  Actions jobs for:
-  - Linux repo checks (`shellcheck`, fish syntax, `luacheck`,
-    `writing-check`, `gitleaks`)
-  - macOS-native checks (`lint-plists`, `writing-check`, `nvim-check`)
-- **`.github/dependabot.yml`** — Dependabot on the private GitHub mirror now
-  proposes weekly GitHub Actions updates and a monthly Betterfox submodule bump,
-  keeping dependency PRs low-trust and review-gated.
-- **`depmerge <pr-number>`** — fish helper for the Codeberg-canonical /
-  GitHub-mirror workflow: fast-forward `main` from Codeberg, fetch the exact
-  Dependabot PR head from GitHub, merge locally, push once to both remotes, and
-  delete the temporary branch.
-- **Scheduled CI issue reporting** — the monthly GitHub Actions run now opens or
-  updates a `Scheduled CI failure` issue on breakage and closes it
-  automatically once the scheduled run recovers.
-- **`make lint-plists`** — `plutil -lint` over tracked LaunchAgents and
-  Automator workflow files; only practical on macOS runners / your local Mac.
-- **`make nvim-check`** — headless Neovim startup smoke test in a temporary XDG
-  tree, exercising the real config without polluting your normal cache/state.
-
-### Removed
-- **`.woodpecker/lint.yaml`** — superseded by GitHub Actions.
-
-### Changed
-- README CI / Git docs now describe the private GitHub mirror setup: Codeberg
-  stays canonical, GitHub runs the checks.
-- GitHub Actions workflow steps now pin reusable actions by full commit SHA,
-  while Dependabot continues opening weekly PRs to roll those pins forward on
-  the private GitHub mirror.
-- Shared workflow paths now live in tracked `paths.env`, with fish and Neovim
-  both reading that file directly so path edits stay centralized without Lua
-  parsing fish config.
+- Dropped the scheduled-CI issue-reporter job — it was the only thing
+  requiring `issues: write`; CI now only needs `contents: read`.
+- Removed the duplicate `paths.env` parser from `paths.lua` — Neovim now just
+  reads the env vars `paths.fish` already exported instead of re-parsing the
+  file itself.
+- Moved `citecheck`/`zotcheck`/`readnote` logic out of `python3 -c` heredocs
+  into standalone `bin/*.py` scripts; the fish functions became thin wrappers
+  that validate args/env and invoke them.
 
 ---
 
-## 2026-06-24 — Writing workflow hardening: citation edge cases, recursive notes, fixture-backed checks
+## 2026-06-23–24 — CI migration to GitHub Actions; writing-workflow hardening
 
-This pass tightened the scholarly-writing workflow around the places most
-likely to drift silently over time: citation parsing, note reconciliation,
-editor path resolution, and note scaffolding.
+CI moved twice in three days: Forgejo Actions (configured but never
+executed — Codeberg has no shared runners) → Woodpecker (ran, but the only
+consumer) → **GitHub Actions** on a private mirror (hosted Linux + macOS
+runners; Codeberg stays the public canonical repo).
 
-### Added
-- **`make writing-check`** — fixture-backed smoke tests for the writing helpers:
-  `citecheck` must catch both `@citekey` and suppressed-author `-@citekey`,
-  `zotcheck` must recurse into nested note trees, and `readnote` must scaffold
-  a history-oriented note body with archival metadata when present.
-- **`tests/writing-check.sh`** — the checked-in harness behind `make writing-check`;
-  added to `shellcheck` coverage and to the Woodpecker pipeline as its own step.
-- **`writing/nvim/lua/config/paths.lua`** — shared Neovim path resolver for the
-  dotfiles root and workflow paths, so editor-side writing features can follow
-  the same tracked defaults as the fish functions.
-
-### Fixed
-- **`citecheck`** now validates suppressed-author Pandoc citations (`-@citekey`)
-  instead of silently skipping them.
-- **`zotcheck`** now walks reading/research note trees recursively rather than
-  only the top level, so nested note structures are fully audited.
-- **Telescope bibtex** no longer hardcodes `~/Documents/Library/Library.bib`;
-  it resolves `ZOTERO_LIBRARY_BIB` from the centralized workflow-path config
-  (env override first, tracked default second).
-
-### Changed
-- **`readnote`** now writes an expanded, history-oriented scaffold
-  (summary/argument/context/evidence/quotations/project use/follow-up) and
-  carries archival metadata / abstracts from the Zotero CSL JSON into the note
-  body when available. In non-interactive runs it skips opening Neovim, which
-  keeps `writing-check` automation headless-safe.
-- **Vale `Academic` vocabulary** now includes common historiographical and
-  archival terms (`antebellum`, `historiography`, `prosopography`, etc.) so
-  projects that re-enable spelling/terminology checks need less local allowlist
-  churn.
+- Split lint into four jobs (`shellcheck`, fish syntax, `luacheck`, secrets)
+  so one failing check doesn't bury the others in a combined log; added
+  macOS-native checks (`lint-plists`, `nvim-check`) only GitHub's macOS
+  runners can do.
+- Added Dependabot (Actions + monthly Betterfox bump) and `depmerge
+  <pr-number>` to fast-forward Dependabot PRs across the Codeberg-canonical /
+  GitHub-mirror split.
+- Added `make writing-check` — fixture-backed tests for `citecheck`,
+  `zotcheck`, `readnote`. Caught two real bugs in the process: `citecheck`
+  wasn't validating suppressed-author `-@citekey` citations, and `zotcheck`
+  only checked the top level of the note tree instead of recursing.
 
 ---
 
-## 2026-06-23 — Switch CI to Woodpecker, harden the lint pipeline
+## 2026-06-22 — Full audit pass: bug hunt, platform commitment, Makefile dedup
 
-The Forgejo Actions workflow never actually ran — Codeberg has no shared
-runners, so it was dead config kept as a placeholder. Woodpecker replaces it
-with a pipeline that executes.
+A single intensive pass: exercised every function with edge cases, ran
+`shellcheck`/`luacheck` clean, and did a `make install` ordering + doc-table
+accuracy sweep.
 
-### Added
-- **`make lint-shellcheck` / `lint-fish` / `lint-luacheck` / `lint-secrets`** —
-  `make lint` now composes these four standalone targets instead of one
-  monolithic recipe. `lint-secrets` runs a full-history `gitleaks git` scan as
-  a fail-closed backstop: the local `git/hooks/pre-commit` gitleaks check
-  fails *open* when gitleaks isn't installed, so CI is the only place a missing
-  scan is guaranteed to be caught.
-- **`.woodpecker/lint.yaml`** splits the single `lint` step into four
-  (`shellcheck`, `fish-syntax`, `luacheck`, `secrets`) so a failure in one
-  check is visible on its own in the Woodpecker UI instead of buried inside a
-  combined log. The base image is pinned by digest
-  (`debian@sha256:49ba34...`) rather than the floating `bookworm` tag,
-  `luacheck` is pinned to v1.2.0 in LuaRocks, and `gitleaks` is fetched as a
-  checksum-verified release tarball (v8.30.1) rather than relying on an image's
-  entrypoint.
+**Fixed**
+- Fresh-machine `make apps`: the official Homebrew installer doesn't add
+  `brew` to the *current* process PATH, so the next recipe line failed on a
+  truly clean machine. Now calls `$(HOMEBREW_PREFIX)/bin/brew` directly.
+- `words`: piping through `pandoc | wc -w | string trim` meant the
+  pipeline's reported status was always `string trim`'s (0), so a failed
+  pandoc run silently reported 0 words instead of erroring.
+- `wordfrequency`: a leading/trailing delimiter made `awk` emit a spurious
+  empty "word".
+- `newdoc "Quoted Title"`: `string join` returns non-zero for a single-element
+  list, so the `... or echo "Untitled"` fallback fired *in addition to* the
+  real title — every frontmatter field after it shifted by one.
+- `make doctor`: false positive on `core.hooksPath` (compared the tilde form
+  git actually stores against an absolute-path string).
+- macOS 26 (Tahoe) false warnings in `make macos-check`: the stealth-mode
+  grep looked for `"enabled"` but Tahoe prints `"...is on"`; the auto-update
+  check read a legacy key Tahoe no longer populates.
 
-### Removed
-- **`.forgejo/workflows/lint.yml`** — superseded by Woodpecker.
+**Changed**
+- Committed to macOS / Apple Silicon only — dropped the Linux and Intel
+  Homebrew-prefix fallbacks across `env.fish`, `homebrewupdate.sh`,
+  `mailsync.sh`, and the Makefile.
+- Centralized the repo path (`DOTFILES := $(HOME)/.dotfiles`, one
+  `DOTFILES_DIR` fish var) — replaced ~45 literal path occurrences.
+- `make check` — one target for every read-only health check.
+- Deduped the LaunchAgent install dance (template → lint → bootout →
+  bootstrap) into one `install_agent` canned recipe used by `brewauto`,
+  `mailsync`, and `resticcheck`.
 
----
-
-## 2026-06-22 — Fresh-install bootstrap fix + doc-table gap
-
-From a documentation-accuracy sweep and a `make install` ordering analysis.
-(Every function is documented; `.PHONY` matches the target list exactly; no
-README `make` reference points to a missing target.)
-
-### Fixed
-- **Fresh-machine `make apps` bootstrap.** After the Homebrew installer runs, the
-  bare `brew bundle` on the next recipe line would fail — the official installer
-  doesn't add brew to the *current* process PATH. Now calls
-  `$(HOMEBREW_PREFIX)/bin/brew` by absolute path, which works whether brew was
-  pre-installed or just installed.
-
-### Added
-- `services` row in the README Makefile Options table (the target existed and had
-  its own section, but was missing from the quick-reference table).
+**Removed** unused Brewfile fonts and the `fn` function (redundant with
+`fd`-backed `findf`/`findd`). **Added** `.gitleaks.toml` to allowlist the
+public GPG fingerprint (the one legitimate false positive in a full-history
+scan) and `shellcheck` itself to the Brewfile (referenced by CI but never
+actually installed locally).
 
 ---
 
-## 2026-06-22 — Bug hunt: words / wordfrequency latent fixes
+## 2026-06-21 — Reading-note scaffolder, `make update`, centralized paths
 
-A full pass exercising each function with edge-case inputs (the runtime-logic
-audit that caught the newdoc frontmatter bug). `shellcheck` (bin scripts) and
-`luacheck` (nvim) are clean; two issues found and fixed.
+- `readnote <citekey> [--primary]` — scaffolds a reading note from the Zotero
+  CSL JSON export, closing the loop `zotcheck` needs (an item with no note).
+  Refuses unknown citekeys and won't clobber an existing note.
+- `make update` — one command for the non-Homebrew toolchain (Neovim plugins,
+  tmux TPM, `vale sync`); Homebrew and Betterfox stay on their own
+  (review-gated) paths.
+- Centralized workflow paths (Zotero library, notes trees, research
+  archives, website repo) that several functions had hardcoded independently
+  into `conf.d/paths.fish` as `set -q`-guarded vars.
 
-### Fixed
-- **`words`**: the "pandoc failed" branch was dead code. The count runs through
-  `pandoc | wc -w | string trim`, so the pipeline's *final* status (string trim)
-  is 0 even when pandoc fails — `or` never fired and a failed file was silently
-  reported as 0 words. Now checks `$pipestatus[1]` (pandoc's own status).
-- **`wordfrequency`**: a leading/trailing delimiter made `awk` emit an empty
-  field, so a blank "word" appeared in the frequency list. Now skips empties.
+## 2026-06-21 — Security hardening: secret scanning, key custody, backups
 
----
-
-## 2026-06-22 — Single-source the repo path; fix newdoc title corruption
-
-### Changed
-- Centralized the repo location: `DOTFILES := $(HOME)/.dotfiles` in the Makefile
-  (replacing 45 literal `$(HOME)/.dotfiles` uses) and a guarded `DOTFILES_DIR`
-  var in `conf.d/paths.fish`, used by `newdoc`, `valeinit`, `mdexport`, and
-  `dots`. Relocating the repo is now ~2 edits instead of ~50.
-
-### Fixed
-- **`newdoc "Quoted Title"` produced corrupted frontmatter** (every field shifted
-  by one — author became "Untitled", date got the author, the CSL path got the
-  bibliography, etc.). `string join` returns non-zero when there's a single
-  element to join, so the `… or echo "Untitled"` fallback fired *in addition to*
-  the title, making `$title` two list elements and misaligning every subsequent
-  `printf` arg. Replaced the one-liner with an explicit default + conditional join.
-
-### Added
-- README "Changing values" map — where each repeated constant lives and exactly
-  what to edit when it changes (repo path, GPG key, identity, machine, Homebrew
-  prefix), including the cross-format ones that can't be DRY'd.
-
----
-
-## 2026-06-22 — Commit to macOS / Apple Silicon only: drop Linux + Intel fallbacks
-
-### Removed
-- Stripped the `linuxbrew` (`/home/linuxbrew/.linuxbrew`) **and** Intel
-  (`/usr/local`) Homebrew-prefix fallbacks from `conf.d/env.fish`, `config.fish`,
-  `bin/homebrewupdate.sh`, `bin/mailsync.sh`, and the Makefile (now a flat
-  `HOMEBREW_PREFIX := /opt/homebrew`), plus the cross-architecture wording in
-  comments and the README platform note. The repo now targets **Apple Silicon
-  macOS** only (`pbcopy`, `launchd`, `osascript`, Automator, `Library/Application
-  Support`); Intel-Mac users adapt it themselves.
+- **Secret scanning**: a tracked `git/hooks/pre-commit` hook runs `gitleaks
+  git --staged` before every commit (fails *open* if gitleaks isn't
+  installed — warns, allows).
+- **`make harden`/`make touchid`** (sudo, excluded from `make install`):
+  firewall + stealth mode, automatic security updates, Apple diagnostics
+  opt-out; Touch ID for `sudo` via `pam_reattach` + `pam_tid`.
+- **FileVault check** in `make doctor`/`macos-check` — warned, not toggled
+  automatically (headless enable is unsafe).
+- **Pinned SSH host keys** (`known_hosts_pinned`) — removes the
+  trust-on-first-use window for GitHub/Codeberg on a fresh machine.
+- **SSH key custody via Secretive** (Secure Enclave) — `SSH_AUTH_SOCK`
+  routed to Secretive's socket so `ssh`/`git`/`ssh-keygen` all use enclave
+  keys.
+- **Backup integrity**: `archbackup check` runs `restic check` on the
+  encrypted research-scan repo; `make resticcheck` schedules it weekly.
+- Shell hardening: `umask 077`, `HOMEBREW_NO_INSECURE_REDIRECT`, a
+  `fish_should_add_to_history` filter dropping space-prefixed/secret-bearing
+  lines.
+- **Fixed**: `gpg-master-done` staged exported subkeys under `~/.gnupg`
+  (mode 0700) instead of a predictable, world-readable `/tmp` path. `ipic`
+  now `html.escape`s API-supplied URLs (a stray quote could break out of an
+  attribute). `fuck` now shows the command and asks for confirmation before
+  re-running it under `sudo`.
 
 ---
 
-## 2026-06-22 — `make check` aggregate + doctor hooksPath false positive
+## 2026-06-16 — macOS Services; drop stale zsh submodules
 
-### Added
-- **`make check`** — runs all read-only health checks in one shot (`doctor` +
-  `macos-check` + `brew-check` + `tools-check`); `brew-drift` stays separate. The
-  read-only counterpart to `make update`.
-- **Permission check in `doctor`** — warns if `~/.ssh`/`~/.gnupg`, the SSH
-  private keys, or `~/.config/restic/archive.pass` grant any group/other access
-  (owner-only = mode ends in `00`). Rides along in `make check`.
-
-### Fixed
-- **`make doctor` false positive on `core.hooksPath`.** The value is stored as
-  `~/.dotfiles/git/hooks` (git expands the tilde at runtime — the hook works),
-  but the check string-compared it against the absolute `$(HOME)/…` form and
-  warned. Now accepts both the tilde and absolute forms.
+- `macos/services/` + `make services` — version-controls three browser
+  integrations with no terminal equivalent: `Open in Firefox`, and Markdown
+  reference-list copiers for open Firefox/Safari tabs.
+- Deleted the other ~36 Markdown Service Tools — macOS Services only fire
+  from a GUI right-click menu, and this is a terminal-editor setup with
+  nothing for them to act on (one, `HTML to Markdown`, was already broken:
+  it embedded a Python-2-only script).
+- Purged orphaned `zsh/submodules/*` git config entries left over from the
+  pre-fish era.
 
 ---
 
-## 2026-06-22 — Inspection follow-ups: gitleaks allowlist, shellcheck, cache cleanup
+## 2026-06-15 — Zotero/Obsidian integration: CSL JSON, OCR'd archive search
 
-A full-history `gitleaks` scan, startup profile, lint run, and orphan sweep
-surfaced these. (No real secret was ever committed — the two history "leaks"
-were the public GPG signing-key fingerprint; startup is ~50ms; Lua/fish lint
-clean.)
-
-### Added
-- `.gitleaks.toml` allowlisting the public GPG `signingkey` fingerprint line, so
-  a full `gitleaks git` scan returns 0 instead of 2 false positives — any future
-  finding is then genuinely real, and the pre-commit hook won't false-trip if
-  that line is re-staged.
-- `shellcheck` to the Brewfile — the CI lint workflow references it but it was
-  never installed locally (and CI has no runners), so `bin/` scripts went
-  unlinted everywhere.
-
-### Changed
-- `make clean` now also removes `bin/__pycache__` (Python bytecode left by
-  running `ipic`/`waybackup` via uv).
+- Citation rendering switched to the Better CSL JSON export (preserves
+  Zotero's archive/box/folder fields that the BibTeX translator drops); the
+  citekey pickers (`cite`, telescope-bibtex) stay on the `.bib` export since
+  they can't parse CSL JSON.
+- Research-workflow functions over the OCR'd archival-scan tree: `archgrep`
+  (full-text search via ripgrep-all), `archverify` (SHA-256 manifest),
+  `archbackup` (restic encrypted snapshots), `archcheck` (flags PDFs missing
+  an OCR layer), `citecheck`, `zotcheck`.
+- Unified on one CSL stylesheet (CMOS 18e) across pandoc and the Obsidian
+  plugins, so in-app previews match final output.
 
 ---
 
-## 2026-06-22 — Streamline: dedupe LaunchAgent installs, prune unused fonts
+## 2026-06-14 — Cross-machine sync, drift checks, markdown LSP
 
-### Changed
-- Collapsed the repeated LaunchAgent install dance (template → `plutil -lint` →
-  `bootout` → `bootstrap`) into a single `install_agent` Make canned recipe;
-  `brewauto`, `mailsync`, and `resticcheck` now `$(call …)` it. Behavior
-  unchanged (verified via `make -n`); ~25 fewer lines and one install procedure
-  to maintain.
-- `tools-check` now loops over the tool list instead of 14 near-identical
-  `command -v` lines (`tectonic` kept separate for its specific message). Same
-  output, ~8 fewer lines. (The `macos`/`macos-check` enumeration was left inline
-  on purpose — a data-file rewrite would cost readability and self-containment.)
-
-### Removed
-- Dropped `font-fira-code` and `font-inconsolata` from the Brewfile — unused
-  after standardizing the terminal on JetBrainsMono Nerd Font and BBEdit on IBM
-  Plex Mono. (Already-installed copies aren't auto-removed; `make brew-drift`
-  now lists them, or `brew uninstall --cask font-fira-code font-inconsolata`.)
-- Removed the `fn` function — a pre-`fd` port from the zsh era, ~90% redundant
-  with the `findf`/`findd` (`fd`) aliases but slower and not `.gitignore`-aware.
-  Use `findf`/`findd`, or `fd <name>` for files + dirs in one call.
+- Neovim spellfile and the Vale `Academic` vocabulary are now tracked in the
+  repo, so words/terms added on one machine sync to the others.
+- `marksman` markdown LSP for cross-document link/heading navigation.
+- `make doctor` now checks that launchd agents are actually *loaded*, not
+  just that the plist exists (catches silent sync failures after a macOS
+  upgrade). `make brew-drift` lists installed-but-untracked packages.
+- `.editorconfig` and a Git commit-message template added.
 
 ---
 
-## 2026-06-22 — Fix macOS 26 hardening checks (false warnings)
+## 2026-06-11 — Academic history workflow: CMOS 18, shared pandoc pipeline
 
-### Fixed
-- **`make macos-check` false negatives on macOS 26 (Tahoe).** The firewall,
-  auto-update, and Touch ID settings were applied correctly, but the checks
-  misreported them: the stealth check grepped for `"enabled"` while macOS prints
-  `"…is on"`; the auto-update check read the legacy `AutomaticCheckEnabled` key
-  that Tahoe no longer populates. Stealth now matches `on`; auto-update now reads
-  `softwareupdate --schedule`.
-- **`make touchid` left `/etc/pam.d/sudo_local` mode 600.** With `umask 077` in
-  effect, `sudo tee` created it owner-only — harmless to PAM (which reads it as
-  root, so Touch ID worked) but unreadable to the non-sudo `macos-check` grep.
-  Now `chmod 644` (standard pam.d perms).
-
-### Changed
-- **`make harden`** enables automatic update checks via the supported
-  `softwareupdate --schedule on` (the `AutomaticCheckEnabled` default is a no-op
-  on current macOS).
+- Pandoc PDF export switched to tectonic (self-contained XeTeX); BasicTeX
+  dropped once nothing else needed it.
+- `site` fish function — dispatches every website-repo script from any
+  directory.
+- Added CMOS 18th-edition CSL as the new default (17th kept for in-progress
+  manuscripts, set per-document); `writing/pandoc/defaults.yaml` as the one
+  shared pandoc pipeline for both nvim and `mdexport` — deliberately
+  excludes `csl:`/`bibliography:`, since a defaults-file value silently
+  overrides document frontmatter.
+- `mdarchive` (snapshot every URL in a draft to the Wayback Machine via
+  `waybackup`) and `mdimport` (docx → markdown round-trip via
+  `--track-changes`).
 
 ---
 
-## 2026-06-21 — Workflow: reading-note scaffolder, update target, centralized paths
+## 2026-06-10 — Future-proofing audit: post-quantum SSH, Vale trim, bootstrap
 
-### Added
-- **`readnote <citekey> [--primary]`**: scaffolds a reading note in
-  `$READING_NOTES_DIR`, pulling authors/title/year from the Zotero CSL JSON into
-  the exact frontmatter `zotcheck` reconciles — closing the loop from "Zotero
-  item with no note yet" to a real note. Refuses unknown citekeys (no instant
-  orphans) and won't overwrite an existing note.
-- **`make update`**: updates the non-brew toolchain in one command — Neovim
-  plugins (`Lazy! sync`), tmux TPM, and `vale sync`. Deliberately leaves
-  Homebrew (weekly launchd / `brewup`) and review-gated Betterfox to their own
-  paths, and reminds you to commit `lazy-lock.json` if Lazy changed it.
-
-### Changed
-- **Centralized workflow paths**: the personal locations several functions
-  hardcoded independently (Zotero library, notes trees, research archives,
-  website repo) now live once in `shell/fish/conf.d/paths.fish` as `set -q`-guarded
-  vars (so a per-machine `set -Ux` override wins). Rewired `cite`, `citecheck`,
-  `zotcheck`, `newdoc`, `archbackup`, `archcheck`, `archverify`, `archgrep`, and
-  `site` to use them.
-- **Function descriptions**: added `--description` to `fish_prompt` and
-  `fish_mode_prompt` so every function in `shell/fish/functions/` carries one.
-
----
-
-## 2026-06-21 — Security hardening: secret scanning, key custody, backup integrity
-
-### Added
-- **Secret scanning**: a global `core.hooksPath` runs a tracked
-  `git/hooks/pre-commit` hook (`gitleaks git --staged`) before every commit,
-  guarding the `acp` / `git add . && git push` flow. Fails *open* if gitleaks
-  isn't installed (warns, allows). `gitleaks` added to the Brewfile; `make git`
-  makes the hook executable; `make doctor` verifies `hooksPath` + gitleaks.
-- **macOS system hardening** (new targets, both `sudo`): `make harden` enables
-  the application firewall + stealth mode, automatic security updates / security
-  responses, and opts out of Apple diagnostics submission; `make touchid` writes
-  `/etc/pam.d/sudo_local` for Touch-ID `sudo` (with `pam_reattach` ahead of
-  `pam_tid` so it works inside tmux). `pam-reattach` added to the Brewfile. Both
-  are intentionally excluded from `make install`.
-- **FileVault check**: `make macos-check` / `make doctor` warn if full-disk
-  encryption is off (not toggled automatically — headless enable is unsafe).
-- **Pinned SSH host keys**: `security/known_hosts` → `~/.ssh/known_hosts_pinned`
-  (a second `UserKnownHostsFile`) pre-trusts verified GitHub/Codeberg host keys,
-  removing the trust-on-first-use window on a fresh machine.
-- **SSH key custody via Secretive** (Secure Enclave): `secretive` cask added;
-  `env.fish` routes `SSH_AUTH_SOCK` to Secretive's socket (guarded) so `ssh`,
-  `git`, and `ssh-keygen` all use the enclave keys; `ssh-config` points
-  `IdentityFile` at per-machine Secretive public keys with `IdentityAgent`
-  enabled. Per-machine migration recipe documented in `ssh-config`.
-- **Backup integrity**: `archbackup check` subcommand runs `restic check` on the
-  encrypted research-scan repo; `make resticcheck` schedules it weekly via
-  `org.jaredeberle.resticcheck` (no-op when the drive is unmounted).
-- **Shell/env hardening**: `umask 077`, `HOMEBREW_NO_INSECURE_REDIRECT`, and a
-  `fish_should_add_to_history` filter that drops space-prefixed and
-  secret-bearing command lines from history.
-
-### Changed
-- **Git object integrity**: `transfer/fetch/receive.fsckObjects = true` reject
-  malformed/malicious objects on clone/fetch.
-- **SSH algorithm floor**: added `PubkeyAcceptedAlgorithms`/`HostKeyAlgorithms`
-  and `RequiredRSASize 3072` to refuse `ssh-rsa`/SHA-1, DSA, and short RSA.
-  Subsequently widened `PubkeyAcceptedAlgorithms` to include `ecdsa-sha2-nistp256`,
-  since Secure-Enclave (Secretive) keys are necessarily P-256.
-- **GPG keyserver privacy**: `auto-key-locate` drops `keyserver` (now
-  `local,wkd`) so key lookups don't leak the queried key ID.
-
-### Fixed
-- **`gpg-master-done`**: exported secret subkeys are now staged inside `~/.gnupg`
-  (mode 0700) under `umask 077` via `mktemp`, instead of a predictable
-  `/tmp/subkeys-<machine>.gpg` — closes a world-readable window and a
-  symlink-race on the shared, sticky `/tmp`.
-- **`ipic`**: API-supplied artwork/store URLs are now `html.escape`d, preventing
-  a stray quote from breaking out of the `href`/`src` attribute.
-- **`fuck`**: now prints the previous command and asks for confirmation before
-  re-running it under `sudo` (and guards the empty-history / `$history[1] = fuck`
-  off-by-one). Prevents reflexively amplifying a typo to root and re-running
-  command substitutions/globs under root's view of the system without review.
-
----
-
-## 2026-06-16 — Manage macOS Services; drop stale zsh submodules
-
-### Added (macOS Services)
-- New `macos/services/` directory and `make services` target (folded into
-  `make install`) that symlinks Automator workflows into `~/Library/Services`.
-  `make doctor` now verifies each workflow's symlink. Documented under
-  Scripting → macOS Services in the README
-- Brought three browser integrations under version control: `Open in Firefox`
-  (open the frontmost Safari tab in Firefox), `md - Links - Firefox Tabs`, and
-  `md - Links - Safari Tabs` (copy all open tabs of each browser as a Markdown
-  reference list). All reach into a running browser and have no terminal
-  equivalent
-- Hardened the `Open in Firefox` AppleScript: hands the URL to an
-  already-running Firefox via `open -a` (reliably opens a new tab), and only
-  cold-starts the binary directly when Firefox is closed — there using
-  `-new-tab` so the URL survives session restore (a bare positional URL was
-  intermittently dropped) while keeping `MOZ_DISABLE_SAFE_MODE_KEY=1` so the
-  Option-using hotkey can't trigger Troubleshoot Mode. Also guards the Safari
-  read (`front document`, with running/empty-window checks)
-
-### Removed
-- Deleted the rest of the Markdown Service Tools (36 `md - *` text transforms)
-  from `~/Library/Services`. macOS Services only fire from a GUI app's
-  right-click menu; in this Neovim/NeoMutt/Pandoc setup there's no GUI text
-  editor for them to act on, and they duplicated `pandoc`/Neovim functionality.
-  (`HTML to Markdown` was also broken outright — it embeds a Python-2-only
-  script, and `/usr/bin/python` is gone on current macOS.)
-- Purged orphaned `zsh/submodules/*` entries from `.git/config` and the stale
-  `.git/modules/zsh` tree (leftovers from the pre-fish zsh era; no `.gitmodules`
-  entry or tracked gitlink referenced them)
-
----
-
-## 2026-06-15 — Zotero/Obsidian research integration: CSL JSON bibliography, OCR'd archive search & integrity
-
-### Changed (bibliography)
-- Pandoc citation rendering (`newdoc`, `writing/pandoc/metadata.yaml`) now reads
-  the Better CSL JSON export (`~/Documents/Library/Library.json`) instead of
-  `Library.bib`. CSL JSON preserves Zotero's archive / archive-location fields
-  that the BibTeX translator drops, so archival citations render with the
-  repository and box/folder. Better BibTeX keeps both files auto-exported
-- The citekey pickers (`cite`, telescope-bibtex `<leader>fc`) stay on
-  `Library.bib` — they parse BibTeX entry syntax and can't read CSL JSON; added
-  guard comments noting why. Citekeys are identical across both exports
-- Unified the toolchain on one stylesheet: the version-controlled CMOS 18e
-  (`writing/pandoc/chicago-notes-bibliography-18th-edition.csl`) now also drives
-  the Obsidian Pandoc and Pandoc Reference List plugins, so in-app previews
-  match final pandoc output
-
-### Added (OCR'd archive search & integrity)
-Research-workflow fish functions over the Obsidian vault's `03 Research/Archives`
-tree and the `Library.json` export:
-- `archgrep <query>` — full-text search inside the OCR'd archival PDFs via
-  `ripgrep-all` (poppler-backed); prints the matching page number. No Obsidian
-  plugin or search index to maintain
-- `archverify [--update]` — SHA-256 manifest of the irreplaceable scans
-  (`Archives/checksums.sha256`) to detect corruption / bit-rot
-- `archbackup [snapshots]` — `restic` versioned, encrypted, deduplicated
-  snapshot of the archive to an external HD (`ARCHIVE_RESTIC_REPO`; one-time
-  `restic init`)
-- `archcheck` — flags any archival PDF lacking an OCR text layer (invisible to
-  `archgrep`) so it can be run through `ocrmypdf`
-- `citecheck <md…>` — validates every `@citekey` in a draft against
-  `Library.json` before export, catching broken pandoc citations
-- `zotcheck [--list]` — reconciles notes against Zotero: orphaned note citekeys
-  and Zotero items still lacking a note
-
-### Added (Brewfile)
-- `ocrmypdf` and `tesseract` — OCR pipeline for scanned archival PDFs (searchable
-  text layer + Zotero OCR); `ripgrep-all` (rga) for `archgrep`; `restic` for
-  `archbackup`. The `poppler` comment now notes `pdftoppm` (Zotero OCR plugin)
-
----
-
-## 2026-06-14 — cross-machine sync, drift checks, markdown LSP
-
-### Added (cross-machine consistency)
-- Neovim personal dictionary is now tracked in the repo
-  (`writing/nvim/spell/en.utf-8.add`) and `spellfile` is pinned to the config
-  dir, so words added with `zg` sync across machines. The compiled `.add.spl`
-  binary is gitignored
-- Vale `Academic` vocabulary (`writing/vale/vocab/Academic/`) — a curated
-  allowlist of proper nouns / domain terms, tracked in the repo. `make vale`
-  symlinks it under `StylesPath/config/vocabularies/`; `vale.ini` references it
-  via `Vocab = Academic`
-
-### Added (markdown LSP)
-- `marksman` markdown LSP (Brewfile + `nvim/lua/plugins/lsp.lua` + tools-check):
-  cross-document go-to-definition on links/headings, link completion, and
-  rename across files. Style stays vale, grammar harper_ls, spelling vim spell
-
-### Added (health & drift)
-- `make doctor` now verifies the launchd agents (mailsync, brewupdate,
-  brewlogclean) are actually *loaded*, not just that the plist exists — catches
-  silent background-sync failures after a macOS upgrade or `bootout`
-- `make brew-drift` — lists formulae/casks installed but absent from the
-  Brewfile (reverse of `brew-check`). Note: deliberately-untracked items (e.g.
-  `claude`, Hush) will appear here; it is informational, not a cleanup command
-
-### Added (consistency)
-- `.editorconfig` at the repo root, aligned with the conform formatters
-  (stylua tabs, black 4-space, prettier 2-space, preserve markdown hard breaks)
-- Git commit-message template (`git/gitmessage` → `~/.gitmessage`, wired via
-  `commit.template`); symlinked by `make git`, checked by `doctor`
-
----
-
-## 2026-06-11 — academic history workflow: CMOS 18, shared pandoc pipeline, link archiving
-
-### Changed (PDF engine)
-- Pandoc PDF export now uses tectonic (`pdf-engine: tectonic` in
-  defaults.yaml) — self-contained XeTeX, fetches LaTeX packages on demand.
-  The CV repo already requires tectonic and syllabi prefers it, so BasicTeX
-  had no remaining consumers: removed the cask from the Brewfile and the
-  `make latex` tlmgr target. `make tools-check` now checks for tectonic
-- Brewfile: added poppler (PDF text/image extraction) and tectonic;
-  added ChangeTheHeaders (App Store) and font-tex-gyre-schola (academic PDF
-  body font for tectonic builds); hush and emacs deliberately untracked
-
-### Added (website integration)
-- `site` fish function — website tasks from anywhere, pure dispatch to
-  `~/git/website/scripts/` (new/images/preflight/push/serve/archive/
-  sync-hugo/csp/theme). Args that exist relative to the caller's cwd are
-  absolutized before cd'ing to the repo, so `site images <dir> ~/Downloads/x.jpg`
-  works. Retires the `update-theme` alias (`site theme`)
-- `bin/homebrewupdate.sh` Hugo notification now says `run: site sync-hugo &&
-  site csp` and records where the scripts live
-- nvim-lint now anchors vale's cwd to the linted file's directory — vale
-  discovers `.vale.ini` upward from its cwd (stdin input carries no path), so
-  project configs (website repo, `valeinit` scaffolds) previously only applied
-  when nvim happened to be cd'd into the project
-- Website repo (committed there): project `.vale.ini` with Readability enabled
-  (public-facing prose), `.vale/` gitignored
-
-### Added
-- `writing/pandoc/chicago-notes-bibliography-18th-edition.csl` — current CMOS;
-  now the default for `newdoc` and `metadata.yaml`. The 17th-edition CSL stays
-  for in-progress manuscripts and journals still on 17e (set per-document via
-  `csl:` frontmatter)
-- `writing/pandoc/defaults.yaml` — single source of truth for the export
-  pipeline (pandoc-crossref → citeproc), used by both the nvim `<leader>p`
-  mappings and `mdexport`. CSL deliberately excluded: verified empirically
-  that defaults-file `csl` (both top-level and `metadata:`) overrides document
-  frontmatter, which would silently re-style pinned manuscripts
-- `mdarchive` fish function — extracts every URL from markdown files (lychee
-  --dump) and snapshots each to the Wayback Machine via `waybackup`; cite the
-  archive URL alongside the original to beat link rot
-- `mdimport` fish function — `pandoc --track-changes` docx → markdown for
-  round-tripping editor/colleague revisions; extracts embedded media
-- `git wdiff` alias + `gwd` abbr — `diff --word-diff=color`, word-level diffs
-  for manuscript revision (verified delta passes word-diff through cleanly)
-- `note` snippet — pandoc inline footnote `^[…]`, self-numbering (no `[^n]`
-  bookkeeping), the low-friction form for Chicago notes style
-- nvim `<leader>fo` ("Open citation in Zotero") — jumps from the `@citekey`
-  under the cursor to its Zotero item via `zotero://select`; companion to the
-  `<leader>fc` telescope-bibtex citekey-insert binding
-
----
-
-## 2026-06-10 — future-proofing audit: post-quantum SSH, path fixes, bootstrap hardening
-
-### Changed (Vale)
-- Global Vale config trimmed to `Vale, proselint` for scholarly prose.
-  Measured on a typical history paragraph: 23 alerts → 1, with the survivor
-  the only actionable one. write-good (E-Prime, passive voice), Readability
-  (grade-level caps), and alex (flags period terminology and primary-source
-  quotes — "master" in slavery scholarship, "remains") moved to per-project
-  opt-in; all four packages stay synced. `Vale.Spelling = NO` — vim spell
-  owns spelling, harper_ls owns grammar
-- `vale-project.ini` template documents the opt-in packages and disables
-  `Vale.Spelling` to match
-
-### Added
-- Markdown/academic-writing fish functions and aliases:
-  - `mdexport <fmt> <files…>` — batch Pandoc export (crossref + citeproc +
-    sibling metadata.yaml); shell mirror of the nvim `<leader>p` mappings
-  - `words <files…>` — prose word count via `pandoc -t plain` (excludes
-    frontmatter, markdown syntax, URLs — what a word limit actually counts)
-  - `cite` — fzf picker over the Zotero Better BibTeX export; copies
-    `@citekey`; warns when the .bib is >30 days stale
-  - `linkcheck [files…]` — lychee wrapper (the Brewfile had lychee but
-    nothing used it)
-  - `valeinit` — scaffold per-project `.vale.ini` from the
-    `writing/vale/vale-project.ini` template (previously orphaned)
-  - `pdfpages` / `pdfmerge` — qpdf wrappers for page extraction and merging
-  - aliases: `rgmd` (`rg -t md`), `drafts` (markdown touched this week),
-    `marked` (open in Marked 2)
-- Markdown/Pandoc writing upgrades in nvim:
-  - `<leader>pd` — Pandoc export to docx (the `reference.docx` workflow had
-    no keybinding); `<leader>pv` — open in Marked 2 for live preview
-  - Pandoc exports now run async via `vim.system` — no more frozen editor
-    during LaTeX builds; notification on success/failure; buffer auto-written
-    before export
-  - `telescope-bibtex.nvim` (`<leader>fc`) — fuzzy-find the Zotero
-    Better BibTeX export and insert a pandoc `@citekey`
-  - `harper_ls` grammar LSP for markdown (brew `harper`); SpellCheck linter
-    disabled (vim spell covers it), vale still owns style
-  - pandoc-crossref snippets (`fig`, `tbl`, `eq`, `sec`) in
-    `writing/nvim/snippets/markdown.json`, served by blink's snippets source
-  - Word count in lualine for markdown/text buffers (selection-aware)
-
-### Changed
-- Completion migrated `nvim-cmp` → `blink.cmp`: nvim-cmp is feature-frozen
-  upstream; blink has lsp/buffer/path sources and `vim.snippet` support built
-  in, so `cmp-buffer`, `cmp-path`, and `cmp-nvim-lsp` are dropped (4 plugins
-  → 1). LSP capabilities now come from `blink.cmp.get_lsp_capabilities()`.
-  Enter-confirms-only-selected behavior preserved via the `enter` keymap
-  preset with `preselect = false`
 - SSH key exchange now prefers hybrid post-quantum algorithms
-  (`mlkem768x25519-sha256`, `sntrup761x25519-sha512`) ahead of curve25519 —
-  the previous pinned list silently excluded the OpenSSH 9.x/10.x defaults.
-  Verified live against GitHub (negotiates `sntrup761x25519-sha512`)
-- SSH ciphers reordered AES-256-GCM first: unaffected by Terrapin
-  (CVE-2023-48795), so security no longer leans on the strict-KEX
-  countermeasure; ChaCha20-Poly1305 kept as fallback for servers without
-  AES hardware acceleration
-- tmux Nord plugin renamed `arcticicestudio/nord-tmux` → `nordtheme/tmux`
-  (upstream org migration; old name only worked via GitHub redirect)
-- `writing/neomutt/notmuch-config` is now a `__HOME__` template;
-  `make neomutt` substitutes the home path like `make vale` does, so only
-  `name`/`primary_email` need hand-editing
-- `make install` now depends on `apps` first, so a fresh machine gets
-  Homebrew + packages before targets that need them (vale, tpm clone)
-
-### Fixed
-- `writing/pandoc/metadata.yaml` pointed at the removed `templates/`
-  directory; CSL and reference-doc paths now resolve to `writing/pandoc/`
-- `bin/ipic` emitted `<meta charset=”utf-8”>` with curly quotes — invalid
-  attribute, breaking the UTF-8 rendering the script exists to provide
-- `make mailsync` failed on a fresh account: `~/Library/LaunchAgents` was
-  never created (only `brewauto` made it)
-- `make vale` now fails fast with a clear error when vale isn't installed
-- fish startup no longer errors on machines without Homebrew/fzf/zoxide —
-  the init-cache blocks are guarded by `test -x`
-- `git/gitup-bookmarks` used an absolute `/Users/jaredeberle` path for
-  micro-theme; now `~` like the other entries
-- Brewfile tmux comment pointed at the old `general/tmux.conf` location
+  (`mlkem768x25519-sha256`, `sntrup761x25519-sha512`) — the old pinned list
+  silently excluded current OpenSSH defaults. Ciphers reordered AES-256-GCM
+  first (unaffected by the Terrapin downgrade attack, CVE-2023-48795).
+- Global Vale config trimmed to `Vale, proselint` — measured 23 alerts down
+  to 1 actionable one on a sample paragraph; the other three packages (write-
+  good, Readability, alex) moved to per-project opt-in.
+- Added the markdown/academic-writing function set: `mdexport`, `words`,
+  `cite`, `linkcheck`, `valeinit`, `pdfpages`/`pdfmerge`; nvim gained async
+  Pandoc export (`vim.system`, no more editor freeze during LaTeX builds),
+  `telescope-bibtex.nvim`, and `harper_ls` for grammar.
+- Completion migrated `nvim-cmp` → `blink.cmp` (upstream-frozen vs.
+  actively maintained; 4 plugins collapsed to 1).
+- **Fixed**: `bin/ipic` was emitting curly quotes in a `<meta charset>` tag
+  (invalid attribute, broke the UTF-8 rendering the script exists to
+  provide); `make mailsync` failed on a fresh account (`LaunchAgents` dir
+  never created); fish startup no longer errors without Homebrew/fzf/zoxide.
 
 ---
 
 ## 2026-06-09 — mailbox.org migration, mbsync + notmuch, background sync
 
-### Added
-- `bin/mailsync.sh` — runs `mbsync -a && notmuch new` with timestamped logging
-  to `~/.local/mail_sync_logs.txt`; invoked by launchd
-- `writing/neomutt/org.jaredeberle.mailsync.plist` — LaunchAgent template;
-  `make mailsync` installs it to sync mail every 5 minutes
-- `writing/neomutt/mbsyncrc` — mbsync config template for mailbox.org →
-  `~/.mail/mailbox/` Maildir sync; uses Keychain `PassCmd`
-- `writing/neomutt/notmuch-config` — notmuch config template; indexes
-  `~/.mail` for full-text search
-- `mailsync` fish function (`shell/fish/functions/mailsync.fish`) — runs
-  `mbsync -a && notmuch new` on demand
-- `isync` and `notmuch` added to Brewfile
-- `make mailsync` Makefile target — installs and bootstraps the launchd agent
-- `A` keybinding (index + pager) — archive current message to `=Archive`
-- `Ctrl-F` keybinding (index) — notmuch `vfolder-from-query` search prompt
-- `make neomutt` now creates `~/.mail/mailbox/`, scaffolds `~/.mbsyncrc` and
-  `~/.notmuch-config` from templates on first run
-- `make doctor` checks for `~/.mbsyncrc`, `~/.notmuch-config`, and the
-  mailsync LaunchAgent plist
+Migrated mail from iCloud to mailbox.org (via `imapsync`), replacing Apple
+Mail with NeoMutt + local Maildir sync.
 
-### Changed
-- Mail store moved from `~/Mail` to `~/.mail`
-- `accounts/example.rc` rewritten for mailbox.org + local Maildir: no IMAP
-  credentials (mbsync handles sync), SMTP only via mailbox.org, notmuch virtual
-  mailboxes in sidebar, `unset record` (mailbox.org saves sent mail server-side)
-- Keychain password commands corrected for Fish shell: `read -s -P` instead of
-  bash `read -sp`; two separate lines instead of `&&` chain
-- Keychain entries use custom service names (`mbox-imap`, `mbox-smtp`) to avoid
-  conflicts with Apple Mail OAuth tokens stored under the actual server hostnames
-- `smtp_pass` backtick wrapped in double quotes to handle passwords containing
-  `%` characters (NeoMutt's config parser misinterprets bare `%` tokens)
-- mbsyncrc: `SSLType` → `TLSType` (deprecated in isync 1.5+); added
-  `AuthMechs LOGIN` for macOS SASL compatibility
-- notmuch `database.path` must be an absolute path — notmuch does not expand `~`
-- README: NeoMutt section rewritten to document the full mbsync + notmuch +
-  launchd stack; NeoMutt added to Apps TOC; `mailsync` added to Makefile Options
-  and Launchd tables; `mailsync.sh` added to Bin table
-
-### Migration notes
-- `imapsync` used to migrate iCloud mail to mailbox.org before switching
-- DNS records configured for `jaredeberle.org`: MX (mxext1/2/3.mailbox.org),
-  SPF (`include:mailbox.org`), four DKIM CNAME keys (MBO0001–MBO0004),
-  MTA-STS (enforce mode), TLS-RPT
+- `bin/mailsync.sh` (`mbsync -a && notmuch new`, timestamped logging) run
+  every 5 minutes via a new `make mailsync` LaunchAgent.
+- `make neomutt` scaffolds `~/.mbsyncrc`/`~/.notmuch-config` from templates
+  on first run; `make doctor` checks both plus the LaunchAgent.
+- Assorted mbsync/notmuch correctness fixes: `SSLType` → `TLSType`, Keychain
+  service names disambiguated from Apple Mail's OAuth entries,
+  `%`-containing passwords quoted, notmuch's `database.path` needs an
+  absolute path (no `~` expansion).
 
 ---
 
-## 2026-06-08 — NeoMutt integration (refined)
+## 2026-06-08 — NeoMutt integration; repo restructure; Betterfox; macOS defaults
 
-### Changed
-- `colors.rc` — fixed incorrect Nord ANSI palette mapping (color1=Aurora red,
-  not Polar Night); indicator is now Snow Storm on Polar Night 3 (readable);
-  status bar is Frost cyan on Polar Night 1
-- `mutt` alias moved from a standalone function file to `conf.d/aliases.fish`
-  alongside `alias vim 'nvim'` where it belongs
-- `mailcap` — HTML emails now render inline via macOS `textutil` (`auto_view`);
-  press `\Ch` to open in Firefox instead
-- `neomuttrc` — added `auto_view text/html`, `alternative_order` (prefer plain
-  text), clean `status_format`/`pager_format` with left/right layout, removed
-  spurious `[RO]` flag, rebound `sidebar-open` from `Ctrl-O` to `B`
-- `accounts/example.rc` — updated to document Apple Mail Keychain conflict
-  (Apple Mail stores iCloud OAuth tokens under the same server keys, causing
-  `security find-internet-password` to return a hex token); direct password
-  with `chmod 600` documented as the reliable approach; `%40` encoding for `@`
-  in `smtp_url`; iCloud-specific settings added
+The single biggest day of infrastructure work in the repo's history.
 
-## 2026-06-08 — NeoMutt integration
-
-### Added
-- `writing/neomutt/` — NeoMutt configuration:
-  - `neomuttrc` — core config: threading, vim-style keybindings, sidebar,
-    index/pager layout, nvim as editor
-  - `gpg.rc` — GPGME-backed PGP using the same key as `make security`;
-    auto-encrypt/sign replies, verify all incoming signatures
-  - `colors.rc` — dark color scheme matching the Ghostty/nvim aesthetic
-  - `mailcap` — content handlers (HTML→Firefox, PDFs/images via macOS `open`)
-  - `accounts/example.rc` — account template using macOS Keychain for passwords
-- `make neomutt` — symlinks config files into `~/.config/neomutt/`, creates
-  cache dirs, stubs `accounts/local.rc` on first run with a reminder
-- `neomutt` added to `make install` dependency chain
-- `make doctor` check for neomuttrc symlink
-- `mutt` alias for `neomutt` in `conf.d/aliases.fish`
-- `neomutt` added to `homebrew/Brewfile` (alphabetical order)
-- README: NeoMutt subsection under Apps; Makefile Options table updated;
-  Quick Start per-app table updated
+- **NeoMutt**: full config (`neomuttrc`, GPGME-backed `gpg.rc`, Nord
+  `colors.rc`, `mailcap` with macOS `textutil`/Firefox handlers); `make
+  neomutt` symlinks it all and stubs an account file with a reminder.
+- **Repo restructure**: six top-level directories replacing the old ad hoc
+  layout (`fish/`+`ghostty/`→`shell/`; `general/`→`security/`+
+  `writing/vale/`; `templates/`→`writing/pandoc/`; `nvim/`→`writing/nvim/`;
+  `launchd/`→`homebrew/`). Makefile targets collapsed 12→9 to match.
+- **`make macos`**: keyboard repeat, Finder, Dock, screenshot, and
+  smart-quote/dash defaults, applied idempotently.
+- **Betterfox**: tracked as a git submodule; `make firefox` concatenates it
+  with personal `user-overrides.js` into the active profile's `user.js`.
+- **`make chsh`**: sets fish as the login shell via `dscl` (idempotent,
+  sudo).
+- Fixed the Homebrew update log so the newest run prepends to the top of
+  the file instead of appending to the bottom.
 
 ---
 
-## 2026-06-08 — Prepend brew update logs; README/Makefile doc update
+## 2026-06-06 — Nord theme everywhere; SSH/GPG hardening round 1
 
-### Changed
-- `bin/homebrewupdate.sh`: captures all output to a temp file and prepends it
-  to `~/.local/brew_update_logs.txt` so the newest run always appears at the
-  top of the file instead of at the bottom
-- `homebrew/org.jaredeberle.brewupdate.plist`: removed `StandardOutPath` and
-  `StandardErrorPath` — the script now owns its own logging
-- README Scripting → Launchd and `make brewauto` message updated to reflect
-  newest-run-first ordering
-
----
-
-## 2026-06-08 — README reorganization, check system, stale artifact cleanup
-
-### Added
-- `make clean`: removes stale `fish/` and `general/` directories left over
-  from the 2026-06-08 repo restructure on machines that had the repo checked
-  out beforehand — git pull does not remove untracked/gitignored directories
-- `make dots` fish function: run any dotfiles make target from any directory
-- README reorganized into: Quick Start → Check System → Makefile Options →
-  Apps (Ghostty, Fish, Neovim, tmux, Git) → Prose and Pandoc →
-  Scripting (Bin, Launchd) → Security → Repository Layout → Credits
-- Check System is now a dedicated README section covering `doctor`,
-  `macos-check`, `brew-check`, `tools-check`, and `clean`
-
-### Fixed
-- Quick Start numbered steps now include `make chsh` (was only in the
-  per-app table, missing from the sequence)
-- Makefile Options `vale` row now mentions `vale sync`
-- Prose and Pandoc section: corrected stale claim that "No `vale sync` is
-  needed" and "built-in Vale style only" — the config lists four external
-  packages and `make vale` always runs `vale sync`
-- Security section: `gpg-agent.conf` corrected to `gpg-agent.conf.tmpl`
-- `.gitignore`: removed stale `general/gpg-agent.conf` entry (path no longer
-  exists after `general/` was renamed to `security/`)
+- Switched every themed tool (Ghostty, Neovim, tmux, bat, delta, fzf) from
+  Catppuccin Mocha to Nord; replaced the Starship prompt with a native
+  `fish_prompt` (identical output, no external dependency).
+- Trimmed the Brewfile: `mole` added; nine unused packages removed
+  (`ffmpeg`, `exiftool`, `git-lfs`, `gibo`, `wget`, `rbenv`, `pipx`, `pyenv`,
+  `starship`, among others) plus Homebrew telemetry/hint env vars disabled.
+- **SSH**: dedicated key per host (`id_github`, `id_codeberg`) with a
+  port-443 fallback host for networks blocking port 22.
+- **GPG**: commit signing switched from SSH back to GPG; `gpg-master-import`/
+  `gpg-master-done` functions manage the offline-master-key → per-machine-
+  subkey workflow; `no-allow-loopback-pinentry` requires physical pinentry.
 
 ---
 
-## 2026-06-08 — New machine automation, Betterfox submodule, macOS defaults
+## 2026-06-01 — Audit fixes; Go/MacTeX removal; Vale packages
 
-### Added
-- `make macos`: writes sensible macOS system defaults — keyboard repeat
-  (`ApplePressAndHoldEnabled`, `KeyRepeat 2`, `InitialKeyRepeat 15`), Finder
-  (extensions, path bar, status bar, folder sort, current-folder search, no
-  extension-change warning, no `.DS_Store` on network/USB), Dock (autohide, no
-  recent apps, minimize-to-app), screenshots (saved to `~/Desktop/Screenshots`,
-  no shadow), and system (expanded save/print panels, save to disk not iCloud,
-  no smart quotes/dashes, immediate screensaver password); restarts Finder, Dock,
-  and SystemUIServer to apply immediately
-- `make latex`: installs the `tlmgr` packages required for PDF export via BasicTeX;
-  guards against running when `tlmgr` is not found
-- `make chsh`: adds fish to `/etc/shells` and sets it as the login shell via `dscl`
-  (idempotent; requires sudo)
-- `make install`: updated post-run message to note `make firefox` and `make latex`
-- Betterfox tracked as a git submodule at `security/betterfox/`; `make firefox` now
-  concatenates `security/betterfox/user.js` + `security/user-overrides.js` into a
-  single `user.js` written to the active Firefox profile (Firefox only reads `user.js`
-  natively — `user-overrides.js` is never edited by upstream)
-- `make betterfox-update`: pulls the latest Betterfox commit into the submodule
-- `security/user-overrides.js`: personal Firefox prefs extracted from the old
-  `security/user.js` — Smoothfox scroll tuning, DoH/NextDNS, shutdown sanitizing,
-  service worker and JIT hardening, captive portal disable, built-in VPN disable
-
-### Changed
-- Quick start clone command updated to `--recurse-submodules` (required for Betterfox)
-- `make apps`: Homebrew auto-install means the manual Homebrew install step is removed
-  from the quick start
-- README quick start updated to reflect full new-machine sequence:
-  `apps → install → macos → chsh → firefox → latex`
-
-### Removed
-- `security/user.js`: replaced by Betterfox submodule + `user-overrides.js`
-
----
-
-## 2026-06-08 — Repo restructure, bat and lazygit configs, Firefox user.js wiring
-
-### Added
-- `shell/bat/config`: Nord theme, `numbers,changes,header-filename` style, syntax
-  mappings for `.fish`, `Brewfile`, and `.env*` files
-- `git/lazygit.yml`: Nord theme, delta pager integration (`--paging=never`), nvim
-  editor, NerdFonts v3 icons
-- `make firefox`: detects the default Firefox profile via `installs.ini` (profile
-  string varies per machine) and symlinks `security/user.js` into it; `make doctor`
-  checks the symlink when Firefox has been launched
-
-### Changed
-- **Repo layout** reorganised into six top-level directories:
-  - `fish/`, `ghostty/` → `shell/` (also absorbs `tmux.conf` from `general/` and new `bat/`)
-  - `general/` → `security/` (SSH, GPG) + `writing/vale/` (Vale configs)
-  - `templates/` → `writing/pandoc/` (Pandoc templates, CSL, reference.docx)
-  - `nvim/` → `writing/nvim/`
-  - `launchd/` → `homebrew/` (alongside Brewfile)
-  - `lazygit/config.yml` → `git/lazygit.yml` (flattened into `git/`)
-  - `templates/user.js` → `security/user.js`
-- **Makefile** targets reduced from 12 → 9:
-  - `git` absorbs lazygit symlinking
-  - `shell` replaces `fish`, `ghostty`, `tmux` (adds `bat`)
-  - `auth` renamed to `security`
-  - `firefox` added (new)
-  - Individual `ghostty`, `tmux`, `fish` targets removed
-- `make security`: `gpg-agent.conf` now written directly to `~/.gnupg/gpg-agent.conf`
-  via `sed` substitution (same pattern as `make vale`) — no intermediate generated
-  file in the repo, no symlink for that file
-- `writing/vale/vale.ini`: fixed stale comment that said `vale sync` was not required
-  (it is — four external packages are listed)
-- `security/gpg-agent.conf.tmpl`: updated comment to reference `make security` and
-  correct destination path
-
----
-
-## 2026-06-06 — GPG hardening, bat pager, Tor Browser, starship.toml removal
-
-### Added
-- `general/common.conf` tracked in dotfiles (`use-keyboxd`); `make auth` symlinks it to `~/.gnupg/common.conf`; `make doctor` checks the symlink
-- `gpg.conf`: `import-options import-minimal` and `export-options export-minimal` — strip subkeys/sigs on import/export
-- `gpg-agent.conf`: `no-allow-loopback-pinentry` — require physical pinentry, block programmatic passphrase injection
-- Tor Browser added to Brewfile
-
-### Changed
-- `PAGER` switched from `less` to `bat --style=plain` in `env.fish` — syntax-highlighted paging with clean output
-- `dirmngr.conf`: replaced `disable-ipv6` with `disable-ldap` — disables legacy LDAP protocol instead of IPv6
-
-### Removed
-- `gpg.conf`: removed deprecated `use-agent` and `sig-keyserver-url` directives
-- `fish/starship.toml` — file deleted; Starship is fully gone from the repo (already removed from config.fish and Makefile in earlier commits)
-
----
-
-## 2026-06-06 — Brewfile cleanup, Homebrew privacy, mole
-
-### Added
-- `mole` to Brewfile — deep clean and optimize macOS
-- `HOMEBREW_NO_ENV_HINTS` and `HOMEBREW_NO_ANALYTICS` to `env.fish` — suppress
-  hints and disable Homebrew telemetry
-
-### Removed
-- `ffmpeg`, `exiftool`, `git-lfs`, `gibo`, `ocrmypdf`, `wget`, `rbenv`, `pipx`,
-  `r-app`, `pyenv`, `gh`, `grc`, `spark`, `starship` from Brewfile — none
-  actively used in dotfiles or any project
-- Improved Brewfile comments to note where each tool is used
-
----
-
-## 2026-06-06 — Nord theme, native fish prompt, dependency cleanup
-
-### Added
-- Native `fish_prompt` function replacing Starship — identical output (directory,
-  git branch/status, prompt character) with no external dependency
-- `tmux` alias: `tmux new-session -A -s main` to avoid "no current session" error
-
-### Changed
-- Theme switched from Catppuccin Mocha to Nord across all tools: Ghostty, Neovim
-  (`gbprod/nord.nvim`), lualine, tmux (`arcticicestudio/nord-tmux`), bat, delta, fzf
-- Neovim: replaced `catppuccin/nvim` with `gbprod/nord.nvim` (actively maintained,
-  full treesitter and LSP semantic token support)
-- Tmux: replaced `catppuccin/tmux` with `arcticicestudio/nord-tmux`
-- `ghostty/config`: `shell-integration` changed from `detect` to `fish`
-- `fish_prompt`: `--dir-length 0` to show full directory names without abbreviation
-
-### Removed
-- Starship from Brewfile, `config.fish`, Makefile, and doctor target
-- `grc` and `spark` from Brewfile — not referenced anywhere in the config
-
----
-
-## 2026-06-06 — SSH hardening, GPG commit signing, key management
-
-### Added
-- SSH: dedicated key per host (`id_github`, `id_codeberg`) with explicit `IdentityFile` in each `Host` block
-- SSH: `github-443` fallback host alias (`ssh.github.com:443`) for networks that block port 22
-- `gpg-master-import` fish function: imports offline master key from USB with mount check
-- `gpg-master-done` fish function: exports machine-specific subkeys, wipes keyring, reimports correctly; detects machine via `scutil --get LocalHostName` (Leia/Ahsoka)
-- `env.fish`: `GPG_TTY` set to fix pinentry prompts in terminal
-- Git abbreviations: `glo` (full graph log), `gund` (undo), `gus` (unstage), `glst` (last commit)
-- `pubkey-github` and `pubkey-codeberg` aliases replacing the old `pubkey`
-
-### Changed
-- Git signing switched from SSH to GPG (`gpg.format = openpgp`); signing key updated to GPG fingerprint
-- `gc` abbreviation: removed redundant `-S` flag (signing handled globally by gitconfig)
-- `gpg.conf`: updated stale comment that incorrectly stated git signing used SSH
-- `ghostty/config`: `shell-integration` changed from `detect` to `fish`
-- `newdoc`: author pulled from `git config user.name` instead of hardcoded string
-- `aliases.fish`: `update-theme` uses `$HOME` instead of hardcoded absolute path
-- Forgejo CI workflow: consolidated `apt-get` installs into one step; added comment noting Codeberg has no runners
-- gitconfig: removed redundant aliases (`st`, `co`, `cb`, `br`, `ci`) covered by fish abbreviations
-
-### Removed
-- `git/allowed_signers` — no longer needed after switching to GPG signing
-- `buo/cask-upgrade` tap from Brewfile — `brew upgrade --cask` covers this natively
-- SSH `ControlMaster`/`ControlPersist`/`ControlPath` from GitHub host (unsupported by GitHub)
-- Fallback `IdentityFile ~/.ssh/id_ed25519` from `Host *`
-
----
-
-## 2026-06-01 — Vale: add prose linting packages
-
-### Added
-- `general/vale.ini`: added proselint, write-good, Readability, and alex as Vale packages and base styles
-- `Makefile` (`vale` target): now runs `vale sync` automatically after writing `~/.vale.ini`
-
----
-
-## 2026-06-01 — Audit fixes: hardening, guards, documentation
-
-### Added
-- Brewfile: `bash`, `kagi for safari`, `StopTheMadness`, `StopTheScript`, `Vinegar`
-- `cdf`, `pman`, `o`: macOS guard — print clear error and return 1 on Linux
-- `aliases.fish`: macOS-only aliases (`network`, `showfiles`, `hidefiles`, `flushdns`, `pubkey`, `cb`, `cv`) wrapped in `if test (uname) = Darwin`
-- `cdf`: error message when no Finder window is open
-- `make apps`: auto-installs Homebrew via the official script if `brew` is not found
-- `make git`: warns if `delta` is not installed before symlinks are written
-- `make brewauto`: runs `plutil -lint` on both generated plists before loading them
-- README: "Verify your setup" block with `make doctor` and spot-check commands
-- README: lazy-lock update instructions (`:Lazy update` + commit)
-- README: templates section expanded with copy commands and CSL path explanation
-
-### Changed
-- `gpg-agent.conf` renamed to `gpg-agent.conf.tmpl`; `make auth` now generates the resolved file into the dotfiles dir and symlinks it (`~/.gnupg/gpg-agent.conf` → `general/gpg-agent.conf`); generated file is gitignored
-- `make doctor`: gpg-agent check upgraded from `-f` (file exists) to `-L` (is a symlink)
-- `git/gitconfig`: `signingkey` changed from `~/.ssh/id_ed25519.pub` to absolute path to guarantee expansion across all Git versions
-- `launchd/org.jaredeberle.brewupdate.plist`: removed redundant `EnvironmentVariables`/`PATH` block — `homebrewupdate.sh` resolves `brew` itself
-- `newdoc`: CSL path hardcoded to `$HOME/.dotfiles/templates/chicago-notes-bibliography-17th-edition.csl`
-- README: Git section notes `delta` must be installed before `make git`
-
-## 2026-06-01 — Go removal; MacTeX → BasicTeX; Neovim cleanup; SSH/GPG hardening
-
-### Changed
-- Neovim: removed `go` treesitter parser and FileType pattern (`editor.lua`)
-- Neovim: `nvim-cmp` `<CR>` confirm changed to `select = false` (explicit selection only)
-- Neovim: Twilight now activates automatically with ZenMode (`writing.lua`)
-- Neovim: `mini.icons` wired as lualine dependency for file-type icons (`ui.lua`)
-- SSH: moved `UseKeychain`, `AddKeysToAgent`, and multiplexing options from
-  `Host *` to `Host codeberg` only; multiplexing added to codeberg for future hosts
-- GPG: removed unused `default-cache-ttl-ssh` / `max-cache-ttl-ssh` from
-  `gpg-agent.conf` (gpg-agent is not brokering SSH)
-
-## 2026-06-01 — Go removal; MacTeX → BasicTeX; Brewfile housekeeping
-
-### Changed
-- Removed Go toolchain from Brewfile (`go`, `golang-migrate`, `gopls`) and from
-  Neovim LSP config (`gopls` wired out of `lsp.lua`, `go` filetype removed)
-- Replaced `mactex` cask with `basictex` (~100 MB vs 17 GB); added `tlmgr install`
-  command to README and Quick Start table for the packages required by the CV and
-  syllabus templates (`sourcesanspro` → `sourcesans` is the correct TeX Live name)
-
-### Added
-- Brewfile: `mas "dropover"` (id:1355679052) and `mas "folder quick look"`
-  (id:6753110395) to match installed App Store apps
+- Go toolchain removed entirely (Brewfile + Neovim LSP/treesitter) — no
+  project in active use needed it.
+- `mactex` (17 GB) replaced with `basictex` (~100 MB) plus the specific
+  `tlmgr` packages the CV/syllabus templates need.
+- Vale gained `proselint`/`write-good`/`Readability`/`alex` as its package
+  set (previously running with none), with `vale sync` wired into `make
+  vale`.
+- Guard/hardening pass: macOS-only functions (`cdf`, `pman`, `o`, and
+  several aliases) now check `uname` and fail cleanly on Linux; `make
+  brewauto` lints its generated plists before loading them; `gpg-agent.conf`
+  became a `.tmpl` generated per-machine instead of a static tracked file.
 
 ---
 
 ## 2026-05-31 — Improvements & forward compatibility
 
-### Added
-- `ltt` alias: `eza --tree --level=3` (one deeper than `lt`)
-- `disk` alias: `df -h`
-- `usage` alias: `du -sh -- *` (pairs with `biggest`)
-- Git abbreviations: `gpl` (pull), `gf` (fetch), `gds` (diff --staged), `grst` (restore)
-- `newdoc` fish function: bootstrap a Markdown file with Pandoc metadata template
-- `make doctor` target: verify all expected symlinks are in place
-- Forgejo Actions CI workflow (`.forgejo/workflows/lint.yml`): shellcheck, fish
-  syntax, luacheck
-- Go support: `gopls` in Brewfile, wired into `lsp.lua` and treesitter
-
-### Changed
-- `vim.loop` → `vim.uv` in `lazy.lua` (deprecation fix for Neovim 0.11+)
-- Hardcoded `/opt/homebrew` paths in `config.fish` replaced with
-  `$HOMEBREW_PREFIX` (set by `brew shellenv`); works on Apple Silicon, Intel,
-  and Linux
-- `env.fish` Homebrew bootstrap extended to cover Intel (`/usr/local`) and
-  Linux (`/home/linuxbrew`) prefixes
-- `homebrewupdate.sh` resolves the `brew` prefix at runtime rather than
-  hardcoding `/opt/homebrew`; `brew cleanup` added to match the `brewup` alias
-- `gpg.conf`: removed deprecated `keyid-format 0xlong`; `with-fingerprint`
-  alone is sufficient and future-proof
-- tmux terminal config consolidated from dual `terminal-overrides` entries into
-  a single `terminal-features` declaration (tmux 3.2+); `prefix + z` zoom
-  binding added
-- Git aliases in `aliases.fish` converted from `alias` to `abbr` so expansions
-  are visible in the buffer before pressing Enter
-- `acp` function: guard against committing when nothing is staged
-- `ipic` script: exit with a helpful message when search returns no results
-- README updated to reflect all of the above
+- `newdoc` — bootstrap a Markdown file with the Pandoc metadata template.
+- `make doctor` — first version, verifying expected symlinks.
+- Forgejo Actions CI added (shellcheck, fish syntax, luacheck) — later found
+  to never actually run (no Codeberg shared runners) and replaced (see
+  2026-06-23–24).
+- Assorted future-proofing: `vim.uv` (Neovim 0.11+ deprecation fix),
+  `$HOMEBREW_PREFIX` instead of hardcoded `/opt/homebrew`, tmux
+  `terminal-features` consolidation, git aliases converted to visible-
+  expansion `abbr`s.
 
 ---
 
 ## 2026-05-29–30 — Full rewrite: zsh → fish, unified theme
 
-The repo was significantly restructured. Everything zsh-related was removed and
-replaced with a from-scratch fish configuration.
+The repo's biggest single rewrite: every zsh file removed and replaced with
+fish from scratch, alongside a full Neovim rebuild.
 
-### Added
-- Fish shell config (`fish/`): `config.fish`, `conf.d/` (env, options, aliases),
-  `functions/` (acp, bb, cdf, fn, fuck, mkd, o, pman, wordfrequency)
-- Starship prompt (`fish/starship.toml`): minimal directory/git/character format
-  in Catppuccin Mocha colors
-- fzf, zoxide, and starship initializations cached to disk; cache invalidated
-  automatically when the binary is newer than the cache file
-- Neovim rewritten from scratch: `lazy.nvim`, Catppuccin Mocha, Telescope,
-  nvim-treesitter (main branch), nvim-cmp, nvim-lspconfig (`lua_ls`, `pyright`,
-  `bashls`), conform.nvim, nvim-lint (vale), render-markdown, zen-mode, twilight,
-  mini.nvim, oil.nvim, gitsigns, lualine
-- Pandoc export keymaps (`<leader>ph` HTML, `<leader>pp` PDF) with automatic
-  `metadata.yaml` detection and `pandoc-crossref` + `--citeproc` pipeline
-- Vale prose linting wired into nvim-lint; `make vale` installs global config
-- `templates/`: `metadata.yaml` (Pandoc metadata block), `vale.ini` (per-project
-  config), Chicago Notes-Bibliography 17th edition CSL file
-- Ghostty terminal config (`ghostty/config`): Catppuccin Mocha, JetBrainsMono
-  Nerd Font, `macos-option-as-alt` for tmux `M-h`/`M-l`
-- tmux config (`general/tmux.conf`): `C-a` prefix, vim pane navigation, TPM,
-  Catppuccin Mocha status line, clipboard integration via `pbcopy`
-- SSH hardening: curve25519/chacha20 only, `ControlMaster` multiplexing,
-  `IdentitiesOnly`, no agent/X11 forwarding, `codeberg` host shortcut
-- Launchd agents for automated weekly Homebrew updates and monthly log rotation
-  (`make brewauto`)
-- Brewfile reorganized and fully annotated
-- README rewritten with full setup guide, keybinding tables, and per-section docs
-
-### Changed
-- Signing switched from GPG back to SSH (`gpg.format = ssh`)
-- All configs unified on Catppuccin Mocha (Ghostty, Neovim, tmux, bat, fzf)
-
-### Removed
-- All zsh config files (zshrc, zshenv, zprofile, aliases, functions, plugins)
-- zsh4humans, Zim, Powerlevel10k
-- Old Neovim config (LazyVim-based)
+- Fish config from scratch (`config.fish`, `conf.d/`, `functions/`); Starship
+  prompt in Catppuccin Mocha; fzf/zoxide/starship init cached to disk.
+- Neovim rebuilt on `lazy.nvim`: Catppuccin, Telescope, nvim-treesitter
+  (main branch), nvim-cmp, nvim-lspconfig, conform.nvim, nvim-lint (Vale),
+  render-markdown, zen-mode/twilight, mini.nvim, oil.nvim, gitsigns,
+  lualine.
+- Pandoc export keymaps with automatic `metadata.yaml` detection;
+  `templates/` added (metadata, per-project Vale config, CMOS 17e CSL).
+- Ghostty + tmux configs added, both Catppuccin Mocha; SSH hardened
+  (curve25519/chacha20 only, multiplexing, no agent/X11 forwarding).
+- Weekly Homebrew update + monthly log-rotation LaunchAgents.
+- Removed: all zsh config, zsh4humans, Zim, Powerlevel10k, the old
+  LazyVim-based Neovim config.
 
 ---
 
