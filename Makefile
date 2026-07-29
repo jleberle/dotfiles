@@ -296,12 +296,18 @@ resticcheck :
 	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
 decksync :
+	@echo "Building DeckSync.app (thin wrapper so folder access is scoped to one app, not /bin/bash)"
+	mkdir -p $(HOME)/Applications
+	osacompile -o $(HOME)/Applications/DeckSync.app $(DOTFILES)/keynote/DeckSync.applescript
 	@echo "Installing Keynote deck -> Slides flash drive sync LaunchAgent"
 	mkdir -p $(LAUNCH_AGENTS)
 	$(call install_agent,$(DOTFILES)/keynote/org.jaredeberle.decksync.plist)
 	@echo "Fires whenever a volume is mounted; no-op unless it's the 'R2-D2' drive."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.decksync"
 	@echo "Logs: ~/Library/Logs/deck-sync.log (script) and deck-sync-launchd.log (launchd)"
+	@echo "NOTE: osacompile regenerates the app's signature every rebuild, which resets"
+	@echo "its TCC grants -- if DeckSync.app was rebuilt just now, expect two one-time"
+	@echo "prompts on the next run (Documents folder + removable volumes access)."
 update :
 	@echo "Updating Neovim plugins (Lazy sync)..."
 	@if command -v nvim >/dev/null 2>&1; then nvim --headless "+Lazy! sync" +qa; \

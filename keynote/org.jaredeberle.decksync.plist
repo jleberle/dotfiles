@@ -11,7 +11,27 @@
      auto-discovered from that folder (see sync_slides_drive.sh's own
      header comment); there's no per-course list to maintain here. See
      ~/Documents/Classes/Slides/theme-system/README.txt for the full
-     normalization workflow this supports. -->
+     normalization workflow this supports.
+
+     ProgramArguments launches ~/Applications/DeckSync.app's own compiled
+     binary directly, NOT /bin/bash -- ~/Documents and the drive itself
+     (a removable volume) are both under macOS's TCC folder protections,
+     so a background agent touching them needs to be a permission-checked
+     app, not a bare interpreter. Granting broad access to /bin/bash
+     itself would hand that same access to every shell script on the
+     system; DeckSync.app is a thin `do shell script` wrapper around this
+     exact script (source: keynote/DeckSync.applescript in this repo)
+     that exists so the grant is scoped to just this one app instead.
+     `do shell script` is one of the patterns TCC attributes to the
+     calling app rather than to /bin/sh, which is what makes the scoping
+     work. In practice this surfaced as two one-time "DeckSync would like
+     to access files in your Documents folder / on a removable volume"
+     prompts (confirmed via `launchctl kickstart`, the same invocation
+     WatchPaths uses) -- narrower than Full Disk Access, and sufficient,
+     since those are the only two locations this script ever touches.
+     If DeckSync.app is ever rebuilt, expect both prompts to reappear --
+     TCC grants are tied to the app's signature, which osacompile
+     regenerates on every build. -->
 <plist version="1.0">
 <dict>
     <key>Label</key>
@@ -19,8 +39,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/bin/bash</string>
-        <string>__HOME__/Documents/Classes/Slides/theme-system/sync_slides_drive.sh</string>
+        <string>__HOME__/Applications/DeckSync.app/Contents/MacOS/applet</string>
     </array>
 
     <key>WatchPaths</key>
