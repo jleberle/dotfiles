@@ -163,6 +163,7 @@ documented in [Writing](writing.md#writing-functions-and-aliases-fish).)
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
+| `csvsort [dir] [--header] [--force]` | Sort every unsorted CSV in a directory by the **last word of field 1** (surname order, case-insensitive) into `<name>-sorted.csv`; originals untouched |
 | `depmerge <pr-number>`  | Merge a Dependabot PR locally and push to both remotes — see [Git](git.md)            |
 | `fuck`                  | Re-run the previous command under `sudo`                                              |
 | `gitup`                 | Run `gitup` over the tracked bookmarks file (`git/gitup-bookmarks`)                   |
