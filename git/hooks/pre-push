@@ -1,0 +1,8 @@
+#!/bin/sh
+# Enforce jaredeberle.org's local preflight gate before it can leave this
+# machine. Runs scripts/preflight.sh only inside that repo; every other repo
+# on this machine is a no-op. Bypass deliberately with `git push --no-verify`.
+
+if [ -f "scripts/preflight.sh" ] && [ -f "hugo.yaml" ]; then
+    scripts/preflight.sh || exit 1
+fi
