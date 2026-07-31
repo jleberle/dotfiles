@@ -26,7 +26,7 @@ is beyond my abilities to troubleshoot.
 xcode-select --install
 
 # 2. Clone this repo to the expected location (~/git/dotfiles is hard-coded in the Makefile)
-git clone --recurse-submodules https://codeberg.org/<you>/dotfiles.git ~/git/dotfiles
+git clone --recurse-submodules https://github.com/<you>/dotfiles.git ~/git/dotfiles
 cd ~/git/dotfiles
 
 # 3. Install Homebrew (if needed) and all apps, CLIs, fonts (Brewfile)
@@ -109,7 +109,7 @@ Deeper documentation lives in [`docs/`](docs/):
 |------------------------------------------|--------------------------------------------------------------------|
 | [docs/writing.md](docs/writing.md)       | Pandoc pipeline, Vale, Neovim config, writing functions, and the reading workflow (Zotero ↔ Obsidian vault ↔ website) |
 | [docs/shell.md](docs/shell.md)           | Ghostty, fish (behavior, keybindings, aliases, functions), tmux    |
-| [docs/git.md](docs/git.md)               | Git config, signing, hooks, remotes/CI mirror, Dependabot workflow |
+| [docs/git.md](docs/git.md)               | Git config, signing, hooks, remotes/CI, Dependabot workflow        |
 | [docs/mail.md](docs/mail.md)             | NeoMutt + Proton Bridge setup, keybindings, background sync        |
 | [docs/automation.md](docs/automation.md) | `bin/` scripts, launchd agents, macOS Services                     |
 | [docs/security.md](docs/security.md)     | SSH, GPG, Firefox/Betterfox, Secretive, system hardening           |

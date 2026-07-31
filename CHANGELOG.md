@@ -7,6 +7,22 @@ everything since is one entry per real milestone.
 
 ---
 
+## 2026-07-31 — GitHub is now the sole, public remote; Codeberg archived
+
+- Codeberg is archived. GitHub (`jleberle/dotfiles`) is now the sole,
+  public, canonical remote, replacing the former Codeberg-canonical /
+  private-GitHub-CI-mirror split. `origin` now carries a single fetch/push
+  URL instead of one fetch + two push URLs.
+- `depmerge <pr-number>` dropped its Codeberg sync step: it fast-forwards
+  `main` from GitHub, rebases and watches the PR's checks, then
+  fast-forwards and pushes back to GitHub only.
+- `docs/git.md`, `docs/security.md`, and the README clone command updated to
+  match. `ci.yml` needed no changes for the public repo — SHA-pinned
+  actions, `contents: read`-only permissions, and plain `pull_request` (never
+  `pull_request_target`) were already safe for fork PRs.
+
+---
+
 ## 2026-07-31 — Audit follow-ups: close lint gaps, drop TPM
 
 - `git/hooks/pre-push` joined `SHELLCHECK_FILES`, `make git`'s `chmod`, and

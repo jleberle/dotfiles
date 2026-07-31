@@ -7,7 +7,7 @@ rough edges of day-to-day git.
 
 **Signing:** GPG commit/tag signing is enabled (`gpg.format = openpgp`; the
 signing key is the GPG primary key fingerprint). The same key is registered on
-both GitHub and Codeberg, so commits show as verified on both.
+GitHub, so commits show as verified there.
 
 **Diffs:** `delta` renders diffs and logs (Nord theme). It must be installed
 before `make git` is run, or `git diff`/`git log` will fail — `make apps`
@@ -50,30 +50,25 @@ Both hooks are made executable by `make git` and are covered by
 **Object integrity:** `transfer/fetch/receive.fsckObjects = true` rejects
 malformed or malicious git objects on clone/fetch.
 
-## Remotes / CI mirror
+## Remotes / CI
 
-Codeberg stays the public canonical remote for this repo, but CI runs on a
-private GitHub mirror. In this clone, `origin` should fetch from Codeberg and
-push to both Codeberg and GitHub, so a normal `git push` updates the canonical
-repo and triggers GitHub Actions on the mirror. For a fresh clone:
+GitHub is the sole, public, canonical remote for this repo (Codeberg is
+archived). `origin` fetches from and pushes to GitHub only:
 
 ```sh
-git remote set-url origin codeberg:jle/dotfiles.git
-git remote set-url --push origin codeberg:jle/dotfiles.git
-git remote set-url --add --push origin git@github.com:jleberle/dotfiles.git
+git remote set-url origin github:jleberle/dotfiles.git
+git remote set-url --push origin github:jleberle/dotfiles.git
 ```
 
-GitHub Dependabot on the private mirror watches the SHA-pinned GitHub Actions
-workflow refs weekly and the Betterfox submodule monthly via
+GitHub Dependabot watches the SHA-pinned GitHub Actions workflow refs weekly
+and the Betterfox submodule monthly via
 [.github/dependabot.yml](../.github/dependabot.yml).
-That keeps update PRs reviewable in GitHub without changing Codeberg's role as
-the canonical public remote.
 
-**Dependabot merge workflow:** review the PR on GitHub, but merge it locally so
-Codeberg and GitHub do not diverge. The `depmerge <pr-number>` fish helper:
-switches to `main`, fast-forwards it from Codeberg, asks GitHub to rebase the PR,
-waits for its checks, fetches the resulting PR head, fast-forwards locally, and
-pushes `main` explicitly to both hosts. It refuses a dirty worktree.
+**Dependabot merge workflow:** review the PR on GitHub, then merge it locally
+with the `depmerge <pr-number>` fish helper: switches to `main`,
+fast-forwards it from GitHub, asks GitHub to rebase the PR, waits for its
+checks, fetches the resulting PR head, fast-forwards locally, and pushes
+`main` back to GitHub. It refuses a dirty worktree.
 
 **Scheduled CI:** GitHub Actions still runs the full check suite monthly (catches
 drift from upstream tool/package changes between pushes), but it no longer

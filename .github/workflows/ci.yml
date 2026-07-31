@@ -23,6 +23,7 @@ jobs:
   linux-checks:
     name: Linux checks
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
 
     steps:
       - name: Check out
@@ -77,6 +78,7 @@ jobs:
   macos-checks:
     name: macOS-native checks
     runs-on: macos-14
+    timeout-minutes: 15
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     env:

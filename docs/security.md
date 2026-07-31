@@ -48,9 +48,9 @@ Configs symlinked by `make security`:
   Firefox profile. Personal overrides (Smoothfox scroll tuning, DoH/NextDNS,
   shutdown sanitizing, etc.) live in `user-overrides.js` — Betterfox itself is
   never edited. To update Betterfox: `make betterfox-update`, review the diff,
-  then `make firefox`. The private GitHub mirror also gets a monthly Dependabot
-  PR for the submodule so upstream changes are surfaced even if you do not pull
-  them manually.
+  then `make firefox`. GitHub also gets a monthly Dependabot PR for the
+  submodule so upstream changes are surfaced even if you do not pull them
+  manually.
 
 ## SSH key custody (Secretive)
 

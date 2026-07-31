@@ -1,7 +1,5 @@
-function depmerge --description 'Rebase and merge a GitHub Dependabot PR into Codeberg + GitHub'
+function depmerge --description 'Rebase and fast-forward merge a GitHub Dependabot PR into main'
     # usage: depmerge <pr-number>
-    # Codeberg is canonical and the only pull source. GitHub is a private CI
-    # mirror that hosts Dependabot PRs and Actions checks.
     if test (count $argv) -ne 1
         echo "usage: depmerge <pr-number>" >&2
         return 1
@@ -28,15 +26,9 @@ function depmerge --description 'Rebase and merge a GitHub Dependabot PR into Co
         return 1
     end
 
-    set -l push_urls (git remote get-url --push --all origin 2>/dev/null)
-    set -l codeberg_remote (string match -r '^codeberg:.*|.*codeberg\.org[:/].*' -- $push_urls)[1]
-    set -l github_remote (string match -r '^github:.*|.*github\.com[:/].*' -- $push_urls)[1]
-    if test -z "$codeberg_remote"
-        echo "depmerge: no Codeberg push URL found on origin" >&2
-        return 1
-    end
+    set -l github_remote (git remote get-url origin 2>/dev/null)
     if test -z "$github_remote"
-        echo "depmerge: no GitHub push URL found on origin" >&2
+        echo "depmerge: no origin remote found" >&2
         return 1
     end
 
@@ -56,19 +48,14 @@ function depmerge --description 'Rebase and merge a GitHub Dependabot PR into Co
     end
 
     git switch main; or return 1
-    git pull --ff-only $codeberg_remote main; or return 1
-
-    # Dependabot rebases against GitHub's main, so synchronize the private
-    # mirror with canonical Codeberg before asking GitHub to update the PR.
-    git push $github_remote main:main; or return 1
+    git pull --ff-only origin main; or return 1
 
     gh pr update-branch --rebase --repo $github_repo $pr; or return 1
     gh pr checks --watch --fail-fast --repo $github_repo $pr; or return 1
 
-    git fetch $github_remote refs/pull/$pr/head; or return 1
+    git fetch origin refs/pull/$pr/head; or return 1
     git merge --ff-only FETCH_HEAD; or return 1
-    git push $codeberg_remote main:main; or return 1
-    git push $github_remote main:main; or return 1
+    git push origin main:main; or return 1
 
-    echo "depmerge: merged PR #$pr into main and pushed to Codeberg + GitHub"
+    echo "depmerge: merged PR #$pr into main and pushed to GitHub"
 end
