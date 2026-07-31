@@ -9,7 +9,8 @@ HOMEBREW_PREFIX := /opt/homebrew
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
-SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh git/hooks/pre-commit tests/writing-check.sh
+SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh git/hooks/pre-commit git/hooks/pre-push tests/writing-check.sh
+PYTHON_FILES := bin/citecheck.py bin/zotcheck.py bin/readnote.py bin/waybackup bin/ipic
 FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish
 LUACHECK_DIR := writing/nvim/lua
 
@@ -106,7 +107,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
+.PHONY: default install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
 
 default :
 	@echo "There is no default for your own safety."
@@ -127,7 +128,7 @@ git :
 	mkdir -p "$(HOME)/Library/Application Support/lazygit"
 	ln -sf $(DOTFILES)/git/lazygit.yml "$(HOME)/Library/Application Support/lazygit/config.yml"
 	@echo "Ensuring git hooks are executable (core.hooksPath → git/hooks)"
-	chmod +x $(DOTFILES)/git/hooks/pre-commit
+	chmod +x $(DOTFILES)/git/hooks/pre-commit $(DOTFILES)/git/hooks/pre-push
 	@command -v delta >/dev/null 2>&1 || echo "WARNING: delta not found — git diff/log will fail. Run: make apps"
 	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not found — commits will NOT be scanned for secrets. Run: make apps"
 chsh :
@@ -142,9 +143,6 @@ shell :
 	@echo "Symlinking fish, tmux, and bat config"
 	$(call install_symlinks,shell)
 	@echo "Run 'make chsh' to set fish as your login shell (requires sudo)"
-	@echo "Cloning tmux plugin manager (TPM)"
-	mkdir -p $(HOME)/.tmux
-	[ -d $(HOME)/.tmux/plugins/tpm ] || git clone https://github.com/tmux-plugins/tpm $(HOME)/.tmux/plugins/tpm
 	@echo "Symlinking Ghostty config"
 	mkdir -p "$(GHOSTTY_DIR)"
 	ln -sf $(DOTFILES)/shell/ghostty/config "$(GHOSTTY_DIR)/config"
@@ -342,10 +340,6 @@ update :
 	@echo "Updating Neovim plugins (Lazy sync)..."
 	@if command -v nvim >/dev/null 2>&1; then nvim --headless "+Lazy! sync" +qa; \
 	    else echo "  (nvim not installed; run: make apps)"; fi
-	@echo "Updating tmux plugins (TPM)..."
-	@if [ -x "$(HOME)/.tmux/plugins/tpm/bin/update_plugins" ]; then \
-	    "$(HOME)/.tmux/plugins/tpm/bin/update_plugins" all; \
-	    else echo "  (TPM not installed; run: make shell)"; fi
 	@echo "Syncing Vale styles..."
 	@if command -v vale >/dev/null 2>&1; then vale sync; \
 	    else echo "  (vale not installed; run: make apps)"; fi
@@ -353,8 +347,15 @@ update :
 	@echo "Not auto-run here (deliberately):"
 	@echo "  * Homebrew updates weekly via launchd — run 'brewup' to update now."
 	@echo "  * Betterfox is review-gated — run 'make betterfox-update', review, then 'make firefox'."
+	@echo "  * CI's gitleaks is pinned by version AND checksum in"
+	@echo "    .github/workflows/ci.yml. Local gitleaks comes from Homebrew, so the"
+	@echo "    two drift apart silently. Current CI pin vs. local:"
+	@printf '      CI:    %s\n' "$$(awk -F'v' '/releases\/download\/v/{split($$2,a,"/"); print a[1]; exit}' $(DOTFILES)/.github/workflows/ci.yml)"
+	@printf '      local: %s\n' "$$(gitleaks version 2>/dev/null || echo '<not installed>')"
+	@echo "    To bump: edit the three v8.x.y strings, then replace the sha256 with"
+	@echo "    the one from that release's checksums.txt on GitHub."
 	@echo "Review and commit writing/nvim/lazy-lock.json if Lazy changed it."
-lint : lint-shellcheck lint-fish lint-luacheck lint-secrets
+lint : lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets
 	@echo "Done."
 lint-shellcheck :
 	@echo "Running shellcheck..."
@@ -366,6 +367,16 @@ lint-fish :
 	@for f in $(FISH_FILES); do \
 	    fish --no-execute "$$f" || exit 1; \
 	done
+lint-python :
+	@echo "Checking Python syntax..."
+	@command -v python3 >/dev/null 2>&1 || { echo "ERROR: python3 not found"; exit 1; }
+	@# Syntax-only check, no third-party linter: py_compile is stdlib and every
+	@# script here is stdlib-only, so this needs nothing installed. -X
+	@# pycache_prefix redirects the .pyc files it writes into a temp tree, which
+	@# is why this leaves no bin/__pycache__ behind (needs Python 3.8+).
+	@tmp=$$(mktemp -d); \
+	    trap 'rm -rf "$$tmp"' EXIT; \
+	    python3 -X pycache_prefix="$$tmp" -m py_compile $(PYTHON_FILES)
 lint-luacheck :
 	@echo "Running luacheck..."
 	@command -v luacheck >/dev/null 2>&1 || { echo "ERROR: luacheck not found — install it first (make apps)"; exit 1; }
@@ -455,7 +466,6 @@ doctor :
 	@echo "Checking shell..."
 	@dscl . -read /Users/$(USER) UserShell 2>/dev/null | grep -qF "$(HOMEBREW_PREFIX)/bin/fish" || \
 	    echo "WARNING: fish is not the login shell (run: make chsh)"
-	@test -d $(HOME)/.tmux/plugins/tpm       || echo "WARNING: TPM not cloned (run: make shell)"
 	@echo "Checking GPG..."
 	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
 	    echo "WARNING: no GPG secret key found — import your key"

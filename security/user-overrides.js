@@ -22,8 +22,20 @@ user_pref("signon.rememberSignons", false);
 user_pref("extensions.formautofill.addresses.enabled", false);
 user_pref("extensions.formautofill.creditCards.enabled", false);
 
-// PREF: disable passkeys
-user_pref("security.webauth.webauthn", false);
+// PREF: keep passkeys / WebAuthn enabled [DEFAULT]
+// Stated explicitly rather than omitted: this file used to set it false, and
+// dropping a pref from user.js does NOT reset it -- the old value persists in
+// an existing profile's prefs.js. Writing true guarantees the change lands.
+//
+// Kept on deliberately. Bitwarden is a passkey *provider* (its extension
+// implements passkeys through this very API), so disabling WebAuthn doesn't
+// hand credential duties to the password manager the way the two prefs above
+// do -- it breaks a Bitwarden feature, blocks hardware keys as 2FA (including
+// on the Bitwarden account itself), and gives up origin-bound phishing
+// resistance. The surface it closes needs a user gesture and can't silently
+// enumerate authenticators, so there's little to win. Betterfox ships this
+// pref commented out for the same reason (Securefox.js).
+user_pref("security.webauth.webauthn", true);
 
 // PREF: hide site shortcut thumbnails on New Tab page
 user_pref("browser.newtabpage.activity-stream.feeds.topsites", false);

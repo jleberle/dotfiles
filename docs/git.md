@@ -37,6 +37,16 @@ Bypass a false positive with `git commit --no-verify`. NOTE: a repo that sets
 its own `core.hooksPath` (e.g. husky) overrides this, so the scan won't run
 there.
 
+**Website preflight:** the same `core.hooksPath` also supplies a `pre-push`
+hook that runs `scripts/preflight.sh` before a push is allowed to leave the
+machine. Because `core.hooksPath` is global, the hook guards against firing in
+unrelated repos by checking for both `scripts/preflight.sh` and `hugo.yaml`
+first — in practice that means jaredeberle.org and nothing else; every other
+repo is a no-op. Bypass with `git push --no-verify`.
+
+Both hooks are made executable by `make git` and are covered by
+`make lint-shellcheck`.
+
 **Object integrity:** `transfer/fetch/receive.fsckObjects = true` rejects
 malformed or malicious git objects on clone/fetch.
 

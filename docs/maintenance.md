@@ -7,8 +7,8 @@ machine acting differently — start here. Two commands cover most situations:
   macOS defaults, Homebrew packages, tool binaries). Anything wrong prints a
   `WARNING: ... (run: make <target>)` line that names the fix.
 - **`make lint`** — checks the repo's own files for mistakes (shell scripts,
-  fish syntax, Lua, and a scan for accidentally committed secrets). Run it
-  after editing anything in the repo.
+  fish syntax, Python, Lua, and a scan for accidentally committed secrets). Run
+  it after editing anything in the repo.
 
 Beyond those two: **`make writing-check`** tests the writing helpers
 (`citecheck`, `zotcheck`, `readnote`) against fixture data, and two
@@ -29,8 +29,8 @@ make doctor
 
 Checks every symlink created by `make install`, plus: SSH keys exist
 (`id_github`, `id_codeberg`), `~/.ssh`/`~/.gnupg` and the private keys are
-owner-only (no group/other access), fish is set as the login shell, TPM is
-cloned, vale styles directory is populated, a GPG secret key is present, and any
+owner-only (no group/other access), fish is set as the login shell, the
+vale styles directory is populated, a GPG secret key is present, and any
 installed launchd agents (mailsync, brewupdate, brewlogclean, resticcheck,
 decksync) are actually loaded — not just that their plist files exist.
 
@@ -94,7 +94,7 @@ just prints a warning) so nothing destructive happens by accident.
 |--------------------|-----------------------------------------------------------------------------------------------------|
 | `install`          | Runs `apps git shell security nvim vale neomutt services brewauto` in order, then `doctor`          |
 | `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
-| `git`              | Symlinks `gitconfig`/`gitignore`/`gitmessage` + lazygit config; makes the `git/hooks/pre-commit` (gitleaks) hook executable |
+| `git`              | Symlinks `gitconfig`/`gitignore`/`gitmessage` + lazygit config; makes the `pre-commit` (gitleaks) and `pre-push` (website preflight) hooks executable |
 | `shell`            | Symlinks fish (`shell/fish/`), Ghostty, tmux, and bat configs                                       |
 | `security`         | Symlinks SSH config + pinned `known_hosts` + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms |
 | `firefox`          | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) |
@@ -114,12 +114,12 @@ just prints a warning) so nothing destructive happens by accident.
 | `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
-| `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-luacheck`/`lint-secrets` |
+| `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, `py_compile` for the Python helpers, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-python`/`lint-luacheck`/`lint-secrets` |
 | `lint-plists`      | macOS-only: `plutil -lint` over tracked LaunchAgents and Automator workflow files                    |
 | `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`) |
 | `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
-| `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync), tmux TPM, `vale sync`; Homebrew/Betterfox stay on their own paths |
-| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, TPM, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
+| `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync) and `vale sync`; Homebrew/Betterfox stay on their own paths. Also prints the CI-pinned vs. local gitleaks version, since that pin is bumped by hand |
+| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
 | `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` |
 
 `harden` and `touchid` are **not** part of `make install` — they touch system

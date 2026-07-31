@@ -193,7 +193,6 @@ twice to send a literal `Ctrl-a` to the underlying program.
 | `Tab`                            | Jump to the last (previous) window                |
 | `z`                              | Zoom / unzoom the current pane                    |
 | `r`                              | Reload `~/.tmux.conf`                             |
-| `I`                              | (TPM) install plugins                             |
 | `Option-h` / `Option-l`         | **No prefix** — previous / next window            |
 
 **Copy mode (Vi keys):** enter with `Ctrl-a [`.
@@ -214,5 +213,11 @@ twice to send a literal `Ctrl-a` to the underlying program.
 - `terminal-features` passes **RGB true color**, **colored underlines**
   (undercurl diagnostics in Neovim), and **cursor-shape** changes through
   (block in normal, beam in insert).
-- **Plugins** (via TPM): `tpm`, `nordtheme/tmux`. The status line
-  is composed from Nord modules (session on the left, date/time on the right).
+- **No plugin manager.** The Nord status line (session on the left, date/time
+  and hostname on the right) is vendored directly into `shell/tmux.conf` as
+  plain `set` commands, copied from the now-archived `nord-tmux` 0.3.0. It was
+  the only plugin in use, so TPM was removed along with it — one less unpinned
+  `git clone` at install time and one less thing to update. Its colors come
+  from the terminal's own 16-color palette, so they track Ghostty's Nord theme
+  rather than being hardcoded; the separators are Powerline glyphs from the
+  JetBrainsMono Nerd Font.

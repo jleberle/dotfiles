@@ -51,7 +51,6 @@ Then finish the per-app setup:
 |-----------|---------------------------------------------------------------------------------------------|
 | Firefox   | Launch Firefox once to create the profile, then run `make firefox`                          |
 | Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                             |
-| tmux      | Start `tmux`, press `Ctrl-a` then `I` to install plugins via TPM                           |
 | Neovim    | Launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
 | NeoMutt   | Follow [docs/mail.md](docs/mail.md) (Bridge password, `~/.mbsyncrc`, Keychain, `make mailsync`) |
 | macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
@@ -72,8 +71,8 @@ names the problem and the fix.
 | Command          | Purpose                                                                    |
 |------------------|-----------------------------------------------------------------------------|
 | `make check`     | All read-only health checks (`doctor` + `macos-check` + `brew-check`)      |
-| `make lint`      | Repo static checks (shellcheck, fish syntax, luacheck, gitleaks)            |
-| `make update`    | Update the non-brew toolchain (Neovim plugins, TPM, vale styles)            |
+| `make lint`      | Repo static checks (shellcheck, fish syntax, Python, luacheck, gitleaks)    |
+| `make update`    | Update the non-brew toolchain (Neovim plugins, vale styles)                 |
 | `brewup`         | Update Homebrew now (it also updates itself weekly via launchd)             |
 | `dots <target>`  | Run any dotfiles `make` target from anywhere (`dots check`, `dots doctor`)  |
 

@@ -43,7 +43,6 @@ brew "imagemagick" # image conversion (website to-avif.sh)
 brew "isync" # IMAP sync to local Maildir (mbsync; config in writing/neomutt/mbsyncrc)
 brew "lazygit" # terminal git UI (aliased to lg)
 brew "lychee" # fast link checker (markdown/prose)
-brew "mole" # deep clean and optimize macOS
 brew "neomutt" # terminal email client (config in writing/neomutt/)
 brew "notmuch" # mail indexer for fast search (used by NeoMutt virtual mailboxes)
 brew "pam-reattach" # lets pam_tid.so (Touch ID for sudo) work inside tmux; see `make touchid`

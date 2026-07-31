@@ -49,6 +49,9 @@ jobs:
       - name: Fish syntax
         run: make lint-fish
 
+      - name: Python syntax
+        run: make lint-python
+
       - name: Luacheck
         run: make lint-luacheck
 

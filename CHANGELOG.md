@@ -7,6 +7,49 @@ everything since is one entry per real milestone.
 
 ---
 
+## 2026-07-31 — Audit follow-ups: close lint gaps, drop TPM
+
+- `git/hooks/pre-push` joined `SHELLCHECK_FILES`, `make git`'s `chmod`, and
+  `docs/git.md`. It had landed outside all three.
+- New `make lint-python` (also a CI step): `py_compile` over the five Python
+  helpers. Stdlib-only, so it adds no dependency; `-X pycache_prefix` keeps the
+  `.pyc` files out of the repo.
+- **Removed TPM.** The Nord theme was the only plugin, and upstream
+  (`arcticicestudio/nord-tmux`) is archived, so its ~20 `set` lines are now
+  vendored into `shell/tmux.conf`. This drops an unpinned `git clone` from
+  `make shell`, a plugin-update step from `make update`, and the TPM check from
+  `make doctor`. It also fixes a latent bug: `~/.tmux/plugins/tmux` still held
+  the old Catppuccin checkout, so TPM had never actually fetched the
+  `nordtheme/tmux` the config asked for and was loading both themes.
+  `status-interval` now stays at the 5s the config asks for instead of being
+  reset to 1s by the plugin.
+- `make update` now prints the CI-pinned gitleaks version next to the local
+  one, with bump instructions — the version and its checksum in `ci.yml` are
+  updated by hand and had no reminder.
+- **Dropped `mole`** from the Brewfile. Not for anything it did wrong, but for
+  what it is: a tool with its own update channel (`mo update`, including
+  `--nightly` main-branch builds) is structurally incompatible with a repo
+  whose dependency model assumes Homebrew is the only thing installing
+  software — `brew-check`, `brew-drift`, and the weekly `brewupdate` agent all
+  see through it. Its `mo touchid` also writes the same
+  `/etc/pam.d/sudo_local` that `make touchid` owns, and would drop the
+  `pam_reattach` line that makes Touch ID work in tmux, in a way
+  `make macos-check` could not detect (that check only greps for `pam_tid.so`).
+  Actual use was one invocation in a month, clearing regenerable caches and the
+  system logs you want when debugging a panic.
+- **Re-enabled WebAuthn** in `security/user-overrides.js`
+  (`security.webauth.webauthn` false → true). Disabling it sat with the
+  autofill prefs under "let Bitwarden handle credentials," but Bitwarden is a
+  passkey *provider* and implements passkeys through that API — so the pref was
+  breaking a Bitwarden feature, blocking hardware keys as 2FA, and giving up
+  origin-bound phishing resistance, in exchange for closing a surface that
+  needs a user gesture and can't enumerate authenticators. Betterfox ships the
+  pref commented out. Written as an explicit `true` rather than deleted,
+  because removing a pref from `user.js` leaves the old value in an existing
+  profile's `prefs.js`.
+
+---
+
 ## 2026-07-08 — Wire the reading workflow end to end, split docs from README
 
 - `newreading <citekey> [book|article] [--primary]` — runs `readnote` (vault
