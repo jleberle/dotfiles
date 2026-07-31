@@ -7,6 +7,10 @@ on:
     branches: [main]
   schedule:
     - cron: "0 14 1 * *"
+  # Manual trigger exists so the macOS job (monthly-only, see below) can be run
+  # on demand right after a macOS upgrade, which is when it actually has
+  # something new to tell us.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -61,9 +65,16 @@ jobs:
       - name: Secret scan
         run: make lint-secrets
 
+  # Monthly cron (and manual runs) only. What this job checks — plist syntax,
+  # native Neovim startup, macOS-side workflow scripts — changes with the OS,
+  # not with our commits, so running it per-push spent the most expensive
+  # runner class GitHub offers on a result that was already known. The Linux
+  # job still gates every push and PR, and `workflow_dispatch` is there to run
+  # this on demand after an OS upgrade.
   macos-checks:
     name: macOS-native checks
     runs-on: macos-14
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
 
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
