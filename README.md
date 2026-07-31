@@ -1,5 +1,7 @@
 # Dotfiles
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A macOS-focused, speed-oriented development and **prose-writing** environment.
 Everything is symlinked from `~/git/dotfiles` via a `Makefile` — the real configs
 live in this repo, and the places apps look for them (`~/.config/fish`,
