@@ -1,6 +1,6 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # NeoMutt — ~/.config/neomutt/neomuttrc
-# Symlinked from ~/.dotfiles/writing/neomutt/neomuttrc by `make neomutt`
+# Symlinked from ~/git/dotfiles/writing/neomutt/neomuttrc by `make neomutt`
 # ──────────────────────────────────────────────────────────────────────────────
 
 # ── Core behavior ──────────────────────────────────────────────────────────────
@@ -120,5 +120,5 @@ macro index \Cf "<vfolder-from-query>" "search mail with notmuch"
 
 # ── Account configuration ───────────────────────────────────────────────────────
 # Per-account settings live in ~/.config/neomutt/accounts/local.rc (not tracked
-# by git). Copy ~/.dotfiles/writing/neomutt/accounts/example.rc there to start.
+# by git). Copy ~/git/dotfiles/writing/neomutt/accounts/example.rc there to start.
 source "~/.config/neomutt/accounts/local.rc"

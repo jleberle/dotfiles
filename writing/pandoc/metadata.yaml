@@ -10,11 +10,11 @@ bibliography:
 
 # CMOS 18th edition (current); swap to ...-17th-edition.csl for journals
 # still on 17e. Keep this default in sync with the newdoc fish function.
-csl: ~/.dotfiles/writing/pandoc/chicago-notes-bibliography-18th-edition.csl
+csl: ~/git/dotfiles/writing/pandoc/chicago-notes-bibliography-18th-edition.csl
 
 link-citations: true
 
-reference-doc: ~/.dotfiles/writing/pandoc/reference.docx
+reference-doc: ~/git/dotfiles/writing/pandoc/reference.docx
 
 geometry: margin=1in
 

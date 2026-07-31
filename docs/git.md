@@ -28,7 +28,7 @@ installs it.
 - a commit-message template (`git/gitmessage` → `~/.gitmessage`) prefills
   subject/body guidance for manual commits
 
-**Secret scanning:** `core.hooksPath = ~/.dotfiles/git/hooks` points every
+**Secret scanning:** `core.hooksPath = ~/git/dotfiles/git/hooks` points every
 repo at a tracked `pre-commit` hook that runs `gitleaks` on staged changes,
 blocking accidental secret commits (the guard for `acp`'s
 `git add . && git push`). The hook fails *open* if gitleaks isn't installed

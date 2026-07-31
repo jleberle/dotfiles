@@ -41,7 +41,7 @@
 	# global — a repo that sets its own core.hooksPath (e.g. husky) overrides it,
 	# so the secret scan won't run there; conversely it supersedes any per-repo
 	# .git/hooks. See git/hooks/pre-commit.
-	hooksPath = ~/.dotfiles/git/hooks
+	hooksPath = ~/git/dotfiles/git/hooks
 
 # Reject malformed/malicious objects on fetch, clone, and (local) receive —
 # defense against object-confusion and known git-parsing CVEs. Downside: refuses

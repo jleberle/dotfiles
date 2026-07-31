@@ -9,10 +9,10 @@
 #   1. Install and sign in to Proton Bridge. It must be running to sync mail.
 #
 #   2. Edit ~/.mbsyncrc — set User to your Proton Bridge email address.
-#      Template: ~/.dotfiles/writing/neomutt/mbsyncrc (copied by make neomutt)
+#      Template: ~/git/dotfiles/writing/neomutt/mbsyncrc (copied by make neomutt)
 #
 #   3. Edit ~/.notmuch-config — set name and primary_email.
-#      Template: ~/.dotfiles/writing/neomutt/notmuch-config (copied by make neomutt)
+#      Template: ~/git/dotfiles/writing/neomutt/notmuch-config (copied by make neomutt)
 #
 #   4. Store the Bridge password in Keychain (same password for IMAP and SMTP):
 #        read -s -P "Bridge password: " PASS

@@ -35,7 +35,7 @@ built into fish, so there are no shell plugins to source or `compinit` to run.
 
 - `conf.d/env.fish` — environment (`EDITOR=nvim`, `PAGER="bat --style=plain"`,
   `MANPAGER="nvim +Man!"`, `BAT_THEME`, `LS_COLORS`, `HOMEBREW_NO_ANALYTICS`,
-  `HOMEBREW_NO_ENV_HINTS`), PATH (`~/.dotfiles/bin`, `~/.local/bin`), and the
+  `HOMEBREW_NO_ENV_HINTS`), PATH (`~/git/dotfiles/bin`, `~/.local/bin`), and the
   Homebrew shellenv.
   `conf.d/*.fish` is auto-sourced for every session.
 - `conf.d/paths.fish` — exports the workflow locations from

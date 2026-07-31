@@ -8,7 +8,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>__HOME__/.dotfiles/bin/mailsync.sh</string>
+        <string>__HOME__/git/dotfiles/bin/mailsync.sh</string>
     </array>
 
     <!-- Every 5 minutes. -->

@@ -17,11 +17,11 @@ if test -x /opt/homebrew/bin/brew
 end
 
 # --- PATH ---------------------------------------------------------------------
-# zprofile prepended ~/.dotfiles/bin and ~/.local/bin ahead of everything.
+# zprofile prepended ~/git/dotfiles/bin and ~/.local/bin ahead of everything.
 # fish_add_path is idempotent and de-duplicates (the `typeset -U path` analog).
 # --global keeps this per-session (recomputed each startup) instead of writing
 # to universal variables, so nothing leaks into the repo's fish_variables.
-fish_add_path --global --prepend $HOME/.dotfiles/bin $HOME/.local/bin
+fish_add_path --global --prepend $HOME/git/dotfiles/bin $HOME/.local/bin
 
 # --- GPG ----------------------------------------------------------------------
 # Required for pinentry to open a passphrase prompt in the current terminal.

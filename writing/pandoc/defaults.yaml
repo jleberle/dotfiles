@@ -2,7 +2,7 @@
 # nvim <leader>p mappings (writing/nvim/lua/config/keymaps.lua) and the fish
 # mdexport function:
 #
-#   pandoc -d ~/.dotfiles/writing/pandoc/defaults.yaml file.md -o file.ext
+#   pandoc -d ~/git/dotfiles/writing/pandoc/defaults.yaml file.md -o file.ext
 #
 # Deliberately NOT here: csl / bibliography / reference-doc. Anything set in a
 # defaults file overrides document frontmatter (verified empirically — both

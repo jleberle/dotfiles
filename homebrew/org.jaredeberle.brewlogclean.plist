@@ -8,7 +8,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>__HOME__/.dotfiles/bin/homebrewlogclean.sh</string>
+        <string>__HOME__/git/dotfiles/bin/homebrewlogclean.sh</string>
     </array>
 
     <!-- Monday 08:00 (before the update); the script itself gates to the

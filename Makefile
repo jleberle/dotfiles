@@ -1,4 +1,4 @@
-DOTFILES := $(HOME)/.dotfiles
+DOTFILES := $(HOME)/git/dotfiles
 LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
@@ -298,7 +298,7 @@ neomutt :
 	mkdir -p $(HOME)/.mail/proton
 	$(call install_symlinks,neomutt)
 	@[ -f "$(HOME)/.config/neomutt/accounts/local.rc" ] || \
-	    { printf '# NeoMutt account config — fill in your details.\n# See ~/.dotfiles/writing/neomutt/accounts/example.rc\n' \
+	    { printf '# NeoMutt account config — fill in your details.\n# See ~/git/dotfiles/writing/neomutt/accounts/example.rc\n' \
 	        > "$(HOME)/.config/neomutt/accounts/local.rc"; \
 	      echo "REMINDER: edit ~/.config/neomutt/accounts/local.rc with your account details"; }
 	@[ -f "$(HOME)/.mbsyncrc" ] || \
@@ -425,7 +425,7 @@ doctor :
 	@test -L "$(GHOSTTY_DIR)/config"           || echo "WARNING: ghostty config not symlinked (run: make shell)"
 	@HP=$$(git config --global core.hooksPath); \
 	case "$$HP" in \
-	    "$(DOTFILES)/git/hooks"|"~/.dotfiles/git/hooks") ;; \
+	    "$(DOTFILES)/git/hooks"|"~/git/dotfiles/git/hooks") ;; \
 	    *) echo "WARNING: git core.hooksPath not set to dotfiles hooks (run: make git)" ;; \
 	esac
 	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not installed — pre-commit secret scan inactive (run: make apps)"

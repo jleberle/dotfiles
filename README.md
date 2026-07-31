@@ -1,7 +1,7 @@
 # Dotfiles
 
 A macOS-focused, speed-oriented development and **prose-writing** environment.
-Everything is symlinked from `~/.dotfiles` via a `Makefile` — the real configs
+Everything is symlinked from `~/git/dotfiles` via a `Makefile` — the real configs
 live in this repo, and the places apps look for them (`~/.config/fish`,
 `~/.gitconfig`, …) just point here — so a new machine comes up the same as the
 old one. The editor (Neovim), terminal (Ghostty),
@@ -25,9 +25,9 @@ is beyond my abilities to troubleshoot.
 # 1. Install the Xcode command-line tools (gives you git)
 xcode-select --install
 
-# 2. Clone this repo to the expected location (~/.dotfiles is hard-coded in the Makefile)
-git clone --recurse-submodules https://codeberg.org/<you>/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
+# 2. Clone this repo to the expected location (~/git/dotfiles is hard-coded in the Makefile)
+git clone --recurse-submodules https://codeberg.org/<you>/dotfiles.git ~/git/dotfiles
+cd ~/git/dotfiles
 
 # 3. Install Homebrew (if needed) and all apps, CLIs, fonts (Brewfile)
 make apps
@@ -55,8 +55,8 @@ Then finish the per-app setup:
 | NeoMutt   | Follow [docs/mail.md](docs/mail.md) (Bridge password, `~/.mbsyncrc`, Keychain, `make mailsync`) |
 | macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
 
-> **Why `~/.dotfiles`?** Every symlink in the `Makefile` is rooted at
-> `$(HOME)/.dotfiles`. Cloning anywhere else will break the symlinks.
+> **Why `~/git/dotfiles`?** Every symlink in the `Makefile` is rooted at
+> `$(HOME)/git/dotfiles`. Cloning anywhere else will break the symlinks.
 
 ---
 
@@ -120,7 +120,7 @@ Deeper documentation lives in [`docs/`](docs/):
 ## Repository Layout
 
 ```
-.dotfiles/
+dotfiles/
 ├── Makefile              # symlink/install targets (see docs/maintenance.md)
 ├── README.md
 ├── paths.env             # workflow locations (Zotero, notes, website) — single source of truth

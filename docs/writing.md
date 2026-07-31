@@ -35,7 +35,7 @@ symlinked into place by `make vale`, so additions sync across machines.
   `bibliography`, page geometry, font size, line spacing). Copy it next to a
   document and edit:
   ```sh
-  cp ~/.dotfiles/writing/pandoc/metadata.yaml .
+  cp ~/git/dotfiles/writing/pandoc/metadata.yaml .
   ```
   Its `bibliography` points at the Better CSL JSON export (`Library.json`),
   not the `.bib` — CSL JSON preserves Zotero's archive / archive-location
