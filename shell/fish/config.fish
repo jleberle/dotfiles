@@ -34,7 +34,7 @@ if status is-interactive
     set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
     set -gx FZF_CTRL_T_OPTS "--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
     set -gx FZF_ALT_C_COMMAND 'fd --type d --hidden --follow --exclude .git'
-    set -gx FZF_ALT_C_OPTS "--preview 'eza --tree --level=2 --icons --color=always {}'"
+    set -gx FZF_ALT_C_OPTS "--preview 'eza --tree --level=2 --icons=always --color=always {}'"
     # Nord palette (matches ghostty, nvim, bat, tmux)
     set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border --color=bg+:#3B4252,bg:#2E3440,spinner:#81A1C1,hl:#616E88 --color=fg:#D8DEE9,header:#616E88,info:#81A1C1,pointer:#81A1C1 --color=marker:#81A1C1,fg+:#D8DEE9,prompt:#81A1C1,hl+:#81A1C1 --color=border:#4C566A"
 

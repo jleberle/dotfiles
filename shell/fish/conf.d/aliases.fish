@@ -11,10 +11,10 @@ alias mutt 'neomutt'
 alias cat 'bat'
 
 # Eza
-alias ls 'eza --icons'
-alias ll 'eza -lh --git --icons --group-directories-first'
-alias la 'eza -lah --git --icons --group-directories-first'
-alias lt 'eza --tree --level=2 --icons'
+alias ls 'eza --icons=always'
+alias ll 'eza -lh --git --icons=always --group-directories-first'
+alias la 'eza -lah --git --icons=always --group-directories-first'
+alias lt 'eza --tree --level=2 --icons=always'
 
 # recent files first
 alias recent 'eza -lah --sort=modified'
@@ -63,7 +63,7 @@ alias findd 'fd --type d'   # find a directory:  findd foo
 alias findf 'fd --type f'   # find a file:       findf foo
 
 # Eza extras
-alias ltt 'eza --tree --level=3 --icons'   # one level deeper than lt
+alias ltt 'eza --tree --level=3 --icons=always'   # one level deeper than lt
 
 # System monitoring
 alias disk  'df -h'                         # free/used space per mount

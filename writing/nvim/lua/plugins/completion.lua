@@ -10,9 +10,13 @@ return {
 			-- Enter confirms; C-n/C-p or arrows select. With preselect off,
 			-- Enter inserts a newline unless an item was explicitly selected —
 			-- matches the old nvim-cmp confirm({ select = false }) behavior.
-			keymap = { preset = "enter" },
+			-- C-space opens the menu on demand since auto_show is off below.
+			keymap = { preset = "enter", ["<C-space>"] = { "show" } },
 			completion = {
 				list = { selection = { preselect = false, auto_insert = true } },
+				-- Don't pop up the menu on every keystroke while writing prose;
+				-- only show it when explicitly requested (<C-space>).
+				menu = { auto_show = false },
 			},
 
 			-- lsp/path/buffer match the old nvim-cmp setup (all built into

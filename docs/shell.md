@@ -85,11 +85,11 @@ picker.
 |-------------|---------------------------------------------------------|
 | `v`, `vim`  | `nvim`                                                  |
 | `cat`       | `bat`                                                   |
-| `ls`        | `eza --icons`                                           |
-| `ll`        | `eza -lh --git --icons --group-directories-first`       |
-| `la`        | `eza -lah --git --icons --group-directories-first`      |
-| `lt`        | `eza --tree --level=2 --icons`                          |
-| `ltt`       | `eza --tree --level=3 --icons`                          |
+| `ls`        | `eza --icons=always`                                    |
+| `ll`        | `eza -lh --git --icons=always --group-directories-first`|
+| `la`        | `eza -lah --git --icons=always --group-directories-first`|
+| `lt`        | `eza --tree --level=2 --icons=always`                   |
+| `ltt`       | `eza --tree --level=3 --icons=always`                   |
 | `recent`    | `eza -lah --sort=modified`                              |
 | `biggest`   | `eza -lah --sort=size --reverse`                        |
 | `findd`     | `fd --type d`                                           |
