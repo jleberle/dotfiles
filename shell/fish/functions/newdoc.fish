@@ -1,7 +1,26 @@
 function newdoc --description 'Create a new Markdown document pre-filled with Pandoc metadata'
     # usage: newdoc <filename> [title]
+    if __help_requested $argv
+        echo "usage: newdoc <filename> [title]"
+        return 0
+    end
+
     if test (count $argv) -eq 0
         echo "usage: newdoc <filename> [title]" >&2
+        return 1
+    end
+
+    # The frontmatter written below interpolates both of these. Unset (nvim
+    # launched outside fish, or a broken paths.env) used to yield an empty
+    # `bibliography:` and a csl: path rooted at /, with exit 0 and the file
+    # opened as if nothing were wrong — the breakage only surfaced at export
+    # time, months later, as citations rendering "???".
+    if not set -q ZOTERO_LIBRARY_JSON; or test -z "$ZOTERO_LIBRARY_JSON"
+        echo "newdoc: ZOTERO_LIBRARY_JSON is not set — check paths.env" >&2
+        return 1
+    end
+    if not set -q DOTFILES_DIR; or test -z "$DOTFILES_DIR"
+        echo "newdoc: DOTFILES_DIR is not set — check paths.env" >&2
         return 1
     end
 

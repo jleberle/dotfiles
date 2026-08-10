@@ -1,4 +1,9 @@
 function cdf --description 'cd to the top-most Finder window location'
+    if __help_requested $argv
+        echo "usage: cdf   (no arguments)"
+        return 0
+    end
+
     if test (uname) != Darwin
         echo "cdf is macOS only" >&2
         return 1

@@ -8,6 +8,11 @@ function csvsort --description 'Sort CSVs in a directory by the last word of the
     #
     # Field 1 is split on plain commas — a quoted first field containing a comma
     # ("Smith, Jr., John") will key off the wrong text.
+    if __help_requested $argv
+        echo "usage: csvsort [dir] [--header] [--force]   (no dir: the cwd)"
+        return 0
+    end
+
     argparse header force -- $argv
     or return 1
 

@@ -5,6 +5,11 @@ function archgrep --description "Full-text search the OCR'd archival PDFs (ripgr
     # or search index to maintain. PDFs must be OCR'd first (ocrmypdf; see the
     # Archives README). Extra args pass through to ripgrep, e.g. -l for filenames
     # only, -C3 for more context.
+    if __help_requested $argv
+        echo "usage: archgrep <query> [rg options]"
+        return 0
+    end
+
     if test (count $argv) -eq 0
         echo "usage: archgrep <query> [rg options]" >&2
         return 1

@@ -1,4 +1,9 @@
 function gpg-master-import --description 'Import GPG master key from USB for editing'
+    if __help_requested $argv
+        echo "usage: gpg-master-import   (no arguments)"
+        return 0
+    end
+
     set usb /Volumes/Files
     set master_key $usb/key.asc
 

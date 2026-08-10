@@ -6,6 +6,12 @@ function zotcheck --description 'Reconcile reading/research notes against the Zo
     #   - a note whose citekey is no longer in Zotero (key drifted or item
     #     deleted) — its [[links]] and @citations are now broken;
     #   - a Zotero item with no note — a source you have not processed.
+    if __help_requested $argv
+        echo "usage: zotcheck            orphaned notes + count of items lacking a note"
+        echo "       zotcheck --list     also list every Zotero item with no note yet"
+        return 0
+    end
+
     set -l lib $ZOTERO_LIBRARY_JSON
     if not test -f $lib
         echo "zotcheck: library not found: $lib" >&2

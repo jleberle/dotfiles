@@ -5,6 +5,11 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
     # writing/pandoc/defaults.yaml (crossref + citeproc). Runs from each
     # document's own directory so relative paths in metadata.yaml
     # (bibliography, CSL) and relative images resolve.
+    if __help_requested $argv
+        echo "usage: mdexport <html|pdf|docx|...> <file.md> [more.md ...]"
+        return 0
+    end
+
     if test (count $argv) -lt 2
         echo "usage: mdexport <html|pdf|docx|...> <file.md> [more.md ...]" >&2
         return 1

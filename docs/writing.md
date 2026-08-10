@@ -211,7 +211,7 @@ like commands. (General-purpose shell functions are listed under
 | `cite`                  | fzf over the Zotero `.bib`; copies `@citekey` (warns if the export is >30 days stale) |
 | `linkcheck [md…]`       | Check links with `lychee` (no args: all `*.md` under the cwd)                         |
 | `mdarchive <md…>`       | Snapshot every URL cited in the file(s) to the Wayback Machine (lychee + `waybackup`) |
-| `mdimport <docx> [mode]`| Convert returned `.docx` edits to markdown (`--track-changes`: all/accept/reject)     |
+| `docx2md <docx> [mode]` | Convert returned `.docx` edits to markdown (`--track-changes`: all/accept/reject)     |
 | `valeinit`              | Scaffold a per-project `.vale.ini` from `writing/vale/vale-project.ini`               |
 | `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |
 | `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
@@ -223,7 +223,6 @@ like commands. (General-purpose shell functions are listed under
 | `citecheck <md…>`       | Validate every `@citekey` / `-@citekey` in a draft against `Library.json` before export |
 | `zotcheck [--list]`     | Reconcile notes vs Zotero recursively — orphaned citekeys, and items lacking a note   |
 | `readnote <key> [--primary]` | Scaffold a history-oriented reading note for a Zotero citekey (metadata from `Library.json` + archival fields when present); closes a `zotcheck` gap |
-| `newreading <key> [type] [--primary]` | Start a Zotero-backed source in one step: `readnote`, then `site sync-reading` (vault note + website reading-ledger entry) |
 
 **Bibliography sources.** Pandoc *rendering* (`newdoc`, `metadata.yaml`) reads
 the Better CSL JSON export (`~/Documents/Library/Library.json`), which preserves
@@ -270,33 +269,31 @@ dispatches to those scripts from anywhere.
 **Start a source (has a Zotero citekey):**
 
 ```sh
-newreading smith2020 book        # or: article; add --primary for a primary source
+readnote smith2020               # add --primary for a primary source
+site newsource zotero smith2020  # prefills the source page from the Zotero library
 ```
 
-This runs `readnote smith2020` (scaffolds the vault note from Zotero CSL-JSON,
-opens it in nvim), then `site sync-reading smith2020 book` (pulls the
-bibliographic identity from Zotero + the note into a new
-`data/reading/books/<slug>.yaml` ledger entry, prompting for reading-specific
-fields). Each half also runs standalone — rerun `site sync-reading` alone if
-the note already exists.
+`readnote` scaffolds the vault note from the Zotero CSL-JSON export and opens it
+in nvim; `site newsource zotero` creates the website's source page at
+`content/sources/<slug>/_index.md`, prefilled from the same library. Each half
+runs standalone — run `site newsource` alone if the vault note already exists.
 
 **Start a source (no Zotero record — casual reading):**
 
 ```sh
 site newsource book "Title"      # prefills from Open Library (ISBN) / Crossref (DOI)
-site newbook "Title"             # shorthand for the book case
+site newsource article "Title"   # prefills from Crossref (DOI)
 ```
 
 **Finish a source:**
 
 ```sh
-site finishsource [slug]         # or: site finishbook — lists current sources if no slug
+site finishsource [slug]         # lists current sources if no slug
 ```
 
-Marks the ledger entry `read`, sets `finished`/`read_year`, and — via
-`sync-vault-status.py` — flips the matching vault note's `status` to `read`,
-so the vault and the public ledger never silently diverge. Pass `--push` to
-skip the editor and run the website's preflight + commit + push in one step.
+Flips the source page's `status` to `read`, stamps `finished`, and derives
+`read_year`. With no slug it lists the sources currently marked `reading`. Pass
+`--push` to run the website's preflight + commit + push in one step.
 
 **Keep everything reconciled:**
 

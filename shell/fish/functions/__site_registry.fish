@@ -1,5 +1,6 @@
 function __site_registry --description 'Command table for `site` — one source for dispatch, help, and completions'
-    # Five tab-separated columns: name(|alias)  group  runner  usage  description
+    # Six tab-separated columns:
+    #   name(|alias)  group  runner  usage  description  takes-paths
     #
     # ONE table, three consumers: site.fish dispatches from it, prints its help
     # from it, and completions/site.fish completes from it.
@@ -15,61 +16,69 @@ function __site_registry --description 'Command table for `site` — one source 
     # that any .sh/.py in it actually exists before running, so if this table
     # goes stale again the error names the table instead of blaming the user.
     #
+    # `takes-paths` is `paths` for commands whose arguments are files or
+    # directories, `-` for everything else. site.fish rewrites arguments to
+    # absolute paths before cd-ing into the repo, and it needs to know which
+    # commands that applies to: it used to absolutize any argument that merely
+    # matched something in the current directory, so `site newsource book Notes`
+    # run beside a folder called Notes silently retitled the source
+    # /Users/you/.../Notes. Titles, slugs and citekeys are never paths.
+    #
     # The tabs come from the format string: printf cycles it over the argument
-    # list, so each group of five below is one row. Escapes are NOT processed
+    # list, so each group of six below is one row. Escapes are NOT processed
     # inside %s arguments, which is why the separators can't live in the rows.
-    printf '%s\t%s\t%s\t%s\t%s\n' \
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
         doctor setup scripts/doctor.sh \
-        "[--quiet]" "Check this machine has what the site needs" \
+        "[--quiet]" "Check this machine has what the site needs" - \
         \
         new write scripts/newpost.sh \
-        "<article|review|quote> [--cover] [title]" "Start a draft (created outside the repo)" \
+        "<article|review|quote> [--cover] [title]" "Start a draft (created outside the repo)" - \
         \
         publish write scripts/publish-draft.sh \
-        "[--cover] [--cite] [--push] <draft>" "Move a finished draft into content/" \
+        "[--cover] [--cite] [--push] <draft>" "Move a finished draft into content/" paths \
         \
         images write scripts/add-images.sh \
-        "<post-dir> [--cover] <img...>" "Convert and attach images to a post" \
+        "<post-dir> [--cover] <img...>" "Convert and attach images to a post" paths \
         \
         to-avif write scripts/to-avif.sh \
-        "[flags] <img...>" "Convert images to AVIF (+ JPEG companion)" \
+        "[flags] <img...>" "Convert images to AVIF (+ JPEG companion)" paths \
         \
         cite-refs write scripts/cite-refs.sh \
-        "--keys|--bibliography <file>" "Pull citation keys or render a Works Cited list" \
+        "--keys|--bibliography <file>" "Pull citation keys or render a Works Cited list" paths \
         \
         newsource reading scripts/newsource.sh \
-        "[book|article|zotero] [title|citekey]" "Add a work to the bibliography" \
+        "[book|article|zotero] [title|citekey]" "Add a work to the bibliography" - \
         \
         finishsource reading scripts/finishsource.sh \
-        "[--push] <slug>" "Mark a source read, then ship it" \
+        "[--push] <slug>" "Mark a source read, then ship it" - \
         \
         open reading scripts/open-source.sh \
-        "<citekey>" "Open a source's note in Obsidian" \
+        "<citekey>" "Open a source's note in Obsidian" - \
         \
         window reading "python3 scripts/reading-window.py" \
-        "" "Show which reading events Micro.blog can still re-import" \
+        "" "Show which reading events Micro.blog can still re-import" - \
         \
         "check|preflight" check scripts/preflight.sh \
-        "[--strict] [--full]" "Pre-push gate; --full runs exactly what CI runs" \
+        "[--strict] [--full]" "Pre-push gate; --full runs exactly what CI runs" - \
         \
         serve check "hugo server -D --navigateToChanged" \
-        "[hugo flags]" "Preview at localhost:1313, drafts included" \
+        "[hugo flags]" "Preview at localhost:1313, drafts included" - \
         \
         ship publish scripts/ship.sh \
-        "[--full] [--yes] [message]" "Check, commit everything, push" \
+        "[--full] [--yes] [message]" "Check, commit everything, push" - \
         \
         logwriting publish scripts/log-writing.sh \
-        "" "End of session: count the vault, publish the writing log" \
+        "" "End of session: count the vault, publish the writing log" - \
         \
         archive maintain scripts/archive-links.sh \
-        "[--dry-run] [--all|files...]" "Repoint dead links at Wayback snapshots" \
+        "[--dry-run] [--all|files...]" "Repoint dead links at Wayback snapshots" paths \
         \
         csp maintain scripts/csp-hashes.sh \
-        "[--check|--write]" "Reconcile CSP hashes in static/_headers" \
+        "[--check|--write]" "Reconcile CSP hashes in static/_headers" - \
         \
         security maintain scripts/sign-security-txt.sh \
-        "[--check [--days N]]" "Re-sign security.txt, or check its expiry" \
+        "[--check [--days N]]" "Re-sign security.txt, or check its expiry" - \
         \
         hugo-version maintain scripts/sync-hugo-version.sh \
-        "" "Bump the Hugo version pinned in statichost.yml"
+        "" "Bump the Hugo version pinned in statichost.yml" -
 end

@@ -6,6 +6,11 @@ function readnote --description 'Scaffold a reading note from a Zotero citekey (
     # source tag to secondary; pass --primary for a primary source. The body
     # opens with a history-oriented scaffold plus any archival metadata Zotero
     # already knows.
+    if __help_requested $argv
+        echo "usage: readnote <citekey> [--primary]"
+        return 0
+    end
+
     argparse primary -- $argv
     or return 1
 

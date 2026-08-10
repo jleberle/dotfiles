@@ -6,6 +6,12 @@ function archverify --description 'Generate or verify a SHA-256 manifest of the 
     # checksum of every file under 03 Research/Archives so silent corruption — a
     # bad copy, a partial sync, disk bit-rot — is detectable. Run --update when
     # you add scans; run plain archverify periodically (or before a backup).
+    if __help_requested $argv
+        echo "usage: archverify            verify files against the stored manifest"
+        echo "       archverify --update   regenerate the manifest"
+        return 0
+    end
+
     set -l archives $RESEARCH_ARCHIVES_DIR
     if not test -d $archives
         echo "archverify: archive folder not found: $archives" >&2

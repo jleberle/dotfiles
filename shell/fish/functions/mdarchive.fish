@@ -4,6 +4,11 @@ function mdarchive --description 'Archive every URL cited in markdown files to t
     # with waybackup (bin/waybackup), prints the archive URL to cite alongside
     # the original. Archiving is slow (the Wayback Machine can take ~30s+ per
     # URL) — expect a wait on link-heavy manuscripts.
+    if __help_requested $argv
+        echo "usage: mdarchive <file.md> [more.md ...]"
+        return 0
+    end
+
     if test (count $argv) -eq 0
         echo "usage: mdarchive <file.md> [more.md ...]" >&2
         return 1

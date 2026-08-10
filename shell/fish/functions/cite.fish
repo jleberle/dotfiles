@@ -4,6 +4,11 @@ function cite --description 'Fuzzy-pick a citation from the BibTeX library; copi
     # for citing in email, BBEdit, or anywhere outside the editor.
     # Reads the .bib (not the .json pandoc renders from): the rg/grep below
     # parse BibTeX entry syntax. Citekeys are identical across both exports.
+    if __help_requested $argv
+        echo "usage: cite   (no arguments)"
+        return 0
+    end
+
     set -l bib $ZOTERO_LIBRARY_BIB
 
     if not test -f $bib

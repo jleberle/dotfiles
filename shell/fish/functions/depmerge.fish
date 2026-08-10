@@ -1,5 +1,10 @@
 function depmerge --description 'Rebase and fast-forward merge a GitHub Dependabot PR into main'
     # usage: depmerge <pr-number>
+    if __help_requested $argv
+        echo "usage: depmerge <pr-number>"
+        return 0
+    end
+
     if test (count $argv) -ne 1
         echo "usage: depmerge <pr-number>" >&2
         return 1

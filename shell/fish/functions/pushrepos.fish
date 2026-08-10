@@ -1,5 +1,10 @@
 function pushrepos --description 'Push every git repo under a directory that has commits ahead of its remote; errors on any repo with uncommitted changes instead of pushing it'
     # usage: pushrepos [dir]   (defaults to the current directory)
+    if __help_requested $argv
+        echo "usage: pushrepos [dir]   (defaults to the current directory)"
+        return 0
+    end
+
     set -l root (test (count $argv) -gt 0; and echo $argv[1]; or echo .)
     set -l had_error 0
 

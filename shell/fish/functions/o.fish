@@ -1,4 +1,9 @@
 function o --description 'Open cwd if no args, otherwise open the given paths'
+    if __help_requested $argv
+        echo "usage: o [paths]   (no args: open the cwd)"
+        return 0
+    end
+
     if test (uname) != Darwin
         echo "o is macOS only" >&2
         return 1

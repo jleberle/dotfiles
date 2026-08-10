@@ -1,5 +1,10 @@
 function linkcheck --description 'Check links in markdown files with lychee'
     # usage: linkcheck [file.md ...]   (no args: all *.md under the cwd)
+    if __help_requested $argv
+        echo "usage: linkcheck [file.md ...]   (no args: all *.md under the cwd)"
+        return 0
+    end
+
     if not type -q lychee
         echo "linkcheck: lychee not found (run: make apps)" >&2
         return 1

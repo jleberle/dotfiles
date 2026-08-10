@@ -25,7 +25,13 @@ alias biggest 'eza -lah --sort=size --reverse'
 alias cp 'cp -i'
 alias mv 'mv -i'
 alias reload 'exec fish'        # reload shell after editing dotfiles
-alias tmux 'tmux new-session -A -s main'  # attach to main session or create it
+# Attach to the main session or create it. An `abbr`, not an `alias`: fish
+# aliases append $argv, so `alias tmux 'tmux new-session -A -s main'` turned
+# `tmux ls` into `tmux new-session -A -s main ls` — every tmux subcommand
+# (ls, kill-server, new -s other) became something else, with `command tmux`
+# the only way back. As an abbreviation it expands before Enter, so plain
+# `tmux` still means tmux.
+abbr -a tm 'tmux new-session -A -s main'
 # NB: not `path` — that's a fish builtin (`path filter`/`basename`/…); shadowing
 # it breaks completions (e.g. git's) that call the builtin.
 alias paths 'string join \n $PATH'

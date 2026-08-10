@@ -1,4 +1,9 @@
 function gpg-master-done --description 'Remove GPG master key and reimport machine-specific subkeys only'
+    if __help_requested $argv
+        echo "usage: gpg-master-done   (no arguments)"
+        return 0
+    end
+
     set fingerprint 17904CDD2FA1441662D0CCD1E0646B558C79DB58
     set usb /Volumes/Files
     set machine (scutil --get LocalHostName)
@@ -11,12 +16,37 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
             set subkeys_file $usb/subkeys-ahsoka.gpg
             set subkey_ids 4BD1A809! 2F17E066! 533BAA7D!
         case '*'
-            echo "Error: unknown machine '$machine' — add it to gpg-master-done" >&2
+            echo "gpg-master-done: unknown machine '$machine' — add it to gpg-master-done" >&2
             return 1
     end
 
     if not test -f $subkeys_file
-        echo "Error: subkeys not found at $subkeys_file" >&2
+        echo "gpg-master-done: subkeys not found at $subkeys_file" >&2
+        return 1
+    end
+
+    # Both files are checked BEFORE anything is deleted. The keyring wipe below
+    # is only survivable because key.asc can be reimported afterwards, so a
+    # missing/renamed key.asc has to stop the run here, not halfway through.
+    if not test -f $usb/key.asc
+        echo "gpg-master-done: public key not found at $usb/key.asc" >&2
+        echo "                 refusing to delete local key material without it" >&2
+        return 1
+    end
+
+    # Never run this unattended: it destroys local key material and the only
+    # recovery path is the offline master.
+    if not status --is-interactive
+        echo "gpg-master-done: refusing to run non-interactively" >&2
+        return 1
+    end
+
+    echo "About to DELETE all local secret and public key material for:"
+    echo "  $fingerprint"
+    echo "then reimport $usb/key.asc plus this machine's subkeys ($machine)."
+    read -l -P "Continue? [y/N] " reply
+    if not contains -- "$reply" y Y
+        echo "aborted" >&2
         return 1
     end
 
@@ -49,6 +79,14 @@ function __gpg-master-done-run --description 'internal: gpg-master-done body (se
     echo "Exporting subkeys..."
     gpg --export-secret-subkeys $subkey_ids > $subkeys_tmp
     or return 1
+
+    # Re-check immediately before the point of no return: the wrapper verified
+    # key.asc, but the drive can be ejected between then and now, and after the
+    # next line it is the only way back.
+    if not test -f $usb/key.asc
+        echo "gpg-master-done: $usb/key.asc disappeared — aborting before delete" >&2
+        return 1
+    end
 
     # Wipe entire keyring entry
     echo "Deleting all secret and public key material..."

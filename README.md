@@ -85,7 +85,7 @@ names the problem and the fix.
 | `newdoc <file> [title]`    | New Markdown doc with Pandoc metadata, opened in Neovim       |
 | `cite`                     | Fuzzy-pick a citation; copies `@citekey`                      |
 | `citecheck <md…>`          | Validate a draft's citekeys against the Zotero library        |
-| `newreading <key> [type]`  | Start a source: vault reading note + website ledger entry     |
+| `readnote <key>`           | Scaffold a vault reading note from a Zotero citekey           |
 | `zotcheck [--list]`        | Reconcile reading/research notes against Zotero               |
 | `mdexport <fmt> <md…>`     | Pandoc export (crossref + citeproc) from the shell            |
 
@@ -135,6 +135,7 @@ dotfiles/
 ├── git/                  # gitconfig, gitignore, gitmessage, lazygit.yml
 │   └── hooks/            # pre-commit (gitleaks secret scan; via core.hooksPath)
 ├── homebrew/             # Brewfile + LaunchAgent plist templates
+├── keynote/              # lecture-deck → flash-drive sync (script, .app source, plist)
 ├── macos/                # macOS GUI artifacts
 │   └── services/         # Automator workflows symlinked into ~/Library/Services
 ├── shell/                # all terminal/shell environment configs

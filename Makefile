@@ -9,7 +9,7 @@ HOMEBREW_PREFIX := /opt/homebrew
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
-SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh git/hooks/pre-commit git/hooks/pre-push tests/writing-check.sh
+SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh keynote/sync_slides_drive.sh git/hooks/pre-commit git/hooks/pre-push tests/writing-check.sh
 PYTHON_FILES := bin/citecheck.py bin/zotcheck.py bin/readnote.py bin/waybackup bin/ipic
 FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish shell/fish/completions/*.fish
 LUACHECK_DIR := writing/nvim/lua
@@ -83,18 +83,41 @@ endef
 SYMLINK_ROWS := $(strip $(SYMLINKS))
 
 # Canned recipe: $(call install_symlinks,<group>) — creates every SYMLINKS row
-# tagged with <group> (ln -sfn handles both file and directory targets, and
-# mkdir -p covers a parent dir that doesn't exist yet, e.g. a clean ~/.config).
+# tagged with <group>. mkdir -p covers a parent dir that doesn't exist yet
+# (e.g. a clean ~/.config).
+#
+# The `-e && ! -L` guard is load-bearing, not belt-and-braces. `ln -sfn` replaces
+# an existing *symlink*, but against an existing *real directory* it silently
+# creates the link INSIDE it — so on a Mac that has already run fish or nvim,
+# `ln -sfn .../shell/fish ~/.config/fish` yields ~/.config/fish/fish and the
+# config never loads. `doctor` then reports "not symlinked (run: make shell)",
+# and re-running make shell does the same nothing: a loop with no way out.
+# Real files have the matching problem — an existing ~/.gitconfig would be
+# replaced outright with no copy kept. So anything that is not already a symlink
+# is moved aside to <target>.bak-<timestamp> first, and the move is announced.
 define install_symlinks
 @for row in $(foreach r,$(SYMLINK_ROWS),'$(r)'); do \
     IFS='|'; set -- $$row; unset IFS; \
     if [ "$$1" = "$(1)" ]; then \
         mkdir -p "$$(dirname "$$3")"; \
+        target="$$3"; $(backup_if_real); \
         ln -sfn "$(DOTFILES)/$$2" "$$3"; \
         echo "  $$2 -> $$3"; \
     fi; \
 done
 endef
+
+# Shell fragment: move "$$target" aside if it exists and is not a symlink. Set
+# `target=...` first, then invoke. Used by install_symlinks above and by the two
+# hand-written destinations under "Application Support" (Ghostty, lazygit) that
+# cannot live in the SYMLINKS table because the split would break on the space.
+backup_if_real = \
+    if [ -e "$$target" ] && [ ! -L "$$target" ]; then \
+        backup="$$target.bak-$$(date +%Y%m%d-%H%M%S)"; \
+        mv "$$target" "$$backup"; \
+        echo "  NOTE: $$target already existed and was not a symlink"; \
+        echo "        moved to $$backup"; \
+    fi
 
 # Canned recipe: $(call install_agent,<source plist path>) — template __HOME__ /
 # __HOMEBREW_PREFIX__ into ~/Library/LaunchAgents, lint, and (re)load it. The
@@ -126,6 +149,7 @@ git :
 	$(call install_symlinks,git)
 	@echo "Symlinking lazygit config"
 	mkdir -p "$(HOME)/Library/Application Support/lazygit"
+	@target="$(HOME)/Library/Application Support/lazygit/config.yml"; $(backup_if_real)
 	ln -sf $(DOTFILES)/git/lazygit.yml "$(HOME)/Library/Application Support/lazygit/config.yml"
 	@echo "Ensuring git hooks are executable (core.hooksPath → git/hooks)"
 	chmod +x $(DOTFILES)/git/hooks/pre-commit $(DOTFILES)/git/hooks/pre-push
@@ -145,6 +169,7 @@ shell :
 	@echo "Run 'make chsh' to set fish as your login shell (requires sudo)"
 	@echo "Symlinking Ghostty config"
 	mkdir -p "$(GHOSTTY_DIR)"
+	@target="$(GHOSTTY_DIR)/config"; $(backup_if_real)
 	ln -sf $(DOTFILES)/shell/ghostty/config "$(GHOSTTY_DIR)/config"
 security :
 	@echo "Creating SSH ControlPath directory"
@@ -324,6 +349,12 @@ resticcheck :
 	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
 decksync :
+	@# The .app is a wrapper around keynote/sync_slides_drive.sh; if that ever
+	@# moves again, fail here rather than installing an agent that no-ops
+	@# silently on every volume mount while doctor reports it healthy.
+	@[ -f "$(DOTFILES)/keynote/sync_slides_drive.sh" ] || \
+	    { echo "ERROR: keynote/sync_slides_drive.sh not found — run: git pull"; exit 1; }
+	chmod +x $(DOTFILES)/keynote/sync_slides_drive.sh
 	@echo "Building DeckSync.app (thin wrapper so folder access is scoped to one app, not /bin/bash)"
 	mkdir -p $(HOME)/Applications
 	osacompile -o $(HOME)/Applications/DeckSync.app $(DOTFILES)/keynote/DeckSync.applescript
@@ -406,8 +437,10 @@ nvim-check :
 	        fish -c 'source $(DOTFILES)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
 brew-check :
 	@echo "Checking Brewfile packages..."
+	@# The WARNING: prefix is the shared contract with `make check`, which
+	@# counts and re-lists those lines in its summary — see the note there.
 	@brew bundle check --file=$(DOTFILES)/homebrew/brewfile --no-upgrade || \
-	    echo "Run 'make apps' to install missing packages."
+	    echo "WARNING: some Brewfile packages are missing (run: make apps)"
 
 brew-drift :
 	@echo "Checking for formulae/casks installed but not in the Brewfile..."
@@ -477,6 +510,36 @@ doctor :
 	    fi; \
 	done
 	@echo "Done."
-check : doctor macos-check brew-check
-	@echo ""
-	@echo "All health checks complete. Run 'make brew-drift' to also list untracked installs."
+check :
+	@# Runs the three read-only check targets, then summarizes. The summary is
+	@# the point: doctor + macos-check + brew-check emit ~30 lines of "Checking
+	@# ..." headers, and a WARNING scrolls past in the middle of them. This used
+	@# to end with an unconditional "All health checks complete", so a machine
+	@# with a dozen real problems still signed off with a success line.
+	@#
+	@# Every check emits its problems as `WARNING: <what> (run: make <target>)`,
+	@# so counting and re-listing those lines needs no other bookkeeping. Adding
+	@# a check anywhere means matching that format and nothing else.
+	@#
+	@# Deliberately still exits 0: a non-zero exit here would print
+	@# "make: *** [check] Error 1" under the summary, which reads as "the health
+	@# check itself broke" rather than "your machine needs three fixes".
+	@tmp=$$(mktemp); \
+	$(MAKE) --no-print-directory doctor macos-check brew-check 2>&1 | tee "$$tmp"; \
+	n=$$(grep -c '^WARNING:' "$$tmp" 2>/dev/null || true); \
+	n=$${n:-0}; \
+	echo ""; \
+	echo "───────────────────────────────────────────────────────────────"; \
+	if [ "$$n" -eq 0 ]; then \
+	    echo "  ✓  All health checks passed — nothing to fix."; \
+	else \
+	    echo "  ✗  $$n problem(s) found:"; \
+	    echo ""; \
+	    grep '^WARNING:' "$$tmp" | sed 's/^WARNING: /     • /'; \
+	    echo ""; \
+	    echo "  Each line above ends with the command that fixes it."; \
+	fi; \
+	echo "───────────────────────────────────────────────────────────────"; \
+	echo ""; \
+	echo "Run 'make brew-drift' to also list untracked installs."; \
+	rm -f "$$tmp"

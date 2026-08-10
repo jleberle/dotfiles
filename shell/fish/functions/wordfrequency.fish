@@ -1,4 +1,9 @@
 function wordfrequency --description 'Count and sort word frequency from stdin'
+    if __help_requested $argv
+        echo "usage: <command> | wordfrequency   (reads stdin)"
+        return 0
+    end
+
     awk '
        BEGIN { FS="[^a-zA-Z]+" } {
            for (i=1; i<=NF; i++) {

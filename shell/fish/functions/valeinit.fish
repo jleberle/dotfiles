@@ -2,6 +2,11 @@ function valeinit --description 'Scaffold a per-project .vale.ini from the dotfi
     # usage: valeinit   (run in the project root)
     # A project-local .vale.ini overrides the global ~/.vale.ini that
     # `make vale` installs (nvim-lint picks whichever is nearest).
+    if __help_requested $argv
+        echo "usage: valeinit   (run in the project root)"
+        return 0
+    end
+
     if test -e .vale.ini
         echo "valeinit: .vale.ini already exists here" >&2
         return 1

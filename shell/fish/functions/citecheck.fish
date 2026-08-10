@@ -3,6 +3,11 @@ function citecheck --description 'Check every @citekey in a draft exists in the 
     # Catches broken pandoc citations (typos, deleted items, key drift) before
     # export — otherwise they render as "???" or silently vanish in the PDF.
     # Supports both normal @citekey and suppressed-author -@citekey forms.
+    if __help_requested $argv
+        echo "usage: citecheck <file.md> [more.md ...]"
+        return 0
+    end
+
     if test (count $argv) -eq 0
         echo "usage: citecheck <file.md> [more.md ...]" >&2
         return 1

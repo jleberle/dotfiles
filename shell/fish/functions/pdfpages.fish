@@ -2,6 +2,12 @@ function pdfpages --description 'Extract a page range from a PDF (qpdf)'
     # usage: pdfpages <in.pdf> <range> [out.pdf]
     # e.g.:  pdfpages reader.pdf 10-25        → reader-p10-25.pdf
     #        pdfpages scan.pdf 1,5-9 excerpt.pdf
+    if __help_requested $argv
+        echo "usage: pdfpages <in.pdf> <range> [out.pdf]"
+        echo "       range examples: 7   10-25   1,5-9   z (last page)"
+        return 0
+    end
+
     if test (count $argv) -lt 2
         echo "usage: pdfpages <in.pdf> <range> [out.pdf]" >&2
         echo "       range examples: 7   10-25   1,5-9   z (last page)" >&2

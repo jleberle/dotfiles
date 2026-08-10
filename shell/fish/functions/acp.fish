@@ -1,5 +1,10 @@
 function acp --description 'All-in-one Git: add, signed commit, push'
     # usage: acp <commit message>   (quotes optional)
+    if __help_requested $argv
+        echo "usage: acp <commit message>   (quotes optional)"
+        return 0
+    end
+
     if test (count $argv) -eq 0
         echo "usage: acp <commit message>" >&2
         return 1

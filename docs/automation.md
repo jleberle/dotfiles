@@ -36,7 +36,7 @@ install time):
 | `org.jaredeberle.brewlogclean`    | Mondays 08:00    | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
 | `org.jaredeberle.mailsync`        | Every 5 minutes  | `bin/mailsync.sh`                                                     |
 | `org.jaredeberle.resticcheck`     | Sundays 10:00    | `archbackup check` (restic integrity; no-op if the drive is unmounted) |
-| `org.jaredeberle.decksync`        | On volume mount  | `sync_slides_drive.sh` — pushes `.pptx` exports of the Keynote lecture decks to the "Slides" flash drive (`WatchPaths` on `/Volumes`; no-op unless that drive appeared) |
+| `org.jaredeberle.decksync`        | On volume mount  | `keynote/sync_slides_drive.sh` (via `DeckSync.app`) — pushes `.pptx` + PDF exports of the Keynote lecture decks to the "R2-D2" flash drive (`WatchPaths` on `/Volumes`; no-op unless that drive appeared) |
 
 Logs: `~/.local/brew_update_logs.txt` (newest run first),
 `~/.local/mail_sync_logs.txt`, `~/.local/restic_check_logs.txt`. Trigger a run

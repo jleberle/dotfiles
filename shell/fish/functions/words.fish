@@ -3,6 +3,11 @@ function words --description 'Prose word count via pandoc (excludes frontmatter,
     # `wc -w` over-counts markdown (YAML frontmatter, citekeys, link URLs,
     # crossref labels); converting to plain text first counts what a reader
     # — or a journal's word limit — actually sees.
+    if __help_requested $argv
+        echo "usage: words <file.md> [more.md ...]"
+        return 0
+    end
+
     if test (count $argv) -eq 0
         echo "usage: words <file.md> [more.md ...]" >&2
         return 1

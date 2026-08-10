@@ -155,11 +155,15 @@ picker.
 Autoloaded — call them like commands. (The writing/research functions are
 documented in [Writing](writing.md#writing-functions-and-aliases-fish).)
 
+Every one of them takes `--help` (or `-h`) and prints its usage without doing
+anything else, so you never have to remember which argument came first. Typing
+a function's name with no arguments does the same wherever arguments are
+required.
+
 | Function                | Usage / behavior                                                                      |
 |-------------------------|---------------------------------------------------------------------------------------|
 | `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |
-| `site <cmd> [args]`     | Website (jaredeberle.org) tasks from anywhere — pure dispatch to `~/git/website/scripts/`: `new`/`images`/`publish`/`preflight`/`ship`/`serve`/`archive`/`cite-refs`/`to-avif`/`sync-reading`/`newsource`/`newbook`/`finishsource`/`finishbook`. Run `site` with no arguments for usage. See [Writing → Reading workflow](writing.md#reading-workflow-vault--website) |
-| `newreading <key> [type]` | `readnote` + `site sync-reading` in one step — see [Writing → Reading workflow](writing.md#reading-workflow-vault--website) |
+| `site <cmd> [args]`     | Website (jaredeberle.org) tasks from anywhere — pure dispatch to `~/git/website/scripts/`. Run `site` with no arguments for the full, always-current command list (it and the completions are generated from the same table, so neither can advertise a command that no longer exists). See [Writing → Reading workflow](writing.md#reading-workflow-vault--website) |
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
@@ -177,6 +181,11 @@ documented in [Writing](writing.md#writing-functions-and-aliases-fish).)
 ---
 
 ## tmux
+
+**Starting it:** the `tm` abbreviation expands to
+`tmux new-session -A -s main` — attaches to the `main` session or creates it.
+Plain `tmux` is left alone, so `tmux ls`, `tmux kill-server`, and
+`tmux new -s other` all still work.
 
 **Prefix:** `Ctrl-a` (remapped from the default `Ctrl-b`). Press `Ctrl-a`
 twice to send a literal `Ctrl-a` to the underlying program.

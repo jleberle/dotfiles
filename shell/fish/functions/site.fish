@@ -23,10 +23,12 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
 
     # Resolve the command against the table, honouring aliases.
     set -l runner
+    set -l takes_paths -
     for row in (__site_registry)
         set -l field (string split \t -- $row)
         if contains -- $cmd (string split '|' -- $field[1])
             set runner $field[3]
+            set takes_paths $field[6]
             break
         end
     end
@@ -93,13 +95,23 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
     # from inside the repo — but arguments like image files are relative to
     # the caller's cwd. Absolutize any argument that exists here; leave
     # repo-relative paths (which don't exist here) and flags untouched.
+    #
+    # Only for commands whose arguments ARE paths, per the table's last column.
+    # Testing every argument against the filesystem was the bug: run beside a
+    # folder called Notes, `site newsource book Notes` silently retitled the
+    # source to /Users/you/.../Notes. Titles, slugs and citekeys are never
+    # paths, so for those commands the arguments pass through untouched.
     set -l args
-    for a in $argv[2..-1]
-        if test -e $a
-            set -a args (path resolve $a)
-        else
-            set -a args $a
+    if test "$takes_paths" = paths
+        for a in $argv[2..-1]
+            if test -e $a
+                set -a args (path resolve $a)
+            else
+                set -a args $a
+            end
         end
+    else
+        set args $argv[2..-1]
     end
 
     pushd $repo
