@@ -19,6 +19,9 @@ function __site_registry --description 'Command table for `site` — one source 
     # list, so each group of five below is one row. Escapes are NOT processed
     # inside %s arguments, which is why the separators can't live in the rows.
     printf '%s\t%s\t%s\t%s\t%s\n' \
+        doctor setup scripts/doctor.sh \
+        "[--quiet]" "Check this machine has what the site needs" \
+        \
         new write scripts/newpost.sh \
         "<article|review|quote> [--cover] [title]" "Start a draft (created outside the repo)" \
         \

@@ -110,8 +110,9 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
 end
 
 function __site_usage --description 'Grouped help for `site`, rendered from __site_registry'
-    set -l groups write reading check publish maintain
+    set -l groups setup write reading check publish maintain
     set -l titles \
+        "SETUP      start here on a new machine" \
         "WRITE      drafting and publishing a post" \
         "READING    the bibliography and reading ledger" \
         "CHECK      before you push" \
