@@ -11,7 +11,7 @@ SERVICES_DIR := $(HOME)/Library/Services
 
 SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh git/hooks/pre-commit git/hooks/pre-push tests/writing-check.sh
 PYTHON_FILES := bin/citecheck.py bin/zotcheck.py bin/readnote.py bin/waybackup bin/ipic
-FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish
+FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish shell/fish/completions/*.fish
 LUACHECK_DIR := writing/nvim/lua
 
 # Managed macOS defaults, one row per line: domain|key|type|value.
