@@ -5,12 +5,13 @@ function cdf --description 'cd to the top-most Finder window location'
     end
 
     if test (uname) != Darwin
-        echo "cdf is macOS only" >&2
+        echo "cdf: macOS only — it asks Finder for its window via osascript" >&2
         return 1
     end
     set -l dir (osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)' 2>/dev/null)
     if test -z "$dir"
-        echo "No Finder window open" >&2
+        echo "cdf: no Finder window open" >&2
+        echo "        open one (or click the Desktop) and run cdf again" >&2
         return 1
     end
     cd $dir

@@ -86,7 +86,16 @@ source "$tmp_dir/prelude.fish"
 zotcheck --list
 EOF_FISH
 
-zot_output=$(fish "$tmp_dir/run-zotcheck.fish")
+# This fixture has an orphan (missing2022), so a non-zero exit is the CORRECT
+# result — commands here exit non-zero when they find something to fix. Capture
+# the status rather than letting `set -e` abort on it.
+zot_status=0
+zot_output=$(fish "$tmp_dir/run-zotcheck.fish") || zot_status=$?
+[[ $zot_status -eq 1 ]] || {
+  echo "writing-check: zotcheck should exit 1 when it finds an orphaned note (got $zot_status)" >&2
+  echo "$zot_output" >&2
+  exit 1
+}
 [[ $zot_output == *"missing2022  (nested/missing2022.md)"* ]] || {
   echo "writing-check: zotcheck did not report the nested orphaned note" >&2
   echo "$zot_output" >&2
@@ -100,6 +109,18 @@ zot_output=$(fish "$tmp_dir/run-zotcheck.fish")
 [[ $zot_output != *"smith2020"* ]] || {
   echo "writing-check: zotcheck treated a nested note as missing" >&2
   echo "$zot_output" >&2
+  exit 1
+}
+
+# The other half of that contract: a backlog is not a failure. The research tree
+# alone has no orphan — only Zotero items still lacking a note — so this must
+# exit 0. Without this case, "always exit 1" would pass the check above.
+zot_clean_status=0
+zot_clean_output=$("$repo_dir/bin/zotcheck.py" "$tmp_dir/Library.json" "$tmp_dir/research") \
+  || zot_clean_status=$?
+[[ $zot_clean_status -eq 0 ]] || {
+  echo "writing-check: zotcheck should exit 0 when the only finding is a reading backlog (got $zot_clean_status)" >&2
+  echo "$zot_clean_output" >&2
   exit 1
 }
 

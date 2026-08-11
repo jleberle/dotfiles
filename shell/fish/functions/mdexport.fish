@@ -21,7 +21,7 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
     set -l failed 0
 
     for file in $argv[2..-1]
-        if not test -f $file
+        if not test -f "$file"
             echo "mdexport: no such file: $file" >&2
             set failed 1
             continue

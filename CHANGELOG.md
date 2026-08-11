@@ -7,6 +7,39 @@ everything since is one entry per real milestone.
 
 ---
 
+## 2026-08-11 — Audit follow-up: naming and conventions
+
+Four rules are now written down in [docs/shell.md](docs/shell.md#conventions)
+and followed everywhere, so the functions behave predictably without reading
+their source.
+
+- **`archcheck` is now `archocr`.** It was one of six unrelated commands ending
+  in `-check`, and the one thing it did *not* check was the archive (that is
+  `archverify`) or the backup (`archbackup check`). The old name survives as a
+  stub that points at the new one and exits 1; delete
+  `shell/fish/functions/archcheck.fish` once the new name is habit.
+- **Finding something now always means exit non-zero.** `citecheck`, `archocr`
+  and `archverify` already did; `zotcheck` returned 0 no matter what it found,
+  so two adjacent commands in the same workflow had opposite conventions.
+  `zotcheck` now exits 1 on orphaned notes — a real, current breakage — but
+  still 0 on its count of Zotero items lacking a note, which is a reading
+  backlog and never empty. Nothing in either repo chains it, so this changes no
+  existing behavior beyond the exit status itself.
+- **`archverify --update` is `archverify update`.** Words select an action,
+  flags modify one: `archbackup snapshots`, `docx2md accept`, `site build`
+  against `zotcheck --list`, `readnote --primary`, `csvsort --header`. The old
+  flag still works. A typo'd subcommand is now an error rather than silently
+  falling through to a verify run.
+- **One error format.** `name: what went wrong`, then any fix indented eight
+  spaces — replacing a mix of `Error:`, bare sentences, and three different
+  indents. Naming the fix as well as the problem is the `make` targets'
+  convention, which was already the best one in the repo.
+- **`test` operands are quoted** in 22 more places. An unset variable used to
+  collapse `test -d $x` into `test -d`, so fish raised its own internal error
+  instead of the friendly message on the next line.
+
+---
+
 ## 2026-08-10 — Audit follow-up: uniform guards, fewer moving parts
 
 - **`bin/homebrewlogclean.sh` and its launchd agent are gone.**

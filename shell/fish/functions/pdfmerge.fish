@@ -12,13 +12,13 @@ function pdfmerge --description 'Merge PDFs into one (qpdf)'
         return 1
     end
 
-    if test -e $argv[1]
+    if test -e "$argv[1]"
         echo "pdfmerge: refusing to overwrite existing $argv[1]" >&2
         return 1
     end
 
     for in in $argv[2..-1]
-        if not test -f $in
+        if not test -f "$in"
             echo "pdfmerge: no such file: $in" >&2
             return 1
         end

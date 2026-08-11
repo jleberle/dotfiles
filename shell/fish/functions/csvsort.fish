@@ -26,7 +26,7 @@ function csvsort --description 'Sort CSVs in a directory by the last word of the
         set dir $argv[1]
     end
 
-    if not test -d $dir
+    if not test -d "$dir"
         echo "csvsort: no such directory: $dir" >&2
         return 1
     end

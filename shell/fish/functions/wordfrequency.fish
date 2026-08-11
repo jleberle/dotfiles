@@ -9,9 +9,8 @@ function wordfrequency --description 'Count and sort word frequency from stdin'
     # The docs say "reads stdin", but the person who typed it bare is not
     # reading the docs at that moment.
     if isatty stdin
-        echo "wordfrequency: reads stdin — pipe something into it" >&2
-        echo "usage: <command> | wordfrequency" >&2
-        echo "   e.g. cat draft.md | wordfrequency | head -20" >&2
+        echo "wordfrequency: reads stdin, so typed bare it would just sit there" >&2
+        echo "        pipe something in: cat draft.md | wordfrequency | head -20" >&2
         return 1
     end
 

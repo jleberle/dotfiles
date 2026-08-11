@@ -20,7 +20,7 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
             return 1
     end
 
-    if not test -f $subkeys_file
+    if not test -f "$subkeys_file"
         echo "gpg-master-done: subkeys not found at $subkeys_file" >&2
         return 1
     end
@@ -28,9 +28,9 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
     # Both files are checked BEFORE anything is deleted. The keyring wipe below
     # is only survivable because key.asc can be reimported afterwards, so a
     # missing/renamed key.asc has to stop the run here, not halfway through.
-    if not test -f $usb/key.asc
+    if not test -f "$usb/key.asc"
         echo "gpg-master-done: public key not found at $usb/key.asc" >&2
-        echo "                 refusing to delete local key material without it" >&2
+        echo "        refusing to delete local key material without it" >&2
         return 1
     end
 
@@ -46,7 +46,7 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
     echo "then reimport $usb/key.asc plus this machine's subkeys ($machine)."
     read -l -P "Continue? [y/N] " reply
     if not contains -- "$reply" y Y
-        echo "aborted" >&2
+        echo "gpg-master-done: aborted" >&2
         return 1
     end
 
@@ -83,7 +83,7 @@ function __gpg-master-done-run --description 'internal: gpg-master-done body (se
     # Re-check immediately before the point of no return: the wrapper verified
     # key.asc, but the drive can be ejected between then and now, and after the
     # next line it is the only way back.
-    if not test -f $usb/key.asc
+    if not test -f "$usb/key.asc"
         echo "gpg-master-done: $usb/key.asc disappeared — aborting before delete" >&2
         return 1
     end

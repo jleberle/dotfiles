@@ -20,7 +20,7 @@ function acp --description 'All-in-one Git: add, signed commit, push'
     git add .
 
     if git diff --cached --quiet
-        echo "Nothing to commit." >&2
+        echo "acp: nothing to commit — the working tree is clean" >&2
         return 1
     end
 
@@ -39,7 +39,7 @@ function acp --description 'All-in-one Git: add, signed commit, push'
         read -l -P "That is a lot of files. Commit and push them? [y/N] " reply
         if not string match -qi 'y*' -- $reply
             git reset >/dev/null
-            echo "Cancelled — nothing committed, staging area reset." >&2
+            echo "acp: cancelled — nothing committed, staging area reset" >&2
             return 1
         end
     end

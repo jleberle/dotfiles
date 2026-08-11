@@ -41,7 +41,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
     # unmounted drive and return success.
     if not set -q RESTIC_PASSWORD_FILE; and not set -q RESTIC_PASSWORD
         echo "archbackup: neither RESTIC_PASSWORD_FILE nor RESTIC_PASSWORD is set" >&2
-        echo "            (see the one-time setup in the function header)" >&2
+        echo "        (see the one-time setup in the function header)" >&2
         return 1
     end
     if set -q RESTIC_PASSWORD_FILE; and not test -f "$RESTIC_PASSWORD_FILE"
@@ -72,7 +72,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
             # (sftp:/s3:/rest: …) has no local directory, so for those any
             # failure is a real failure.
             if not string match -qr '^[a-z0-9]+:' -- $ARCHIVE_RESTIC_REPO
-                if not test -d $ARCHIVE_RESTIC_REPO
+                if not test -d "$ARCHIVE_RESTIC_REPO"
                     echo "archbackup: $ARCHIVE_RESTIC_REPO not present (drive unmounted?) — skipping check" >&2
                     return 0
                 end
@@ -80,7 +80,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
 
             if not restic -r $ARCHIVE_RESTIC_REPO cat config >/dev/null 2>&1
                 echo "archbackup: repo is present but restic cannot read it" >&2
-                echo "            check RESTIC_PASSWORD_FILE, or run: restic -r $ARCHIVE_RESTIC_REPO cat config" >&2
+                echo "        check RESTIC_PASSWORD_FILE, or run: restic -r $ARCHIVE_RESTIC_REPO cat config" >&2
                 return 1
             end
             restic -r $ARCHIVE_RESTIC_REPO check --read-data-subset=5%

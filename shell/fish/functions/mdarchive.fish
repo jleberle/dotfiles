@@ -17,7 +17,7 @@ function mdarchive --description 'Archive every URL cited in markdown files to t
     __require mdarchive lychee; or return 1
 
     for file in $argv
-        if not test -f $file
+        if not test -f "$file"
             echo "mdarchive: no such file: $file" >&2
             return 1
         end

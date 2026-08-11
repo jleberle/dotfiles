@@ -160,6 +160,36 @@ anything else, so you never have to remember which argument came first. Typing
 a function's name with no arguments does the same wherever arguments are
 required.
 
+#### Conventions
+
+Four rules these functions follow, so behavior is predictable without reading
+the source. They were written down after an audit found each one broken
+somewhere — if you add a function, follow them.
+
+**Words choose the action, flags modify it.** `archbackup snapshots`,
+`archverify update`, `docx2md accept`, `site build` pick *what the command
+does*. `zotcheck --list`, `readnote --primary`, `csvsort --header`, `acp --yes`
+change *how it does the one thing it does*. When a command has no modes, its
+arguments are plain positional paths.
+
+**Exit non-zero when there is something to fix.** `citecheck`, `archocr`,
+`archverify`, and `zotcheck` all return 1 on a finding and 0 on a clean run, so
+they chain with `and` / `;` and can be used in a script or a git hook. The
+distinction is *actionable*, not merely *notable*: `zotcheck` fails on orphaned
+notes (broken links, right now) but not on its count of Zotero items still
+lacking a note, which is a reading backlog and never empty.
+
+**Errors start with the command's own name.** `archgrep: no such file …`, never
+a bare `Error:` or a bare sentence — so a message stays attributable after it
+has scrolled past, or when it surfaces from inside a launchd job's log.
+
+**Name the fix, not just the problem.** Where there is an obvious next step, a
+second line indented eight spaces gives it — `brew install ripgrep-all`, `run:
+archocr`, `export Better CSL JSON from Zotero`. This is the `make` targets'
+convention (`WARNING: … (run: make shell)`), which was the best one in the repo.
+`__require` and `__need_path` produce it automatically for the two most common
+failures, a missing tool and a missing path.
+
 | Function                | Usage / behavior                                                                      |
 |-------------------------|---------------------------------------------------------------------------------------|
 | `dots <target>`         | Run a dotfiles `make` target from any directory (`dots doctor`, `dots install`, etc.) |

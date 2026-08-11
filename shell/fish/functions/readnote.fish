@@ -27,7 +27,7 @@ function readnote --description 'Scaffold a reading note from a Zotero citekey (
     __need_path readnote dir "reading-notes folder" "$READING_NOTES_DIR"; or return 1
 
     set -l file $READING_NOTES_DIR/$key.md
-    if test -e $file
+    if test -e "$file"
         echo "readnote: note already exists: $file" >&2
         return 1
     end

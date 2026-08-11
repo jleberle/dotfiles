@@ -17,7 +17,7 @@ function words --description 'Prose word count via pandoc (excludes frontmatter,
     set -l counted 0
 
     for file in $argv
-        if not test -f $file
+        if not test -f "$file"
             echo "words: no such file: $file" >&2
             continue
         end

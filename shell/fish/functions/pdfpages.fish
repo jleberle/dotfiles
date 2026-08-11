@@ -19,7 +19,7 @@ function pdfpages --description 'Extract a page range from a PDF (qpdf)'
     set -l in $argv[1]
     set -l range $argv[2]
 
-    if not test -f $in
+    if not test -f "$in"
         echo "pdfpages: no such file: $in" >&2
         return 1
     end
@@ -31,7 +31,7 @@ function pdfpages --description 'Extract a page range from a PDF (qpdf)'
         set out (path change-extension '' $in)"-p$range.pdf"
     end
 
-    if test -e $out
+    if test -e "$out"
         echo "pdfpages: refusing to overwrite existing $out" >&2
         return 1
     end

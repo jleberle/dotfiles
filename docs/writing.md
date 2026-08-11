@@ -217,11 +217,11 @@ like commands. (General-purpose shell functions are listed under
 | `pdfmerge <out> <in…>`  | Merge PDFs into one (`qpdf`)                                                          |
 | `wordfrequency`         | Read stdin, print word counts sorted high→low (great for prose)                       |
 | `archgrep <query>`      | Full-text search the OCR'd archival scans (`ripgrep-all`); prints matching page numbers |
-| `archcheck`             | List archival PDFs with no OCR text layer (run `ocrmypdf` on those)                    |
-| `archverify [--update]` | SHA-256 manifest of the scans; detects corruption / bit-rot                           |
+| `archocr`               | List archival PDFs with no OCR text layer (run `ocrmypdf` on those)                    |
+| `archverify [update]`   | SHA-256 manifest of the scans; detects corruption / bit-rot                           |
 | `archbackup [snapshots]`| `restic` versioned, encrypted snapshot of the archive to an external HD               |
 | `citecheck <md…>`       | Validate every `@citekey` / `-@citekey` in a draft against `Library.json` before export |
-| `zotcheck [--list]`     | Reconcile notes vs Zotero recursively — orphaned citekeys, and items lacking a note   |
+| `zotcheck [--list]`     | Reconcile notes vs Zotero recursively — orphaned citekeys, and items lacking a note. Exits non-zero on orphans only (see [conventions](shell.md#conventions)) |
 | `readnote <key> [--primary]` | Scaffold a history-oriented reading note for a Zotero citekey (metadata from `Library.json` + archival fields when present); closes a `zotcheck` gap |
 
 **Bibliography sources.** Pandoc *rendering* (`newdoc`, `metadata.yaml`) reads
@@ -231,7 +231,7 @@ Zotero's archive / box-folder fields that BibTeX drops; the citekey *pickers*
 Better BibTeX keeps both auto-exported. The Obsidian Pandoc plugins use the same
 CMOS 18e CSL, so in-app previews match final output.
 
-**Archive integrity.** `archgrep` / `archcheck` / `archverify` / `archbackup`
+**Archive integrity.** `archgrep` / `archocr` / `archverify` / `archbackup`
 operate on `~/Notes/03 Research/Archives` (the Obsidian vault, outside this repo)
 — the functions live here, the irreplaceable scans live there.
 

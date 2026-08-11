@@ -38,8 +38,9 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
         set filename "$filename.md"
     end
 
-    if test -e $filename
-        echo "File already exists: $filename" >&2
+    if test -e "$filename"
+        echo "newdoc: file already exists: $filename" >&2
+        echo "        pick another name, or open the existing one: nvim $filename" >&2
         return 1
     end
 

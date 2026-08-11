@@ -35,13 +35,13 @@ function docx2md --description 'Convert a .docx (e.g. returned editor revisions)
         return 1
     end
 
-    if not test -f $in
+    if not test -f "$in"
         echo "docx2md: no such file: $in" >&2
         return 1
     end
 
     set -l out (path change-extension md $in)
-    if test -e $out
+    if test -e "$out"
         echo "docx2md: refusing to overwrite existing $out" >&2
         return 1
     end

@@ -5,7 +5,7 @@ function pman --description 'Open man pages in Preview'
     end
 
     if test (uname) != Darwin
-        echo "pman is macOS only" >&2
+        echo "pman: macOS only — it renders the man page through Preview" >&2
         return 1
     end
     man -t $argv | open -f -a Preview

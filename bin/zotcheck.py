@@ -45,7 +45,13 @@ def main(argv):
     if show:
         for k in missing:
             print(f"  {k}")
-    return 0
+
+    # Exit non-zero when there is something to FIX, matching citecheck, archocr
+    # and archverify. Only orphans qualify: an orphaned note has broken [[links]]
+    # and @citations right now. "Items with no note yet" is a reading backlog —
+    # never empty by design, so failing on it would make zotcheck permanently
+    # red and therefore permanently ignored.
+    return 1 if orphans else 0
 
 
 if __name__ == "__main__":

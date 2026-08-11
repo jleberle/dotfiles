@@ -8,9 +8,9 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         set repo $HOME/git/website
     end
 
-    if not test -d $repo/scripts
+    if not test -d "$repo/scripts"
         echo "site: no website repo at '$repo'." >&2
-        echo "      Set WEBSITE_REPO to its path, or clone it to ~/git/website." >&2
+        echo "        Set WEBSITE_REPO to its path, or clone it to ~/git/website." >&2
         return 1
     end
 
@@ -69,9 +69,9 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
         end
 
         if test (count $near) -gt 0
-            echo "      Did you mean: "(string join ', ' $near)"?" >&2
+            echo "        Did you mean: "(string join ', ' $near)"?" >&2
         else
-            echo "      Run 'site' with no arguments to see everything it can do." >&2
+            echo "        Run 'site' with no arguments to see everything it can do." >&2
         end
         return 1
     end
@@ -83,9 +83,9 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
     # user's mistake; this names the table instead.
     for part in $parts
         if string match -qr '\.(sh|py)$' -- $part
-            if not test -f $repo/$part
+            if not test -f "$repo/$part"
                 echo "site: '$cmd' runs $part, which is not in the repo." >&2
-                echo "      The table in __site_registry.fish is out of date — fix it there." >&2
+                echo "        The table in __site_registry.fish is out of date — fix it there." >&2
                 return 127
             end
         end
@@ -104,7 +104,7 @@ function site --description 'Run website (jaredeberle.org) tasks from anywhere'
     set -l args
     if test "$takes_paths" = paths
         for a in $argv[2..-1]
-            if test -e $a
+            if test -e "$a"
                 set -a args (path resolve $a)
             else
                 set -a args $a

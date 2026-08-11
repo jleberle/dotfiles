@@ -20,7 +20,7 @@ function fuck --description 'Re-run the previous command under sudo (after confi
     if test "$reply" = y -o "$reply" = Y
         sudo fish -c "$cmd"
     else
-        echo "aborted" >&2
+        echo "fuck: aborted" >&2
         return 1
     end
 end
