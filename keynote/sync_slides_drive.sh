@@ -64,28 +64,42 @@ fi
 
 updated=0
 
+# Paths reach AppleScript as ARGUMENTS, never spliced into the script text. The
+# heredoc delimiter is quoted ('APPLESCRIPT'), so the shell expands nothing
+# inside it. Interpolating instead -- which is what these two did -- breaks on any
+# deck whose name contains a double quote: `The "New" Deal.key` closed the
+# AppleScript string literal and osascript failed with a syntax error, logged as
+# "FAILED export" while the drive kept a stale copy. A name crafted as
+# `" & (do shell script "...") & "` would have executed instead. Both are gone
+# once nothing is interpolated; `osascript -` reads the script from stdin and
+# hands the remaining arguments to `on run argv`.
+
 # Open a .key once and export BOTH the PowerPoint copy and the PDF backup.
 export_key() {
   local key_path="$1" out_pptx="$2" out_pdf="$3"
-  osascript <<APPLESCRIPT >> "$LOG" 2>&1
-tell application "Keynote"
-  set theDoc to open POSIX file "$key_path"
-  export theDoc to POSIX file "$out_pptx" as Microsoft PowerPoint
-  export theDoc to POSIX file "$out_pdf" as PDF
-  close theDoc saving no
-end tell
+  osascript - "$key_path" "$out_pptx" "$out_pdf" >> "$LOG" 2>&1 <<'APPLESCRIPT'
+on run argv
+  tell application "Keynote"
+    set theDoc to open POSIX file (item 1 of argv)
+    export theDoc to POSIX file (item 2 of argv) as Microsoft PowerPoint
+    export theDoc to POSIX file (item 3 of argv) as PDF
+    close theDoc saving no
+  end tell
+end run
 APPLESCRIPT
 }
 
 # Export just a PDF backup from a plain .pptx (legacy decks not yet .key).
 export_pptx_pdf() {
   local pptx_path="$1" out_pdf="$2"
-  osascript <<APPLESCRIPT >> "$LOG" 2>&1
-tell application "Keynote"
-  set theDoc to open POSIX file "$pptx_path"
-  export theDoc to POSIX file "$out_pdf" as PDF
-  close theDoc saving no
-end tell
+  osascript - "$pptx_path" "$out_pdf" >> "$LOG" 2>&1 <<'APPLESCRIPT'
+on run argv
+  tell application "Keynote"
+    set theDoc to open POSIX file (item 1 of argv)
+    export theDoc to POSIX file (item 2 of argv) as PDF
+    close theDoc saving no
+  end tell
+end run
 APPLESCRIPT
 }
 

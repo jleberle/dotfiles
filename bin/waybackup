@@ -11,6 +11,7 @@ Prints the archived snapshot URL on success.
 
 from __future__ import annotations
 
+import email.message
 import json
 import socket
 import sys
@@ -33,13 +34,18 @@ def validate_url(url: str) -> bool:
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
 
 
-def fetch(url: str, timeout: float) -> tuple[str, "email.message.Message", bytes]:
+# The headers object is an http.client.HTTPMessage, which subclasses
+# email.message.Message — that base class is the stable, documented name for the
+# mapping interface both this module and extract_snapshot_url() actually use.
+def fetch(url: str, timeout: float) -> tuple[str, email.message.Message, bytes]:
     request = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.geturl(), response.headers, response.read()
 
 
-def extract_snapshot_url(final_url: str, headers, body: bytes) -> str | None:
+def extract_snapshot_url(
+    final_url: str, headers: email.message.Message, body: bytes
+) -> str | None:
     # Final redirected URL
     if final_url.startswith("https://web.archive.org/web/"):
         return final_url

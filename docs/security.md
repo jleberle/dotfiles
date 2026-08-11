@@ -44,6 +44,15 @@ Configs symlinked by `make security`:
   a global `core.hooksPath` runs `gitleaks` on staged changes before every
   commit, and `*.fsckObjects` reject malformed objects on fetch/clone. See
   [Git](git.md).
+
+  Three layers, each covering a gap the others leave. The pre-commit hook stops
+  a secret before it is committed. CI re-scans the **whole history** on every
+  push — which needs `fetch-depth: 0` in the workflow, because checkout defaults
+  to a one-commit clone and gitleaks then only sees the tip, so a secret that was
+  committed and later deleted passes clean. GitHub's own secret scanning and push
+  protection catch known provider tokens (AWS, Stripe, GitHub) across history,
+  but non-provider patterns are off, which is exactly the generic/high-entropy
+  space gitleaks covers.
 - **Shell/env hardening** (`shell/fish/conf.d/env.fish`): `umask 077` (owner-only
   by default), `HOMEBREW_NO_INSECURE_REDIRECT`, and a
   `fish_should_add_to_history` filter that keeps space-prefixed and
@@ -112,6 +121,13 @@ Not part of `make install` — each touches system state and most need `sudo`:
   `make macos-check` warns if full-disk encryption is off (`make check` runs it).
 - **Backup integrity**: `archbackup check` runs `restic check` on the encrypted
   research-scan repo; `make resticcheck` schedules it weekly (see
-  [Automation → Launchd](automation.md#launchd)).
+  [Automation → Launchd](automation.md#launchd)). A run that finds the drive
+  unmounted exits 0 on purpose — the drive is normally unplugged, and a weekly
+  failure for that would train you to ignore the job. So that a skip can never
+  be mistaken for a pass, a successful check stamps
+  `~/.local/.restic_verified`, and `make doctor` warns once that stamp is
+  missing or older than 35 days (`RESTIC_VERIFY_MAX_AGE_DAYS` in the Makefile).
+  Without it, a machine whose drive is never plugged in logs "skipping check"
+  every Sunday forever while every health check stays green.
 
 `make macos-check` verifies the `harden`/`touchid`/FileVault state.

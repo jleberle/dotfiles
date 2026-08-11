@@ -140,5 +140,12 @@ When something feels wrong, `make check` names the problem and the fix.
 ## Credits
 
 Many of these files have been refined over years from sources I've mostly
-forgotten — if something here deserves attribution, let me know. The `ipic`
-script is originally by [Dr. Drang](https://github.com/drdrang/ipic).
+forgotten — if something here deserves attribution, let me know.
+
+- `ipic` is originally by [Dr. Drang](https://github.com/drdrang/ipic).
+- `mdlinks` descends from the `md - Links - Safari Tabs` and `md - Links -
+  Firefox Tabs` services in [Brett Terpstra](https://brettterpstra.com)'s
+  [Markdown Service
+  Tools](https://brettterpstra.com/projects/markdown-service-tools/). It is
+  rewritten here as a shell command rather than a macOS Service, but the
+  URL-cleaning and short-reference-label scheme are his.

@@ -11,7 +11,7 @@ machine acting differently — start here. Two commands cover most situations:
   it after editing anything in the repo.
 
 Beyond those two: **`make writing-check`** tests the writing helpers
-(`citecheck`, `zotcheck`, `readnote`) against fixture data, and two
+(`citecheck`, `zotcheck`, `readnote`, `mdlinks`) against fixture data, and two
 macOS-only checks — **`make lint-plists`** (validates the launchd/Automator
 files) and **`make nvim-check`** (boots Neovim headless in a throwaway
 environment) — normally run in CI, not by hand.
@@ -27,13 +27,21 @@ All of these work from any directory via `dots`, e.g. `dots check` (see
 make doctor
 ```
 
-Checks every symlink created by `make install`, plus: SSH keys exist
+Checks every symlink created by `make install` — including whether each one
+still *resolves*, since a link left pointing at an old checkout path is a
+symlink that leads nowhere and used to pass this check — plus: SSH keys exist
 (`secretive_github.pub`, `secretive_codeberg.pub` — ssh-config points at the
 Secretive/Secure Enclave keys, not `id_*`), `~/.ssh`/`~/.gnupg` and the private keys are
 owner-only (no group/other access), fish is set as the login shell, the
 vale styles directory is populated, a GPG secret key is present, and any
 installed launchd agents (mailsync, brewupdate, resticcheck,
 decksync) are actually loaded — not just that their plist files exist.
+
+If the resticcheck agent is installed, it also reports how long it has been
+since the backup last *passed* an integrity check (not merely ran one — a check
+that skips because the drive is unmounted exits 0). Warns above 35 days, or if
+no successful check has ever been recorded. See
+[Security → Backup integrity](security.md#optional-system-hardening-separate-targets).
 
 ### macOS defaults
 
@@ -150,10 +158,10 @@ targets' own `## group | description` tags, so it cannot drift.
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, `py_compile` for the Python helpers, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-python`/`lint-luacheck`/`lint-secrets` |
 | `lint-plists`      | macOS-only: `plutil -lint` over tracked LaunchAgents and Automator workflow files                    |
-| `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`) |
+| `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`, `mdlinks`) |
 | `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync) and `vale sync`; Homebrew/Betterfox stay on their own paths. Also prints the CI-pinned vs. local gitleaks version, since that pin is bumped by hand |
-| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, vale styles, GPG key, git hooksPath/gitleaks, and that launchd agents are loaded (FileVault is checked by `macos-check`) |
+| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, vale styles, GPG key, git hooksPath/gitleaks, that launchd agents are loaded, and how long since the backup last passed an integrity check (FileVault is checked by `macos-check`) |
 | `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` |
 
 `harden` and `touchid` are **not** part of `make install` — they touch system

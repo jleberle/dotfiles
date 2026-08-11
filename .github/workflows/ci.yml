@@ -30,6 +30,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history, because `make lint-secrets` runs `gitleaks git` over it.
+          # checkout defaults to depth 1, and on a one-commit clone gitleaks scans
+          # only the tip — so a secret that was committed and later DELETED (the
+          # exact case history scanning exists for, and the first thing anyone
+          # enumerates in a public repo) passes clean. Verified: the same repo
+          # scans "leaks found: 1" at full depth and "no leaks found" at depth 1.
+          fetch-depth: 0
 
       - name: Install Linux dependencies
         run: |

@@ -12,6 +12,30 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-08-11 — Third audit pass: CI history, backups, the last of the Ruby
+
+- CI's secret scan now sees history. It ran against a one-commit checkout, so a
+  secret committed and later deleted passed clean; only GitHub's own push
+  protection had been covering that, and it covers provider tokens only.
+- The Keynote deck sync passes paths to AppleScript as arguments. Built by
+  string interpolation, a deck with a quote in its name — `The "New" Deal.key` —
+  failed to export and said so only in a log.
+- `archbackup check` records when the backup last *passed*, and `make doctor`
+  warns when that is missing or over 35 days old. A check that skips because the
+  drive is unmounted exits 0, so nothing distinguished "verified last Sunday"
+  from "never verified at all".
+  **Action required:** on this machine that turned out to be the latter — the
+  restic password file was empty and the weekly job could not open the repo.
+  Confirm yours works unattended: `fish -c 'archbackup check'`.
+- The two `md - Links - * Tabs` services are gone, replaced by `mdlinks safari`
+  / `mdlinks firefox`. Each held ~90 lines of Ruby inside a `.workflow` plist
+  where no linter could reach it, and two latent crashes had been sitting there
+  for years. Output goes to stdout now, so it reaches a draft open in Neovim.
+- `make doctor` notices broken symlinks. `test -L` is true for a link that
+  resolves to nothing, so links still aimed at an old checkout path reported a
+  healthy machine.
+  **Action required:** expect doctor to name links you did not know were dead.
+
 ## 2026-08-11 — Second audit pass: Neovim, pandoc, mail
 
 - Mail sync reports failures. It kept no exit status at all, so `mbsync`

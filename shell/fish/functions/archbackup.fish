@@ -84,6 +84,28 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
                 return 1
             end
             restic -r $ARCHIVE_RESTIC_REPO check --read-data-subset=5%
+            set -l check_status $status
+            if test $check_status -ne 0
+                return $check_status
+            end
+
+            # Record WHEN the backup was last actually verified. The skip above
+            # returns 0 on purpose, which is exactly why this stamp has to
+            # exist: on a machine whose drive is rarely plugged in, the weekly
+            # job logs "skipping check" forever, `make doctor` reports the agent
+            # healthy, and nothing anywhere distinguishes "verified last Sunday"
+            # from "never verified since the repo was created". `make doctor`
+            # reads this file's mtime and says how old the last PASS is.
+            #
+            # Keyed to restic's exit status, never to a phrase in its output —
+            # a reworded success message in some future restic would otherwise
+            # turn this silently into a permanent "never verified", which is the
+            # same class of bug as the one the comment above describes.
+            #
+            # Status captured explicitly rather than read after `if not`, which
+            # rewrites it to 0 (same reason bin/homebrewupdate.sh does).
+            mkdir -p $HOME/.local
+            touch $HOME/.local/.restic_verified
         case '' backup
             restic -r $ARCHIVE_RESTIC_REPO backup $archives --tag archives
         case '*'

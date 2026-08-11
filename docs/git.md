@@ -9,6 +9,18 @@ rough edges of day-to-day git.
 signing key is the GPG primary key fingerprint). The same key is registered on
 GitHub, so commits show as verified there.
 
+GitHub *enforces* this: `main` has branch protection with "require signed
+commits" and "do not allow bypassing" (`enforce_admins`) both on, so an unsigned
+commit is rejected at push time rather than landing quietly. That makes the
+guarantee mechanical instead of a convention — but it also means a machine where
+signing is broken (no key imported, `make git` never run, expired key) cannot
+push to `main` at all until signing works or the protection is turned off. Check
+what GitHub thinks with:
+
+```sh
+gh api repos/<you>/dotfiles/commits/main --jq '.commit.verification'
+```
+
 **Diffs:** `delta` renders diffs and logs (Nord theme). It must be installed
 before `make git` is run, or `git diff`/`git log` will fail — `make apps`
 installs it.
@@ -70,11 +82,35 @@ fast-forwards it from GitHub, asks GitHub to rebase the PR, waits for its
 checks, fetches the resulting PR head, fast-forwards locally, and pushes
 `main` back to GitHub. It refuses a dirty worktree.
 
+NOTE: `depmerge` and required signed commits can collide. Dependabot's own
+commits are signed by GitHub, but when `gh pr update-branch --rebase` has to
+rebase a stale PR, GitHub rewrites the commit *as you* — it cannot sign as you,
+and the commit never touches local git, so nothing signs it. The final push is
+then rejected. It only bites when the PR needs rebasing; an already-current PR
+merges fine. Both cases exist in this repo's history (`e043bc1` signed,
+`dfbcaab` not). A rejected push is harmless — nothing is applied — so when it
+happens, the fix is to let GitHub do the merge server-side instead, which it
+does sign:
+
+```sh
+gh pr merge --rebase --repo <you>/dotfiles <pr>
+git pull --ff-only origin main
+```
+
 **Scheduled CI:** GitHub Actions still runs the full check suite monthly (catches
 drift from upstream tool/package changes between pushes), but it no longer
 files or closes issues on the result — that required `issues: write`, and CI's
 permissions are read-only (`contents: read`). Check the Actions tab for the
 monthly run's status.
+
+NOTE: GitHub disables a repository's scheduled workflows after 60 days with no
+activity, emailing the repo owner. This repo can easily go that long between
+commits, and the macOS-native job (plists, Automator bundles, headless Neovim)
+runs *only* on the schedule or `workflow_dispatch` — so it would stop with no
+failure to notice, just absence. If the monthly runs have gone quiet, look for
+the "disabled due to inactivity" banner on the Actions tab, or run
+`gh run list --workflow=ci.yml --event=schedule --limit 10`. Re-enable it there;
+`workflow_dispatch` runs it on demand meanwhile.
 
 ## Git aliases
 

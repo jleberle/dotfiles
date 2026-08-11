@@ -27,6 +27,12 @@ HOMEBREW_PREFIX := /opt/homebrew
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
+# How stale a restic verification may get before `make doctor` says so. The
+# check runs weekly, so this allows the backup drive to stay unplugged for about
+# a month without nagging — long enough not to be noise, short enough that an
+# unverified backup cannot quietly become a year old. See the doctor rule.
+RESTIC_VERIFY_MAX_AGE_DAYS := 35
+
 # Globbed, not listed. These were hand-maintained, which meant adding a script
 # left it silently unlinted forever and CI still went green — the one failure a
 # linter must not have. FISH_FILES and LUACHECK_DIR below already globbed.
@@ -140,6 +146,24 @@ backup_if_real = \
         mv "$$target" "$$backup"; \
         echo "  NOTE: $$target already existed and was not a symlink"; \
         echo "        moved to $$backup"; \
+    fi
+
+# Shell fragment: warn unless "$$target" is a symlink that actually RESOLVES.
+# Set `target=...` and `fix=...` first, then invoke. Used by every symlink check
+# in `doctor`.
+#
+# A bare `test -L` was the bug this replaces. It is true for a DANGLING symlink,
+# so a link left pointing at a previous checkout location passed the health check
+# while nothing it named was loading. Found when all three ~/Library/Services
+# links turned out to aim at a ~/.dotfiles path that had not existed since the
+# repo moved to ~/git/dotfiles — `make doctor` had been reporting a clean machine
+# the whole time. That is the same class of failure require-location guards on
+# the WRITE side, missed here on the read side.
+check_symlink = \
+    if [ ! -L "$$target" ]; then \
+        echo "WARNING: $$target not symlinked (run: $$fix)"; \
+    elif [ ! -e "$$target" ]; then \
+        echo "WARNING: $$target is a broken symlink -> $$(readlink "$$target") (run: $$fix)"; \
     fi
 
 # Canned recipe: $(call install_agent,<source plist path>) — template __HOME__ /
@@ -513,7 +537,7 @@ lint-plists : ## check | plutil -lint over tracked plists and workflows
 	@echo "Linting macOS plist/workflow files..."
 	@command -v plutil >/dev/null 2>&1 || { echo "ERROR: plutil not found — macOS only"; exit 1; }
 	@find backup homebrew keynote writing macos/services -type f \( -name '*.plist' -o -name '*.wflow' \) -print0 | xargs -0 -n1 plutil -lint
-writing-check : ## check | Smoke tests for citecheck/zotcheck/readnote
+writing-check : ## check | Smoke tests for citecheck/zotcheck/readnote/mdlinks
 	@echo "Running writing workflow checks..."
 	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }
 	@command -v python3 >/dev/null 2>&1 || { echo "ERROR: python3 not found"; exit 1; }
@@ -553,10 +577,10 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	@echo "Checking symlinks..."
 	@for row in $(foreach r,$(SYMLINK_ROWS),'$(r)'); do \
 	    IFS='|'; set -- $$row; unset IFS; \
-	    test -L "$$3" || echo "WARNING: $$3 not symlinked (run: make $$1)"; \
+	    target="$$3"; fix="make $$1"; $(check_symlink); \
 	done
-	@test -L "$(HOME)/Library/Application Support/lazygit/config.yml" || echo "WARNING: lazygit config not symlinked (run: make git)"
-	@test -L "$(GHOSTTY_DIR)/config"           || echo "WARNING: ghostty config not symlinked (run: make shell)"
+	@target="$(HOME)/Library/Application Support/lazygit/config.yml"; fix="make git"; $(check_symlink)
+	@target="$(GHOSTTY_DIR)/config"; fix="make shell"; $(check_symlink)
 	@HP=$$(git config --global core.hooksPath); \
 	case "$$HP" in \
 	    "$(DOTFILES)/git/hooks"|"~/git/dotfiles/git/hooks") ;; \
@@ -582,9 +606,7 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	test -f "$(FIREFOX_DIR)/$$FFPROFILE/user.js" || \
 	echo "WARNING: Firefox user.js not written (run: make firefox)"
 	@for wf in $(DOTFILES)/macos/services/*.workflow; do \
-	    name=$$(basename "$$wf"); \
-	    test -L "$(SERVICES_DIR)/$$name" || \
-	        echo "WARNING: Service '$$name' not symlinked (run: make services)"; \
+	    target="$(SERVICES_DIR)/$$(basename "$$wf")"; fix="make services"; $(check_symlink); \
 	done
 	@echo "Checking SSH keys..."
 	@test -f $(HOME)/.ssh/secretive_github.pub   || echo "WARNING: ~/.ssh/secretive_github.pub not found — ssh-config points at it; export this machine's Secretive key (see security/ssh-config)"
@@ -623,6 +645,26 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	            echo "WARNING: $$agent plist installed but not loaded (run: launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$$agent.plist)"; \
 	    fi; \
 	done
+	@# The loop above proves the backup check RAN. This proves it PASSED — a
+	@# different question, and the only one that matters. `archbackup check`
+	@# exits 0 when the drive is unmounted (deliberately: a weekly failure for a
+	@# normally-unplugged drive would train you to ignore the job), so a loaded
+	@# agent and a green `make check` read identically whether the backup was
+	@# verified last Sunday or has never been verified at all. This machine's
+	@# log held seven consecutive skips and zero passes when that was written.
+	@# archbackup stamps ~/.local/.restic_verified on a success; this reads
+	@# its age. Gated on the plist because `make resticcheck` is opt-in — a
+	@# machine that never set up backups should not be nagged about them.
+	@STAMP=$(HOME)/.local/.restic_verified; \
+	if [ -f "$(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist" ]; then \
+	    if [ ! -f "$$STAMP" ]; then \
+	        echo "WARNING: restic backup has never passed an integrity check (run: archbackup check with the drive mounted)"; \
+	    else \
+	        D=$$(( ($$(date +%s) - $$(stat -f %m "$$STAMP")) / 86400 )); \
+	        [ "$$D" -le $(RESTIC_VERIFY_MAX_AGE_DAYS) ] || \
+	            echo "WARNING: restic backup last verified $$D days ago (run: archbackup check with the drive mounted)"; \
+	    fi; \
+	fi
 	@echo "Done."
 check : ## check | Everything read-only: doctor + macos-check + brew-check
 	@# Runs the three read-only check targets, then summarizes. The summary is
@@ -639,6 +681,7 @@ check : ## check | Everything read-only: doctor + macos-check + brew-check
 	@# "make: *** [check] Error 1" under the summary, which reads as "the health
 	@# check itself broke" rather than "your machine needs three fixes".
 	@tmp=$$(mktemp); \
+	trap 'rm -f "$$tmp"' EXIT; \
 	$(MAKE) --no-print-directory doctor macos-check brew-check 2>&1 | tee "$$tmp"; \
 	n=$$(grep -c '^WARNING:' "$$tmp" 2>/dev/null || true); \
 	n=$${n:-0}; \
@@ -655,5 +698,4 @@ check : ## check | Everything read-only: doctor + macos-check + brew-check
 	fi; \
 	echo "───────────────────────────────────────────────────────────────"; \
 	echo ""; \
-	echo "Run 'make brew-drift' to also list untracked installs."; \
-	rm -f "$$tmp"
+	echo "Run 'make brew-drift' to also list untracked installs."

@@ -229,6 +229,7 @@ like commands. (General-purpose shell functions are listed under
 | `cite`                  | fzf over the Zotero `.bib`; copies `@citekey` (warns if the export is >30 days stale) |
 | `linkcheck [md…]`       | Check links with `lychee` (no args: all `*.md` under the cwd)                         |
 | `mdarchive <md…>`       | Snapshot every URL cited in the file(s) to the Wayback Machine (lychee + `waybackup`) |
+| `mdlinks <browser>`     | Markdown reference definitions for every open tab — `mdlinks safari` or `mdlinks firefox`. Writes to stdout, so `mdlinks firefox \| pbcopy` or `>> notes.md`. Strips `utm_*`/`ref` params and labels each link by domain (`[jstor]: https://…`) |
 | `docx2md <docx> [mode]` | Convert returned `.docx` edits to markdown (`--track-changes`: all/accept/reject)     |
 | `valeinit`              | Scaffold a per-project `.vale.ini` from `writing/vale/vale-project.ini`               |
 | `pdfpages <pdf> <range>`| Extract a page range to a new PDF (`qpdf`)                                            |

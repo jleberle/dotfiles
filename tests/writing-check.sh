@@ -162,4 +162,86 @@ grep -Fq "  - source/primary" "$note_path" || {
   exit 1
 }
 
+# mdlinks: the Firefox path decodes a mozLz4 session store using the hand-written
+# LZ4 block decoder in bin/mdlinks.py. That decoder is the one piece here that
+# could break silently — a wrong answer looks like "no tabs" rather than an
+# error. An LZ4 block may legally be a single literals-only sequence, so a
+# fixture can be built without an LZ4 compressor.
+python3 - "$tmp_dir/session.jsonlz4" <<'EOF_PY'
+import json
+import pathlib
+import sys
+
+
+def mozlz4(payload):
+    n = len(payload)
+    if n < 15:
+        token, ext = bytes([n << 4]), b""
+    else:
+        rem, run = n - 15, bytearray()
+        while rem >= 255:
+            run.append(255)
+            rem -= 255
+        run.append(rem)
+        token, ext = bytes([0xF0]), bytes(run)
+    return b"mozLz40\0" + n.to_bytes(4, "little") + token + ext + payload
+
+
+session = {
+    "windows": [
+        {
+            "tabs": [
+                {"index": 1, "entries": [{"url": "https://www.jstor.org/stable/1234567"}]},
+                # index points past the first entry: the tab navigated away from
+                # about:newtab, and the CURRENT url is what should be listed.
+                {
+                    "index": 2,
+                    "entries": [
+                        {"url": "about:newtab"},
+                        {"url": "https://github.com/gitleaks/gitleaks"},
+                    ],
+                },
+                {"index": 1, "entries": [{"url": "about:newtab"}]},
+            ]
+        },
+        {
+            "tabs": [
+                {"index": 1, "entries": [{"url": "https://github.com/yokoffing/Betterfox?utm_source=x"}]},
+                {"index": 1, "entries": [{"url": "http://localhost:1313/posts/draft/"}]},
+            ]
+        },
+    ]
+}
+pathlib.Path(sys.argv[1]).write_bytes(mozlz4(json.dumps(session).encode()))
+EOF_PY
+
+# One assertion covering the lot: both windows walked, `index` honoured over the
+# tab's history, about: tabs skipped, utm_* stripped, duplicate hosts numbered
+# across windows, a single-label host labelled at all (the Ruby emitted `[]`),
+# and the whole thing sorted by label.
+mdlinks_output=$("$repo_dir/bin/mdlinks.py" --firefox "$tmp_dir/session.jsonlz4")
+read -r -d '' mdlinks_expected <<'EOF_EXPECT' || true
+[github]: https://github.com/gitleaks/gitleaks
+[github 2]: https://github.com/yokoffing/Betterfox
+[jstor]: https://www.jstor.org/stable/1234567
+[localhost]: http://localhost:1313/posts/draft/
+EOF_EXPECT
+[[ $mdlinks_output == "$mdlinks_expected" ]] || {
+  echo "writing-check: mdlinks did not render the Firefox session store as expected" >&2
+  echo "--- got ---" >&2
+  echo "$mdlinks_output" >&2
+  echo "--- want ---" >&2
+  echo "$mdlinks_expected" >&2
+  exit 1
+}
+
+# The Safari path feeds the same renderer from stdin.
+mdlinks_stdin=$(printf '%s\n' 'https://example.com/a?ref=x&keep=1' 'chrome://extensions' \
+  | "$repo_dir/bin/mdlinks.py")
+[[ $mdlinks_stdin == '[example]: https://example.com/a?keep=1' ]] || {
+  echo "writing-check: mdlinks stdin path did not clean the URL as expected" >&2
+  echo "$mdlinks_stdin" >&2
+  exit 1
+}
+
 echo "writing-check: OK"
