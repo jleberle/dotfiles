@@ -18,8 +18,13 @@ HOMEBREW_PREFIX := /opt/homebrew
 FIREFOX_DIR := $(HOME)/Library/Application Support/Firefox
 SERVICES_DIR := $(HOME)/Library/Services
 
-SHELLCHECK_FILES := bin/homebrewupdate.sh bin/homebrewlogclean.sh bin/mailsync.sh keynote/sync_slides_drive.sh git/hooks/pre-commit git/hooks/pre-push tests/writing-check.sh
-PYTHON_FILES := bin/citecheck.py bin/zotcheck.py bin/readnote.py bin/waybackup bin/ipic
+# Globbed, not listed. These were hand-maintained, which meant adding a script
+# left it silently unlinted forever and CI still went green — the one failure a
+# linter must not have. FISH_FILES and LUACHECK_DIR below already globbed.
+SHELLCHECK_FILES := $(wildcard bin/*.sh) $(wildcard keynote/*.sh) $(wildcard git/hooks/*) $(wildcard tests/*.sh)
+# Cannot glob cleanly: `waybackup` and `ipic` are extensionless Python, so they
+# are named. Everything with a .py extension is picked up automatically.
+PYTHON_FILES := $(wildcard bin/*.py) bin/waybackup bin/ipic
 FISH_FILES := shell/fish/config.fish shell/fish/conf.d/*.fish shell/fish/functions/*.fish shell/fish/completions/*.fish
 LUACHECK_DIR := writing/nvim/lua
 
@@ -209,8 +214,7 @@ firefox :
 	echo "Writing user.js → $$PROFILE (Betterfox + overrides)" && \
 	cat $(DOTFILES)/security/betterfox/user.js \
 	    $(DOTFILES)/security/user-overrides.js \
-	    > "$(FIREFOX_DIR)/$$PROFILE/user.js" && \
-	[ ! -f $(DOTFILES)/security/user.js ] || { echo "Removing stale security/user.js from repo directory"; rm $(DOTFILES)/security/user.js; }
+	    > "$(FIREFOX_DIR)/$$PROFILE/user.js"
 
 betterfox-update :
 	@echo "Updating Betterfox submodule to latest upstream..."
@@ -249,7 +253,6 @@ brewauto :
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
 	$(call install_agent,$(DOTFILES)/homebrew/org.jaredeberle.brewupdate.plist)
-	$(call install_agent,$(DOTFILES)/homebrew/org.jaredeberle.brewlogclean.plist)
 	@echo "Installed. Logs at $(HOME)/.local/brew_update_logs.txt (newest run first)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
 macos :
@@ -518,7 +521,7 @@ doctor :
 	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
 	    echo "WARNING: no GPG secret key found — import your key"
 	@echo "Checking background agents..."
-	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.brewlogclean org.jaredeberle.resticcheck org.jaredeberle.decksync; do \
+	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.resticcheck org.jaredeberle.decksync; do \
 	    if [ -f "$(LAUNCH_AGENTS)/$$agent.plist" ]; then \
 	        launchctl print gui/$(LAUNCHD_UID)/$$agent >/dev/null 2>&1 || \
 	            echo "WARNING: $$agent plist installed but not loaded (run: launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$$agent.plist)"; \

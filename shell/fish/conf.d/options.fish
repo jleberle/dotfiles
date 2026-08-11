@@ -11,8 +11,10 @@
 # fish: history lives in ~/.local/share/fish/fish_history, is shared across
 #       sessions live, de-duplicates, and is effectively unbounded — all by
 #       default. There is nothing to set; the behavior is built in.
-#   GAP: HIST_IGNORE_SPACE has no built-in fish equivalent (a leading space
-#        does not exclude a command from history).
+#   HIST_IGNORE_SPACE has no built-in fish equivalent, but it is not a gap:
+#       `fish_should_add_to_history` (in functions/) is fish's supported hook
+#       for this, and it excludes both space-prefixed lines and lines that look
+#       like they carry a credential inline.
 
 # --- Directory navigation -----------------------------------------------------
 # zsh: AUTO_PUSHD / PUSHD_IGNORE_DUPS / PUSHD_MINUS

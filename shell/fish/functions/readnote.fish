@@ -23,14 +23,8 @@ function readnote --description 'Scaffold a reading note from a Zotero citekey (
     set -l key (string replace -r '^@' '' -- $argv[1])
     set -l source (set -q _flag_primary; and echo primary; or echo secondary)
 
-    if not test -f $ZOTERO_LIBRARY_JSON
-        echo "readnote: library not found: $ZOTERO_LIBRARY_JSON — export Better CSL JSON from Zotero" >&2
-        return 1
-    end
-    if not test -d $READING_NOTES_DIR
-        echo "readnote: reading-notes dir not found: $READING_NOTES_DIR" >&2
-        return 1
-    end
+    __need_path readnote file "Zotero library" "$ZOTERO_LIBRARY_JSON" "export Better CSL JSON from Zotero"; or return 1
+    __need_path readnote dir "reading-notes folder" "$READING_NOTES_DIR"; or return 1
 
     set -l file $READING_NOTES_DIR/$key.md
     if test -e $file

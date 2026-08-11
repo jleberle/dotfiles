@@ -13,11 +13,7 @@ function cite --description 'Fuzzy-pick a citation from the BibTeX library; copi
 
     set -l bib $ZOTERO_LIBRARY_BIB
 
-    if not test -f $bib
-        echo "cite: library not found: $bib" >&2
-        echo "cite: export it from Zotero via Better BibTeX (keep updated)" >&2
-        return 1
-    end
+    __need_path cite file "Zotero library" "$bib" "export it from Zotero via Better BibTeX (keep updated)"; or return 1
 
     # Warn when the Better BibTeX auto-export looks stale (>30 days).
     set -l age_days (math -s0 \( (date +%s) - (stat -f %m $bib) \) / 86400)

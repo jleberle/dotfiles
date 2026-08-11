@@ -13,10 +13,7 @@ function zotcheck --description 'Reconcile reading/research notes against the Zo
     end
 
     set -l lib $ZOTERO_LIBRARY_JSON
-    if not test -f $lib
-        echo "zotcheck: library not found: $lib" >&2
-        return 1
-    end
+    __need_path zotcheck file "Zotero library" "$lib" "export Better CSL JSON from Zotero"; or return 1
 
     $DOTFILES_DIR/bin/zotcheck.py $lib $READING_NOTES_DIR $RESEARCH_NOTES_DIR $argv
 end

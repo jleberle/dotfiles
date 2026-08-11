@@ -18,10 +18,7 @@ function archgrep --description "Full-text search the OCR'd archival PDFs (ripgr
     __require archgrep rga; or return 1
 
     set -l archives $RESEARCH_ARCHIVES_DIR
-    if not test -d $archives
-        echo "archgrep: archive folder not found: $archives" >&2
-        return 1
-    end
+    __need_path archgrep dir "archive folder" "$archives"; or return 1
 
     # --smart-case: case-insensitive unless the query has an uppercase letter.
     rga --smart-case $argv $archives

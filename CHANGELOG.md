@@ -7,6 +7,40 @@ everything since is one entry per real milestone.
 
 ---
 
+## 2026-08-10 — Audit follow-up: uniform guards, fewer moving parts
+
+- **`bin/homebrewlogclean.sh` and its launchd agent are gone.**
+  `homebrewupdate.sh` now caps its own log at 1 MB instead, the way
+  `mailsync.sh` already did. That removed a script, a plist, a `make brewauto`
+  install step, a shellcheck entry, a `make doctor` check and two docs rows —
+  all to delete one file on the first Monday of the month.
+  **Action required on machines that already have the agent installed:** it
+  keeps running until you remove it —
+  `launchctl bootout gui/$(id -u)/org.jaredeberle.brewlogclean` then
+  `rm ~/Library/LaunchAgents/org.jaredeberle.brewlogclean.plist`.
+  The semantics change from "wiped monthly" to "capped at 1 MB", so the log
+  can no longer be emptied just before the run you wanted to read.
+- **Two private helpers replace ~14 hand-written guard blocks.**
+  `__require` (missing tools) and `__need_path` (missing files and folders)
+  now back every such check. Dependency handling in particular used to be a
+  coin flip — six functions explained themselves, seven emitted a bare
+  `Unknown command`. `__need_path` also distinguishes "not configured" from
+  "configured but missing", which need opposite fixes.
+- **Lint file lists are globbed, not hand-maintained.** Adding `bin/foo.sh` or
+  `bin/foo.py` used to leave it silently unlinted with CI still green.
+- **`make services` no longer `rm -rf`s** a real file that shares a name with a
+  repo workflow; it skips and says what to move.
+- **`acp` and `linkcheck` confirm before the runaway case** — a large
+  `git add .` and a whole-tree link check respectively. Both take `--yes`.
+- **`~/.gnupg/gpg-agent.conf` says it is generated** in its own header;
+  `make security` has always overwritten it, discarding hand edits silently.
+- The Makefile now refuses to run from anywhere but `~/git/dotfiles`, and
+  several doc rows that disagreed with the code were corrected — notably
+  `pubkey-github`, which documented `id_github.pub` while both the alias and
+  ssh-config use the Secretive key.
+
+---
+
 ## 2026-07-31 — GitHub is now the sole, public remote; Codeberg archived
 
 - Codeberg is archived. GitHub (`jleberle/dotfiles`) is now the sole,

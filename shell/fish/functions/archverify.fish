@@ -13,10 +13,7 @@ function archverify --description 'Generate or verify a SHA-256 manifest of the 
     end
 
     set -l archives $RESEARCH_ARCHIVES_DIR
-    if not test -d $archives
-        echo "archverify: archive folder not found: $archives" >&2
-        return 1
-    end
+    __need_path archverify dir "archive folder" "$archives"; or return 1
 
     pushd $archives >/dev/null
     if test "$argv[1]" = --update

@@ -32,7 +32,7 @@ Checks every symlink created by `make install`, plus: SSH keys exist
 Secretive/Secure Enclave keys, not `id_*`), `~/.ssh`/`~/.gnupg` and the private keys are
 owner-only (no group/other access), fish is set as the login shell, the
 vale styles directory is populated, a GPG secret key is present, and any
-installed launchd agents (mailsync, brewupdate, brewlogclean, resticcheck,
+installed launchd agents (mailsync, brewupdate, resticcheck,
 decksync) are actually loaded — not just that their plist files exist.
 
 ### macOS defaults

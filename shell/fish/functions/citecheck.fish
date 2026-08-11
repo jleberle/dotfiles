@@ -13,10 +13,7 @@ function citecheck --description 'Check every @citekey in a draft exists in the 
         return 1
     end
     set -l lib $ZOTERO_LIBRARY_JSON
-    if not test -f $lib
-        echo "citecheck: library not found: $lib — export Better CSL JSON from Zotero" >&2
-        return 1
-    end
+    __need_path citecheck file "Zotero library" "$lib" "export Better CSL JSON from Zotero"; or return 1
 
     $DOTFILES_DIR/bin/citecheck.py $lib $argv
 end

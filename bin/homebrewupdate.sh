@@ -96,6 +96,22 @@ if [ -s "$TMPFILE" ]; then
     fi
 fi
 
+# Keep the log from growing unbounded. This replaces homebrewlogclean.sh and its
+# own launchd agent — ten lines, a plist, a Makefile target, a shellcheck entry
+# and a doctor entry, all to delete one file on the first Monday of the month.
+# Capping here is the pattern mailsync.sh already uses, minus the moving parts,
+# and the log can no longer be wiped just before the run you wanted to read.
+#
+# `head`, not `tail`: this log is written newest-first, so the oldest entries are
+# at the END. The note goes where the discarded history used to be.
+if [ -f "$LOG" ] && [ "$(wc -c < "$LOG")" -gt 1048576 ]; then
+    {
+        head -c 524288 "$LOG"
+        echo ""
+        echo "--- older entries dropped: homebrewupdate.sh caps this log at 1 MB ---"
+    } > "${LOG}.tmp" && mv "${LOG}.tmp" "$LOG"
+fi
+
 # Same notification path the Hugo-upgrade notice already uses. Without this the
 # only signal of a broken weekly update is its absence, which is not a signal.
 if [ "$rc" -ne 0 ]; then

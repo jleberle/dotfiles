@@ -46,10 +46,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
         echo "archbackup: RESTIC_PASSWORD_FILE points at a missing file: $RESTIC_PASSWORD_FILE" >&2
         return 1
     end
-    if not test -d $archives
-        echo "archbackup: archive folder not found: $archives" >&2
-        return 1
-    end
+    __need_path archbackup dir "archive folder" "$archives"; or return 1
 
     switch "$argv[1]"
         case snapshots

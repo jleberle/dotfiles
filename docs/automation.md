@@ -19,8 +19,7 @@ validate args/env and invoke them.
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | `ipic -i\|-m\|-a\|-f\|-t\|-b TERM`  | Build an HTML gallery of iTunes/App Store artwork and open it. Flags: `-i` iOS app, `-m` Mac app, `-a` album, `-f` film, `-t` TV, `-b` book. |
 | `waybackup <URL>`                   | Save a URL to the Internet Archive Wayback Machine; prints the snapshot URL.                                         |
-| `homebrewupdate.sh`                 | `brew update` + `outdated` + `upgrade`, with timestamped log output.                                                 |
-| `homebrewlogclean.sh`               | Delete the update log — but only on the **first Monday** of the month.                                               |
+| `homebrewupdate.sh`                 | `brew update` + `outdated` + `upgrade`, with timestamped log output; caps its own log at 1 MB.                        |
 | `mailsync.sh`                       | `mbsync -a` + `notmuch new` with timestamped log output; invoked by the mailsync launchd agent.                      |
 | `citecheck.py` / `zotcheck.py` / `readnote.py` | Logic behind the `citecheck` / `zotcheck` / `readnote` fish functions; exercised by `make writing-check`. |
 
@@ -33,7 +32,6 @@ install time):
 | Agent                             | Schedule         | Runs                                                                  |
 |-----------------------------------|------------------|-----------------------------------------------------------------------|
 | `org.jaredeberle.brewupdate`      | Mondays 09:00    | `bin/homebrewupdate.sh`                                               |
-| `org.jaredeberle.brewlogclean`    | Mondays 08:00    | `bin/homebrewlogclean.sh` (self-gates to the first Monday)            |
 | `org.jaredeberle.mailsync`        | Every 5 minutes  | `bin/mailsync.sh`                                                     |
 | `org.jaredeberle.resticcheck`     | Sundays 10:00    | `archbackup check` (restic integrity; no-op if the drive is unmounted) |
 | `org.jaredeberle.decksync`        | On volume mount  | `keynote/sync_slides_drive.sh` (via `DeckSync.app`) — pushes `.pptx` + PDF exports of the Keynote lecture decks to the "R2-D2" flash drive (`WatchPaths` on `/Volumes`; no-op unless that drive appeared) |
