@@ -255,9 +255,24 @@ firefox : require-location ## link | Write user.js (Betterfox + overrides) to th
 	[ -d "$(FIREFOX_DIR)/$$PROFILE" ] || { echo "ERROR: profile directory missing: $(FIREFOX_DIR)/$$PROFILE"; exit 1; } && \
 	[ -f "$(DOTFILES)/security/betterfox/user.js" ] || { echo "ERROR: Betterfox user.js not found — run: git submodule update --init --recursive"; exit 1; } && \
 	echo "Writing user.js → $$PROFILE (Betterfox + overrides)" && \
-	cat $(DOTFILES)/security/betterfox/user.js \
-	    $(DOTFILES)/security/user-overrides.js \
-	    > "$(FIREFOX_DIR)/$$PROFILE/user.js"
+	{ printf '%s\n' \
+	    '// GENERATED FILE — do not edit.' \
+	    '//' \
+	    '// `make firefox` overwrites this file entirely, by concatenating' \
+	    '//   security/betterfox/user.js   (upstream submodule, never edited)' \
+	    '//   security/user-overrides.js   (your prefs — edit THIS one)' \
+	    '// from the dotfiles repo. Anything you change here is lost on the next run.' \
+	    '//' \
+	    '// The Betterfox header below says to edit this file to make lasting' \
+	    '// changes. Ignore it — that is written for a hand-installed Betterfox.' \
+	    '//' \
+	    '// Removing a pref from user-overrides.js does NOT revert it. user.js only' \
+	    '// SETS values at startup, and the last one set stays in prefs.js. To undo a' \
+	    '// pref, set it explicitly to the value you want rather than deleting the line.' \
+	    ''; \
+	  cat $(DOTFILES)/security/betterfox/user.js \
+	      $(DOTFILES)/security/user-overrides.js; \
+	} > "$(FIREFOX_DIR)/$$PROFILE/user.js"
 
 betterfox-update : ## maintain | Pull Betterfox upstream; re-run make firefox after
 	@echo "Updating Betterfox submodule to latest upstream..."

@@ -72,6 +72,20 @@ Configs symlinked by `make security`:
   submodule so upstream changes are surfaced even if you do not pull them
   manually.
 
+  **The profile's `user.js` is generated — never edit it.** `make firefox`
+  overwrites it whole, and the file carries a header saying so. Betterfox's own
+  header, further down that file, tells you to edit `user.js` to make lasting
+  changes; that advice is for a hand-installed Betterfox, not this setup. Put
+  your changes in `user-overrides.js`. Firefox itself never writes `user.js`, so
+  the overwrite loses nothing but hand edits.
+
+  **Deleting a pref does not revert it.** `user.js` only *sets* values, once per
+  startup — the value then persists in the profile's `prefs.js`. Removing a line
+  from `user-overrides.js` therefore leaves the old setting in force on any
+  profile that already applied it. To undo a pref, set it explicitly to the
+  value you want and re-run `make firefox`. This is why the WebAuthn override is
+  written as an explicit `true` rather than simply deleted.
+
 ## SSH key custody (Secretive)
 
 The `secretive` cask stores SSH keys in the **Secure Enclave**:

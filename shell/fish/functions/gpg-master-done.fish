@@ -44,7 +44,11 @@ function gpg-master-done --description 'Remove GPG master key and reimport machi
     echo "About to DELETE all local secret and public key material for:"
     echo "  $fingerprint"
     echo "then reimport $usb/key.asc plus this machine's subkeys ($machine)."
-    read -l -P "Continue? [y/N] " reply
+    # Deliberately stricter than the repo's usual `y*` match (acp, linkcheck,
+    # fuck): this deletes irreplaceable key material, so only an exact y is
+    # taken as consent — and the prompt says so, since "yes" working elsewhere
+    # would otherwise make this look broken.
+    read -l -P "Continue? (exactly 'y' to confirm) [y/N] " reply
     if not contains -- "$reply" y Y
         echo "gpg-master-done: aborted" >&2
         return 1

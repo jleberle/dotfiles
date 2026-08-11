@@ -16,11 +16,15 @@ function fuck --description 'Re-run the previous command under sudo (after confi
     # Show exactly what will run as root before authorizing it: `sudo fish -c`
     # re-parses the command in a root context, so command substitutions and globs
     # are recomputed with root's view of the system — confirm before that happens.
+    # `string match -qi 'y*'` is the repo's confirm idiom (acp, linkcheck), so
+    # "yes" means the same thing at every prompt. It used to be an exact y/Y
+    # here, which meant typing "yes" — learned from acp — silently aborted.
+    # gpg-master-done is deliberately stricter; its prompt says so.
     read -l -P "sudo: $cmd  [y/N] " reply
-    if test "$reply" = y -o "$reply" = Y
-        sudo fish -c "$cmd"
-    else
+    if not string match -qi 'y*' -- $reply
         echo "fuck: aborted" >&2
         return 1
     end
+
+    sudo fish -c "$cmd"
 end
