@@ -6,9 +6,8 @@ A macOS-focused, speed-oriented development and **prose-writing** environment.
 Everything is symlinked from `~/git/dotfiles` via a `Makefile` — the real configs
 live in this repo, and the places apps look for them (`~/.config/fish`,
 `~/.gitconfig`, …) just point here — so a new machine comes up the same as the
-old one. The editor (Neovim), terminal (Ghostty),
-multiplexer (tmux), shell (fish), and color theme (**Nord**) are all
-wired to work together.
+old one. The editor (Neovim), terminal (Ghostty), multiplexer (tmux), shell
+(fish), and color theme (**Nord**) are all wired to work together.
 
 > **Platform:** macOS only, Apple Silicon (Homebrew at `/opt/homebrew`). It uses
 > `pbcopy`/`pbpaste`, `launchd`, `osascript`, Automator services, and symlinks
@@ -19,31 +18,34 @@ something breaks or I forget a command. If something doesn't make sense, it's
 probably really internal to my system. Feel free to reach out, but all of this
 is beyond my abilities to troubleshoot.
 
+This page is the setup guide and the day-one commands. Everything deeper is in
+[`docs/`](docs/) — see [the table below](#where-to-go-next).
+
 ---
 
-## Quick Start
+## Setup
 
 ```sh
 # 1. Install the Xcode command-line tools (gives you git)
 xcode-select --install
 
-# 2. Clone this repo to the expected location (~/git/dotfiles is hard-coded in the Makefile)
+# 2. Clone to the expected location (~/git/dotfiles is hard-coded in the Makefile)
 git clone --recurse-submodules https://github.com/<you>/dotfiles.git ~/git/dotfiles
 cd ~/git/dotfiles
 
-# 3. Install Homebrew (if needed) and all apps, CLIs, fonts (Brewfile)
+# 3. Install Homebrew (if needed) and all apps, CLIs, fonts
 make apps
 
-# 4. Symlink all configs and install scheduled Homebrew jobs
+# 4. Symlink all configs and install the scheduled jobs
 make install
 
-# 5. Apply macOS system defaults (keyboard repeat, Finder, Dock, screenshots, etc.)
+# 5. Apply macOS system defaults (keyboard repeat, Finder, Dock, screenshots)
 make macos
 
-# 6. Set fish as the login shell (requires sudo; open a new terminal afterwards)
+# 6. Set fish as the login shell (sudo; open a new terminal afterwards)
 make chsh
 
-# 7. Write Firefox user.js (requires Firefox launched at least once first)
+# 7. Write Firefox user.js (launch Firefox once first, so the profile exists)
 make firefox
 ```
 
@@ -55,30 +57,45 @@ Then finish the per-app setup:
 | Fish      | Run `make chsh` (requires sudo); open a new terminal afterwards                             |
 | Neovim    | Launch `nvim`; `lazy.nvim` bootstraps plugins and Tree-sitter parsers install automatically |
 | NeoMutt   | Follow [docs/mail.md](docs/mail.md) (Bridge password, `~/.mbsyncrc`, Keychain, `make mailsync`) |
-| macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
+| macOS     | Log out and back in for keyboard repeat changes to take full effect                         |
 
-> **Why `~/git/dotfiles`?** Every symlink in the `Makefile` is rooted at
-> `$(HOME)/git/dotfiles`, and so are `git/gitconfig`, `paths.env`, the launchd
-> plists, and the pandoc metadata. Cloning anywhere else breaks them, so every
-> target that writes to your machine stops with an explanation instead.
+Optional, deliberately not part of `make install` because they need `sudo` and
+change system state: **`make harden`** (home directory to `0700`, firewall,
+automatic security updates) and **`make touchid`** (Touch ID for `sudo`).
+
+> **Why `~/git/dotfiles`?** Every symlink in the `Makefile` is rooted there, and
+> so are `git/gitconfig`, `paths.env`, the launchd plists, and the pandoc
+> template. Cloning anywhere else breaks them, so every target that writes to
+> your machine stops with an explanation instead.
 
 ---
 
-## Daily use
+## Day one
 
-The commands that come up day to day. Everything below works from any
-directory; if one of them misbehaves, `make check` (or `dots check`) usually
-names the problem and the fix.
+Everything below works from any directory.
+
+**Finding your way around**
+
+| Command          | Purpose                                                                    |
+|------------------|-----------------------------------------------------------------------------|
+| `make help`      | Every `make` target, grouped, with one line each                            |
+| `site`           | Every website command (run with no arguments)                               |
+| `,` in Neovim    | Hold the leader key for a menu of what it can do; `,?` lists everything     |
+| `<Tab>`          | Completions for `dots`, `site`, `archbackup`, `archverify`, `docx2md`, `mdexport` |
+
+Any command also takes `--help`.
 
 **Health and upkeep**
 
 | Command          | Purpose                                                                    |
 |------------------|-----------------------------------------------------------------------------|
 | `make check`     | All read-only health checks (`doctor` + `macos-check` + `brew-check`)      |
-| `make lint`      | Repo static checks (shellcheck, fish syntax, Python, luacheck, gitleaks)    |
-| `make update`    | Update the non-brew toolchain (Neovim plugins, vale styles)                 |
-| `brewup`         | Update Homebrew now (it also updates itself weekly via launchd)             |
-| `dots <target>`  | Run any dotfiles `make` target from anywhere (`dots check`, `dots doctor`)  |
+| `make lint`      | Repo static checks (shellcheck, fish syntax, Python, Lua, secrets)         |
+| `make update`    | Update the non-brew toolchain (Neovim plugins, Vale styles)                |
+| `brewup`         | Update Homebrew now (it also updates itself weekly)                        |
+| `dots <target>`  | Run any dotfiles `make` target from anywhere (`dots check`, `dots doctor`) |
+
+When something feels wrong, `make check` names the problem and the fix.
 
 **Writing and research**
 
@@ -87,7 +104,7 @@ names the problem and the fix.
 | `newdoc <file> [title]`    | New Markdown doc with Pandoc metadata, opened in Neovim       |
 | `newmeta`                  | Write a `metadata.yaml` for a folder of documents             |
 | `cite`                     | Fuzzy-pick a citation; copies `@citekey`                      |
-| `citecheck <md…>`          | Validate a draft's citekeys against the Zotero library        |
+| `citecheck <md…>`          | Check a draft's citekeys against the Zotero library           |
 | `readnote <key>`           | Scaffold a vault reading note from a Zotero citekey           |
 | `zotcheck [--list]`        | Reconcile reading/research notes against Zotero               |
 | `mdexport <fmt> <md…>`     | Pandoc export (crossref + citeproc) from the shell            |
@@ -102,57 +119,21 @@ names the problem and the fix.
 | `site ship [message]`       | Preflight, commit, push (deploys)                            |
 | `site finishsource [slug]`  | Mark a reading-ledger source finished (syncs the vault note) |
 
-Run `site` with no arguments for the full subcommand list.
-
 ---
 
-## Documentation
-
-Deeper documentation lives in [`docs/`](docs/):
+## Where to go next
 
 | Doc                                      | Covers                                                             |
 |------------------------------------------|--------------------------------------------------------------------|
-| [docs/writing.md](docs/writing.md)       | Pandoc pipeline, Vale, Neovim config, writing functions, and the reading workflow (Zotero ↔ Obsidian vault ↔ website) |
+| [docs/writing.md](docs/writing.md)       | Pandoc pipeline, Vale, Neovim, the writing functions, and the reading workflow (Zotero ↔ Obsidian ↔ website) |
 | [docs/shell.md](docs/shell.md)           | Ghostty, fish (behavior, keybindings, aliases, functions), tmux    |
 | [docs/git.md](docs/git.md)               | Git config, signing, hooks, remotes/CI, Dependabot workflow        |
 | [docs/mail.md](docs/mail.md)             | NeoMutt + Proton Bridge setup, keybindings, background sync        |
 | [docs/automation.md](docs/automation.md) | `bin/` scripts, launchd agents, macOS Services                     |
 | [docs/security.md](docs/security.md)     | SSH, GPG, Firefox/Betterfox, Secretive, system hardening           |
-| [docs/maintenance.md](docs/maintenance.md) | Every check target, the full Makefile reference, where values live |
+| [docs/maintenance.md](docs/maintenance.md) | Every check and `make` target, the repo layout, where values live |
 
----
-
-## Repository Layout
-
-```
-dotfiles/
-├── Makefile              # symlink/install targets (see docs/maintenance.md)
-├── README.md
-├── paths.env             # workflow locations (Zotero, notes, website) — single source of truth
-├── docs/                 # deeper documentation (see table above)
-├── backup/               # restic-check LaunchAgent plist template
-├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup, writing helpers)
-├── security/             # ssh, gpg, dirmngr, firefox configs + pinned known_hosts
-│   ├── betterfox/        # Betterfox submodule (upstream user.js — never edited)
-│   └── user-overrides.js # personal Firefox prefs appended on top of Betterfox
-├── git/                  # gitconfig, gitignore, gitmessage, lazygit.yml
-│   └── hooks/            # pre-commit (gitleaks secret scan; via core.hooksPath)
-├── homebrew/             # Brewfile + LaunchAgent plist templates
-├── keynote/              # lecture-deck → flash-drive sync (script, .app source, plist)
-├── macos/                # macOS GUI artifacts
-│   └── services/         # Automator workflows symlinked into ~/Library/Services
-├── shell/                # all terminal/shell environment configs
-│   ├── bat/              # bat pager config
-│   ├── fish/             # config.fish, conf.d, functions
-│   ├── ghostty/          # terminal emulator config
-│   └── tmux.conf         # tmux config
-├── tests/                # writing-check.sh (fixture-backed smoke tests)
-└── writing/              # editor, Pandoc templates, Vale configs, and mail
-    ├── nvim/             # Neovim config (see docs/writing.md); spell/ holds the tracked personal dictionary
-    ├── neomutt/          # NeoMutt config (neomuttrc, gpg.rc, colors.rc, mailcap, mbsyncrc, notmuch-config, plist)
-    ├── pandoc/           # metadata template, CSL, reference.docx
-    └── vale/             # global vale.ini + vale-project.ini template + vocab/ (Academic vocabulary)
-```
+[CHANGELOG.md](CHANGELOG.md) has what changed and when.
 
 ---
 

@@ -68,6 +68,36 @@ reverse of `make brew-check`. Catches ad-hoc `brew install`s that would vanish
 on the next machine. Informational only (a dry run); deliberately-untracked
 items will also appear, so it never removes anything.
 
+## Repository layout
+
+```
+dotfiles/
+├── Makefile              # symlink/install targets (see below)
+├── paths.env             # workflow locations (Zotero, notes, website) — single source of truth
+├── docs/                 # this documentation
+├── backup/               # restic-check LaunchAgent plist template
+├── bin/                  # scripts on $PATH (brew jobs, ipic, waybackup, writing helpers)
+├── security/             # ssh, gpg, dirmngr, firefox configs + pinned known_hosts
+│   ├── betterfox/        # Betterfox submodule (upstream user.js — never edited)
+│   └── user-overrides.js # personal Firefox prefs appended on top of Betterfox
+├── git/                  # gitconfig, gitignore, gitmessage, lazygit.yml
+│   └── hooks/            # pre-commit (gitleaks) and pre-push, via core.hooksPath
+├── homebrew/             # Brewfile + LaunchAgent plist templates
+├── keynote/              # lecture-deck → flash-drive sync (script, .app source, plist)
+├── macos/services/       # Automator workflows symlinked into ~/Library/Services
+├── shell/                # all terminal/shell environment configs
+│   ├── bat/              # bat pager config
+│   ├── fish/             # config.fish, conf.d, functions, completions
+│   ├── ghostty/          # terminal emulator config
+│   └── tmux.conf         # tmux config
+├── tests/                # writing-check.sh (fixture-backed smoke tests)
+└── writing/              # editor, Pandoc templates, Vale configs, and mail
+    ├── nvim/             # Neovim config; spell/ holds the tracked personal dictionary
+    ├── neomutt/          # neomuttrc, gpg.rc, colors.rc, mailcap, mbsyncrc, notmuch-config, plist
+    ├── pandoc/           # metadata template, CSL styles, reference.docx
+    └── vale/             # global vale.ini, project template, and the Academic vocabulary
+```
+
 ## Changing values (where things live)
 
 Most paths that appear in several places are defined once and read everywhere.
@@ -88,11 +118,14 @@ The Nord palette is likewise repeated across `fish_prompt`, the FZF options,
 
 ## Makefile targets
 
-Run `make <target>`. There is intentionally **no default** target (`make` alone
-just prints a warning) so nothing destructive happens by accident.
+Run `make <target>`. Plain `make` prints this list rather than doing anything,
+so nothing destructive happens by accident — `make help` is the same thing, and
+`dots help` reaches it from any directory. The list is generated from the
+targets' own `## group | description` tags, so it cannot drift.
 
 | Target             | What it does                                                                                        |
 |--------------------|-----------------------------------------------------------------------------------------------------|
+| `help`             | Print every target, grouped, with one line each (also what plain `make` does)                        |
 | `install`          | Runs `apps git shell security nvim vale neomutt services brewauto` in order, then `doctor`          |
 | `chsh`             | Adds fish to `/etc/shells` and sets it as the login shell via `dscl` (requires sudo)                |
 | `git`              | Symlinks `gitconfig`/`gitignore`/`gitmessage` + lazygit config; makes the `pre-commit` (gitleaks) and `pre-push` (website preflight) hooks executable |

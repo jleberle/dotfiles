@@ -113,6 +113,10 @@ writing/nvim/
 
 ### Key mappings
 
+The leader is `,`. **Press it and wait** — `which-key` shows what can follow,
+built from these same descriptions, so this table is a reference rather than
+something to memorize. `,?` lists every mapping including the plugins'.
+
 | Keys          | Mode   | Action                                              |
 |---------------|--------|-----------------------------------------------------|
 | `<leader>w`   | Normal | Write (save) the buffer                             |
@@ -129,10 +133,16 @@ writing/nvim/
 | `<leader>pd`  | Normal | **P**andoc export → **d**ocx (uses `reference.docx`) |
 | `<leader>pv`  | Normal | Pre**v**iew in Marked 2 (live-updates on save)      |
 | `<CR>`        | Insert | Confirm the selected completion item                |
+| `,?`          | Normal | List every mapping                                  |
 
-Pandoc exports run **asynchronously** (`vim.system`) — the editor stays
-responsive during slow LaTeX builds; a notification reports success/failure.
-The buffer is auto-written before export/preview.
+`j` and `k` move by *display* line, so they follow wrapped prose — but only
+without a count. `10j` still moves ten real lines.
+
+Pandoc exports run **asynchronously** (`vim.system`), so the editor stays
+responsive during slow LaTeX builds, and the buffer is auto-written first. A
+notification reports the result — including pandoc's *warnings* on an otherwise
+successful export, since an unresolved citekey exports "successfully" with
+`smith2020?` in the text. `citecheck` catches those before you export.
 
 **From `mini.nvim` (defaults):**
 
@@ -160,7 +170,9 @@ The buffer is auto-written before export/preview.
 
 ### Plugins
 
-- **Theme/UI:** `gbprod/nord.nvim`, `lualine` (globalstatus).
+- **Theme/UI:** `gbprod/nord.nvim`, `lualine` (globalstatus), `which-key`
+  (the leader menu — it reads the `desc` on each mapping, so adding a mapping
+  with a description lists it automatically).
 - **Navigation:** `telescope` (lazy on `:Telescope`), `oil` (`-`), `gitsigns`.
 - **Syntax:** `nvim-treesitter` (**`main` branch** — parsers install
   automatically on first launch; highlighting starts per-filetype).
