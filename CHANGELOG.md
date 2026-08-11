@@ -34,8 +34,9 @@ everything since is one entry per real milestone.
   `git add .` and a whole-tree link check respectively. Both take `--yes`.
 - **`~/.gnupg/gpg-agent.conf` says it is generated** in its own header;
   `make security` has always overwritten it, discarding hand edits silently.
-- The Makefile now refuses to run from anywhere but `~/git/dotfiles`, and
-  several doc rows that disagreed with the code were corrected — notably
+- Every Makefile target that writes to the machine now refuses to run from
+  anywhere but `~/git/dotfiles` (read-only lints and checks still run
+  anywhere, which is how CI uses them), and several doc rows that disagreed with the code were corrected — notably
   `pubkey-github`, which documented `id_github.pub` while both the alias and
   ssh-config use the Secretive key.
 

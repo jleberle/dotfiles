@@ -1,12 +1,21 @@
 DOTFILES := $(HOME)/git/dotfiles
 
-# Every symlink this Makefile creates points into $(DOTFILES), which is
-# hardcoded above. Clone the repo anywhere else and `make install` happily
-# builds a working-looking set of links to a directory that isn't there — the
-# breakage shows up later, somewhere else, as missing config. Refuse instead.
-ifneq ($(realpath $(CURDIR)),$(realpath $(DOTFILES)))
-$(error This repo must live at $(DOTFILES), but make is running in $(CURDIR). Move the clone there, or edit DOTFILES at the top of this Makefile)
-endif
+# Every symlink this Makefile creates points into $(DOTFILES), hardcoded above —
+# and so do git/gitconfig (hooksPath), paths.env, the launchd plists, and
+# writing/pandoc/metadata.yaml. Clone the repo anywhere else and `make install`
+# happily builds a working-looking set of links to a directory that isn't there;
+# the breakage shows up later, somewhere else, as missing config.
+#
+# This is a prerequisite rather than a top-of-file $(error) because a parse-time
+# error fires on EVERY target, including the read-only lint ones. CI checks out
+# to its own runner path and runs `make lint-shellcheck` there, so the parse-time
+# form failed the whole build on a rule that has nothing to do with linting.
+# Guard the targets that write to the machine; leave reading alone.
+require-location :
+	@[ "$$(cd "$(CURDIR)" && pwd -P)" = "$$(cd "$(DOTFILES)" 2>/dev/null && pwd -P)" ] || { \
+	    echo "This repo must live at $(DOTFILES), but make is running in $(CURDIR)." >&2; \
+	    echo "Move the clone there, or edit DOTFILES at the top of this Makefile." >&2; \
+	    exit 1; }
 
 LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
@@ -144,7 +153,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -183,7 +192,7 @@ help : ## Print this list
 	@echo "lint-python, lint-luacheck, lint-secrets."
 	@echo "Docs: docs/maintenance.md (targets), README.md (setup)."
 
-install : apps git shell security nvim vale neomutt services brewauto ## setup | Full setup: apps, symlinks, agents, then doctor
+install : require-location apps git shell security nvim vale neomutt services brewauto ## setup | Full setup: apps, symlinks, agents, then doctor
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
 	@echo "If you use NeoMutt, finish setup with: make mailsync"
@@ -192,7 +201,7 @@ install : apps git shell security nvim vale neomutt services brewauto ## setup |
 	@echo ""
 	@$(MAKE) doctor
 
-git : ## link | gitconfig/gitignore/gitmessage, lazygit, git hooks
+git : require-location ## link | gitconfig/gitignore/gitmessage, lazygit, git hooks
 	@echo "Symlinking Git files"
 	$(call install_symlinks,git)
 	@echo "Symlinking lazygit config"
@@ -203,7 +212,7 @@ git : ## link | gitconfig/gitignore/gitmessage, lazygit, git hooks
 	chmod +x $(DOTFILES)/git/hooks/pre-commit $(DOTFILES)/git/hooks/pre-push
 	@command -v delta >/dev/null 2>&1 || echo "WARNING: delta not found — git diff/log will fail. Run: make apps"
 	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not found — commits will NOT be scanned for secrets. Run: make apps"
-chsh : ## setup | Make fish the login shell (sudo)
+chsh : require-location ## setup | Make fish the login shell (sudo)
 	@grep -qF "$(HOMEBREW_PREFIX)/bin/fish" /etc/shells || \
 	    { echo "Adding fish to /etc/shells"; echo "$(HOMEBREW_PREFIX)/bin/fish" | sudo tee -a /etc/shells; }
 	@dscl . -read /Users/$(USER) UserShell 2>/dev/null | grep -qF "$(HOMEBREW_PREFIX)/bin/fish" && \
@@ -211,7 +220,7 @@ chsh : ## setup | Make fish the login shell (sudo)
 	    { echo "Setting fish as login shell" && \
 	      sudo dscl . -create /Users/$(USER) UserShell "$(HOMEBREW_PREFIX)/bin/fish" && \
 	      echo "Done — open a new terminal to start using fish"; }
-shell : ## link | fish, Ghostty, tmux, bat
+shell : require-location ## link | fish, Ghostty, tmux, bat
 	@echo "Symlinking fish, tmux, and bat config"
 	$(call install_symlinks,shell)
 	@echo "Run 'make chsh' to set fish as your login shell (requires sudo)"
@@ -219,7 +228,7 @@ shell : ## link | fish, Ghostty, tmux, bat
 	mkdir -p "$(GHOSTTY_DIR)"
 	@target="$(GHOSTTY_DIR)/config"; $(backup_if_real)
 	ln -sf $(DOTFILES)/shell/ghostty/config "$(GHOSTTY_DIR)/config"
-security : ## link | SSH + GPG config; writes ~/.gnupg/gpg-agent.conf
+security : require-location ## link | SSH + GPG config; writes ~/.gnupg/gpg-agent.conf
 	@echo "Creating SSH ControlPath directory"
 	mkdir -p $(HOME)/.ssh
 	chmod 700 $(HOME)/.ssh
@@ -239,7 +248,7 @@ security : ## link | SSH + GPG config; writes ~/.gnupg/gpg-agent.conf
 	rm -f $(HOME)/.gnupg/gpg-agent.conf
 	sed 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' $(DOTFILES)/security/gpg-agent.conf.tmpl > $(HOME)/.gnupg/gpg-agent.conf
 	chmod 600 $(HOME)/.gnupg/gpg-agent.conf
-firefox : ## link | Write user.js (Betterfox + overrides) to the profile
+firefox : require-location ## link | Write user.js (Betterfox + overrides) to the profile
 	@PROFILE=$$(awk -F= '/^Default=/{print $$2; exit}' \
 	    "$(FIREFOX_DIR)/installs.ini" 2>/dev/null) && \
 	[ -n "$$PROFILE" ] || { echo "ERROR: Firefox profile not found — launch Firefox first"; exit 1; } && \
@@ -255,7 +264,7 @@ betterfox-update : ## maintain | Pull Betterfox upstream; re-run make firefox af
 	git submodule update --remote security/betterfox
 	@echo "Done. Review changes with: git diff security/betterfox"
 	@echo "Then re-run 'make firefox' to rebuild the profile user.js."
-services : ## link | Automator workflows -> ~/Library/Services
+services : require-location ## link | Automator workflows -> ~/Library/Services
 	@echo "Symlinking macOS Services (Automator workflows)"
 	mkdir -p "$(SERVICES_DIR)"
 	@# A real (non-symlink) workflow of the same name is someone's own work, not
@@ -274,22 +283,22 @@ services : ## link | Automator workflows -> ~/Library/Services
 	    echo "  $$name"; \
 	done
 	@echo "Restart target apps (or 'killall Finder') if the Services menu doesn't refresh."
-apps : ## setup | brew bundle against homebrew/brewfile
+apps : require-location ## setup | brew bundle against homebrew/brewfile
 	@command -v brew >/dev/null 2>&1 || { \
 		echo "Homebrew not found. Installing..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	}
 	@# Absolute path, not bare `brew`: the official installer doesn't add brew to
 	@# the current process PATH, so a fresh-machine first run would otherwise fail.
-	$(HOMEBREW_PREFIX)/bin/brew bundle install --file=$(DOTFILES)/homebrew/brewfile
-brewauto : ## agents | launchd agent: update Homebrew weekly
+	$(HOMEBREW_PREFIX)/bin/brew bundle install --file=$(CURDIR)/homebrew/brewfile
+brewauto : require-location ## agents | launchd agent: update Homebrew weekly
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
 	$(call install_agent,$(DOTFILES)/homebrew/org.jaredeberle.brewupdate.plist)
 	@echo "Installed. Logs at $(HOME)/.local/brew_update_logs.txt (newest run first)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.brewupdate"
-macos : ## system | Write the managed macOS defaults
+macos : require-location ## system | Write the managed macOS defaults
 	@echo "Writing macOS defaults (MACOS_DEFAULTS table)..."
 	mkdir -p $(HOME)/Desktop/Screenshots
 	@for row in $(foreach r,$(MACOS_DEFAULT_ROWS),'$(r)'); do \
@@ -329,7 +338,7 @@ macos-check : ## system | Read those defaults back and warn on drift
 	@[ -f /etc/pam.d/sudo_local ] && grep -q pam_tid.so /etc/pam.d/sudo_local || \
 	    echo "WARNING: Touch ID for sudo not configured (run: make touchid)"
 	@echo "Done."
-harden : ## system | Firewall, auto security updates, no diagnostics (sudo)
+harden : require-location ## system | Firewall, auto security updates, no diagnostics (sudo)
 	@echo "Enabling the application firewall (inbound) + stealth mode (requires sudo)"
 	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
@@ -343,7 +352,7 @@ harden : ## system | Firewall, auto security updates, no diagnostics (sudo)
 	-sudo defaults write "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist" AutoSubmit -bool false
 	-sudo defaults write "/Library/Application Support/CrashReporter/DiagnosticMessagesHistory.plist" ThirdPartyDataSubmit -bool false
 	@echo "Done. Verify with: make macos-check"
-touchid : ## system | Touch ID for sudo, tmux-safe (sudo)
+touchid : require-location ## system | Touch ID for sudo, tmux-safe (sudo)
 	@echo "Enabling Touch ID for sudo via /etc/pam.d/sudo_local (requires sudo)"
 	@[ -f "$(HOMEBREW_PREFIX)/lib/pam/pam_reattach.so" ] || \
 	    echo "NOTE: pam-reattach not installed — Touch ID won't work inside tmux (run: make apps)"
@@ -353,10 +362,10 @@ touchid : ## system | Touch ID for sudo, tmux-safe (sudo)
 	@# which would also block `make macos-check` from reading it back.
 	sudo chmod 644 /etc/pam.d/sudo_local
 	@echo "Done. Open a new shell and run any 'sudo' command to test (Touch ID prompt)."
-nvim : ## link | writing/nvim -> ~/.config/nvim
+nvim : require-location ## link | writing/nvim -> ~/.config/nvim
 	@echo "Symlinking nvim config"
 	$(call install_symlinks,nvim)
-vale : ## link | Global ~/.vale.ini, then vale sync
+vale : require-location ## link | Global ~/.vale.ini, then vale sync
 	@command -v vale >/dev/null 2>&1 || { echo "ERROR: vale not found — install it first (make apps)"; exit 1; }
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
 	mkdir -p $(HOME)/.local/share/vale/styles
@@ -367,7 +376,7 @@ vale : ## link | Global ~/.vale.ini, then vale sync
 	ln -sfn $(DOTFILES)/writing/vale/vocab/Academic \
 	    $(HOME)/.local/share/vale/styles/config/vocabularies/Academic
 	vale sync
-neomutt : ## link | NeoMutt config, cache dirs, mbsync/notmuch scaffolds
+neomutt : require-location ## link | NeoMutt config, cache dirs, mbsync/notmuch scaffolds
 	@echo "Setting up NeoMutt"
 	mkdir -p $(HOME)/.config/neomutt/accounts
 	mkdir -p $(HOME)/.cache/neomutt/headers
@@ -385,14 +394,14 @@ neomutt : ## link | NeoMutt config, cache dirs, mbsync/notmuch scaffolds
 	    { sed 's|__HOME__|$(HOME)|g' $(DOTFILES)/writing/neomutt/notmuch-config > $(HOME)/.notmuch-config; \
 	      echo "REMINDER: edit ~/.notmuch-config with your name and email, then run: notmuch new"; }
 	@echo "NeoMutt configured."
-mailsync : ## agents | launchd agent: mbsync + notmuch every 5 minutes
+mailsync : require-location ## agents | launchd agent: mbsync + notmuch every 5 minutes
 	@echo "Installing mail sync LaunchAgent"
 	mkdir -p $(LAUNCH_AGENTS)
 	chmod +x $(DOTFILES)/bin/mailsync.sh
 	$(call install_agent,$(DOTFILES)/writing/neomutt/org.jaredeberle.mailsync.plist)
 	@echo "Mail sync running every 5 minutes."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.mailsync"
-resticcheck : ## agents | launchd agent: weekly restic integrity check
+resticcheck : require-location ## agents | launchd agent: weekly restic integrity check
 	@echo "Installing weekly restic integrity-check LaunchAgent"
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
@@ -400,7 +409,7 @@ resticcheck : ## agents | launchd agent: weekly restic integrity check
 	@echo "Runs 'archbackup check' every Sunday 10:00 (no-op when the drive is unmounted)."
 	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
-decksync : ## agents | launchd agent: sync Keynote decks on volume mount
+decksync : require-location ## agents | launchd agent: sync Keynote decks on volume mount
 	@# The .app is a wrapper around keynote/sync_slides_drive.sh; if that ever
 	@# moves again, fail here rather than installing an agent that no-ops
 	@# silently on every volume mount while doctor reports it healthy.
@@ -433,7 +442,7 @@ update : ## maintain | Neovim plugins + vale sync (not Homebrew)
 	@echo "  * CI's gitleaks is pinned by version AND checksum in"
 	@echo "    .github/workflows/ci.yml. Local gitleaks comes from Homebrew, so the"
 	@echo "    two drift apart silently. Current CI pin vs. local:"
-	@printf '      CI:    %s\n' "$$(awk -F'v' '/releases\/download\/v/{split($$2,a,"/"); print a[1]; exit}' $(DOTFILES)/.github/workflows/ci.yml)"
+	@printf '      CI:    %s\n' "$$(awk -F'v' '/releases\/download\/v/{split($$2,a,"/"); print a[1]; exit}' $(CURDIR)/.github/workflows/ci.yml)"
 	@printf '      local: %s\n' "$$(gitleaks version 2>/dev/null || echo '<not installed>')"
 	@echo "    To bump: edit the three v8.x.y strings, then replace the sha256 with"
 	@echo "    the one from that release's checksums.txt on GitHub."
@@ -484,22 +493,22 @@ nvim-check : ## check | Headless Neovim startup test
 	@tmp=$$(mktemp -d); \
 	    trap 'rm -rf "$$tmp"' EXIT; \
 	    mkdir -p "$$tmp/config" "$$tmp/data" "$$tmp/state" "$$tmp/cache"; \
-	    cp -R "$(DOTFILES)/writing/nvim" "$$tmp/config/nvim"; \
+	    cp -R "$(CURDIR)/writing/nvim" "$$tmp/config/nvim"; \
 	    XDG_CONFIG_HOME="$$tmp/config" XDG_DATA_HOME="$$tmp/data" XDG_STATE_HOME="$$tmp/state" XDG_CACHE_HOME="$$tmp/cache" \
-	        fish -c 'source $(DOTFILES)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
+	        fish -c 'source $(CURDIR)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
 brew-check : ## check | Verify every brewfile package is installed
 	@echo "Checking Brewfile packages..."
 	@# The WARNING: prefix is the shared contract with `make check`, which
 	@# counts and re-lists those lines in its summary — see the note there.
-	@brew bundle check --file=$(DOTFILES)/homebrew/brewfile --no-upgrade || \
+	@brew bundle check --file=$(CURDIR)/homebrew/brewfile --no-upgrade || \
 	    echo "WARNING: some Brewfile packages are missing (run: make apps)"
 
 brew-drift : ## check | List installed packages missing from the brewfile
 	@echo "Checking for formulae/casks installed but not in the Brewfile..."
-	@brew bundle cleanup --file=$(DOTFILES)/homebrew/brewfile || true
+	@brew bundle cleanup --file=$(CURDIR)/homebrew/brewfile || true
 	@echo ""
 	@echo "Nothing listed above = no drift. To add a package, edit the Brewfile;"
-	@echo "to uninstall the drift instead, run: brew bundle cleanup --force --file=$(DOTFILES)/homebrew/brewfile"
+	@echo "to uninstall the drift instead, run: brew bundle cleanup --force --file=$(CURDIR)/homebrew/brewfile"
 doctor : ## check | Symlinks, keys, permissions, shell, agents
 	@echo "Checking symlinks..."
 	@for row in $(foreach r,$(SYMLINK_ROWS),'$(r)'); do \

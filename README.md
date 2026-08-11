@@ -58,7 +58,9 @@ Then finish the per-app setup:
 | macOS     | Logout and back in for keyboard repeat changes to take full effect                          |
 
 > **Why `~/git/dotfiles`?** Every symlink in the `Makefile` is rooted at
-> `$(HOME)/git/dotfiles`. Cloning anywhere else will break the symlinks.
+> `$(HOME)/git/dotfiles`, and so are `git/gitconfig`, `paths.env`, the launchd
+> plists, and the pandoc metadata. Cloning anywhere else breaks them, so every
+> target that writes to your machine stops with an explanation instead.
 
 ---
 
