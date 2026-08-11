@@ -111,7 +111,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly (`homebrewupdate.sh` caps its own log at 1 MB) |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |
-| `harden`           | **(sudo)** Enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |
+| `harden`           | **(sudo)** Sets `~` to `0700`, enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |
 | `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |

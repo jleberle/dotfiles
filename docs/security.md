@@ -48,6 +48,21 @@ Configs symlinked by `make security`:
   by default), `HOMEBREW_NO_INSECURE_REDIRECT`, and a
   `fish_should_add_to_history` filter that keeps space-prefixed and
   secret-bearing command lines out of shell history.
+
+  The umask earns its keep on material that leaves the machine with its modes
+  attached — the GPG master key staged for USB, restic snapshots (which preserve
+  and restore modes), the Keynote decks synced to Drive. It is *not* the main
+  defense against other local accounts; `make harden` setting `~` to `0700` is,
+  because that holds for files this shell never touched (what an app creates,
+  what a backup restores, anything predating the umask) and because you can see
+  it with `ls -ld ~` instead of inferring it.
+
+  Because `conf.d` is sourced for every fish session including scripts, the umask
+  propagates into whatever you launch. That is wrong for Homebrew, which installs
+  world-readable software, so `make apps` and `bin/homebrewupdate.sh` set
+  `umask 022` explicitly; `make brew-check` warns if the Cellar has already
+  drifted. Anything else that installs software for general use should do the
+  same.
 - **Firefox** (`security/betterfox/` submodule + `security/user-overrides.js`):
   `make firefox` concatenates both into a single `user.js` written to the active
   Firefox profile. Personal overrides (Smoothfox scroll tuning, DoH/NextDNS,
@@ -74,9 +89,9 @@ which ignores `ssh_config`'s `IdentityAgent`. Per-machine setup steps live in
 
 Not part of `make install` — each touches system state and most need `sudo`:
 
-- **`make harden`** (sudo): enables the application firewall + stealth mode,
-  automatic macOS security updates / security responses, and opts out of Apple
-  diagnostics submission.
+- **`make harden`** (sudo): sets the home directory to `0700`, enables the
+  application firewall + stealth mode, automatic macOS security updates /
+  security responses, and opts out of Apple diagnostics submission.
 - **`make touchid`** (sudo): enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
   (with `pam_reattach` ahead of `pam_tid` so it works inside tmux).
 - **FileVault**: not toggled here (enabling headless is unsafe), but

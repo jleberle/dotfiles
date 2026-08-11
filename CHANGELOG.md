@@ -7,6 +7,34 @@ everything since is one entry per real milestone.
 
 ---
 
+## 2026-08-11 — umask 077 keeps its job, loses its side effects
+
+`umask 077` was doing two jobs badly instead of one job well. It stays, scoped
+to what it is actually good at.
+
+- **`make harden` now sets `~` to `0700`.** macOS ships home directories as
+  `0750`, group `staff`, which every local account joins. That is the real
+  defense against another user, it covers files the shell never created (what an
+  app writes, what a backup restores, anything predating the umask), and unlike
+  a umask you can *see* it: `ls -ld ~`. `make doctor` re-checks it.
+- **Homebrew installs at `umask 022` again**, set explicitly in `make apps` and
+  `bin/homebrewupdate.sh`. `conf.d/env.fish` is sourced for every fish session
+  including scripts, so brew inherited 077 and installed world-readable software
+  owner-only — 58 Cellar directories on this machine landed `drwx------` while
+  the same packages installed by the launchd job landed `drwxr-xr-x`. Nothing
+  broke, which is the problem: the drift was only discoverable by a second
+  account failing to run something. `make touchid` has carried a `chmod 644`
+  workaround for the same cause since it was written.
+  **Action required:** existing drift is not repaired automatically —
+  `make brew-check` now reports it and prints the fix
+  (`chmod -R go+rX /opt/homebrew/Cellar`).
+- **The umask keeps the job it is good at**: material that leaves the machine
+  with its modes attached — the GPG master key staged for USB, restic snapshots
+  (which preserve and restore modes), the Keynote decks synced to Drive.
+  Reasoning recorded in [docs/security.md](docs/security.md).
+
+---
+
 ## 2026-08-11 — Audit follow-up: naming and conventions
 
 Four rules are now written down in [docs/shell.md](docs/shell.md#conventions)

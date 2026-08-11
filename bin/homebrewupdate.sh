@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Homebrew installs software meant to be world-readable, so use the standard
+# umask rather than inheriting the caller's. Under launchd this is already 022,
+# but the failure message below tells you to re-run this by hand — and by hand
+# means from fish, where conf.d/env.fish sets 077. Without this line the same
+# package gets different permissions depending on who started the update.
+umask 022
+
 LOG="$HOME/.local/brew_update_logs.txt"
 TMPFILE=$(mktemp)
 trap 'rm -f "$TMPFILE"' EXIT

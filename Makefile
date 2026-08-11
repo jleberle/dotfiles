@@ -290,7 +290,14 @@ apps : require-location ## setup | brew bundle against homebrew/brewfile
 	}
 	@# Absolute path, not bare `brew`: the official installer doesn't add brew to
 	@# the current process PATH, so a fresh-machine first run would otherwise fail.
-	$(HOMEBREW_PREFIX)/bin/brew bundle install --file=$(CURDIR)/homebrew/brewfile
+	@#
+	@# umask 022, not the shell's 077 (env.fish). Homebrew installs software that
+	@# is meant to be world-readable, and this recipe inherits whatever umask the
+	@# calling shell had — so packages installed from fish landed in the Cellar as
+	@# drwx------ while the same package installed by the launchd job landed as
+	@# drwxr-xr-x. Harmless while brew runs as you, invisible, and impossible to
+	@# trace back later. The umask stays 077 for everything you create yourself.
+	umask 022 && $(HOMEBREW_PREFIX)/bin/brew bundle install --file=$(CURDIR)/homebrew/brewfile
 brewauto : require-location ## agents | launchd agent: update Homebrew weekly
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
@@ -339,6 +346,16 @@ macos-check : ## system | Read those defaults back and warn on drift
 	    echo "WARNING: Touch ID for sudo not configured (run: make touchid)"
 	@echo "Done."
 harden : require-location ## system | Firewall, auto security updates, no diagnostics (sudo)
+	@# macOS ships home directories as 0750 (group `staff`), which is what makes
+	@# ~/Public and personal file sharing work. Nothing here uses either, and
+	@# every future local account joins `staff` by default. 0700 does the
+	@# keep-other-users-out job once, in a place you can actually SEE
+	@# (`ls -ld ~`) and that `make doctor` re-checks — rather than relying on
+	@# umask 077 to get every file right forever. The umask stays; this is the
+	@# backstop for the files it misses (anything an app creates, anything
+	@# restored from a backup, anything that predates the umask).
+	@echo "Restricting the home directory to owner-only (0700)"
+	chmod 700 $(HOME)
 	@echo "Enabling the application firewall (inbound) + stealth mode (requires sudo)"
 	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
 	sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setstealthmode on
@@ -502,6 +519,14 @@ brew-check : ## check | Verify every brewfile package is installed
 	@# counts and re-lists those lines in its summary — see the note there.
 	@brew bundle check --file=$(CURDIR)/homebrew/brewfile --no-upgrade || \
 	    echo "WARNING: some Brewfile packages are missing (run: make apps)"
+	@# Packages installed from a fish shell before `make apps` set umask 022 landed
+	@# in the Cellar as drwx------ instead of drwxr-xr-x. Nothing breaks while brew
+	@# runs as you, which is exactly why it needs saying out loud — otherwise the
+	@# drift is only discoverable by a second account failing to run something.
+	@# go+rX, capital X: adds execute to directories only, never to data files.
+	@N=$$(find $(HOMEBREW_PREFIX)/Cellar -maxdepth 2 -type d ! -perm -005 2>/dev/null | wc -l | tr -d ' '); \
+	[ "$$N" = 0 ] || \
+	    echo "WARNING: $$N Cellar dirs are not world-readable — installed under a restrictive umask (run: chmod -R go+rX $(HOMEBREW_PREFIX)/Cellar)"
 
 brew-drift : ## check | List installed packages missing from the brewfile
 	@echo "Checking for formulae/casks installed but not in the Brewfile..."
@@ -557,6 +582,13 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	    M=$$(stat -f '%Lp' "$$k"); \
 	    case "$$M" in *00) ;; *) echo "WARNING: private key $$k is mode $$M — want 600 (chmod 600 $$k)" ;; esac; \
 	done
+	@# The home directory itself. macOS ships it 0750, so `staff` — which every
+	@# local account joins — can traverse it. `umask 077` in env.fish covers files
+	@# this shell creates, but not what an app creates, what a backup restores, or
+	@# anything predating the umask. This is the one mode that makes those moot,
+	@# and unlike a umask you can see it: ls -ld ~
+	@M=$$(stat -f '%Lp' "$(HOME)"); \
+	case "$$M" in 700) ;; *) echo "WARNING: home directory is mode $$M — group/other can traverse it (run: make harden)" ;; esac
 	@echo "Checking shell..."
 	@dscl . -read /Users/$(USER) UserShell 2>/dev/null | grep -qF "$(HOMEBREW_PREFIX)/bin/fish" || \
 	    echo "WARNING: fish is not the login shell (run: make chsh)"
