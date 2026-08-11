@@ -28,7 +28,8 @@ make doctor
 ```
 
 Checks every symlink created by `make install`, plus: SSH keys exist
-(`id_github`, `id_codeberg`), `~/.ssh`/`~/.gnupg` and the private keys are
+(`secretive_github.pub`, `secretive_codeberg.pub` — ssh-config points at the
+Secretive/Secure Enclave keys, not `id_*`), `~/.ssh`/`~/.gnupg` and the private keys are
 owner-only (no group/other access), fish is set as the login shell, the
 vale styles directory is populated, a GPG secret key is present, and any
 installed launchd agents (mailsync, brewupdate, brewlogclean, resticcheck,
@@ -119,7 +120,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`) |
 | `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync) and `vale sync`; Homebrew/Betterfox stay on their own paths. Also prints the CI-pinned vs. local gitleaks version, since that pin is bumped by hand |
-| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, vale styles, GPG key, git hooksPath/gitleaks, FileVault, and that launchd agents are loaded |
+| `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, vale styles, GPG key, git hooksPath/gitleaks, and that launchd agents are loaded (FileVault is checked by `macos-check`) |
 | `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` |
 
 `harden` and `touchid` are **not** part of `make install` — they touch system

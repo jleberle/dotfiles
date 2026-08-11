@@ -1,6 +1,12 @@
-# Template — do not symlink or use directly.
-# Run `make security` to substitute __HOMEBREW_PREFIX__ and write
-# directly to ~/.gnupg/gpg-agent.conf.
+# GENERATED FILE — do not edit.
+#
+# `make security` (which `make install` also runs) writes this to
+# ~/.gnupg/gpg-agent.conf from security/gpg-agent.conf.tmpl in the dotfiles
+# repo, substituting the local Homebrew prefix for __HOMEBREW_PREFIX__.
+#
+# Every run overwrites the file. Edits made directly to ~/.gnupg/gpg-agent.conf
+# are discarded without warning — change the template instead, then re-run
+# `make security`.
 pinentry-program __HOMEBREW_PREFIX__/bin/pinentry-mac
 
 default-cache-ttl 600

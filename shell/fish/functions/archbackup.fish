@@ -27,10 +27,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
     end
 
     set -l archives $RESEARCH_ARCHIVES_DIR
-    if not type -q restic
-        echo "archbackup: restic not found — brew install restic" >&2
-        return 1
-    end
+    __require archbackup restic; or return 1
     if not set -q ARCHIVE_RESTIC_REPO
         echo "archbackup: set ARCHIVE_RESTIC_REPO first (see function header)" >&2
         return 1

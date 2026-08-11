@@ -4,5 +4,7 @@ function mailsync --description 'Sync mail from Proton Bridge and update notmuch
         return 0
     end
 
+    __require mailsync mbsync notmuch; or return 1
+
     mbsync -a && notmuch new
 end

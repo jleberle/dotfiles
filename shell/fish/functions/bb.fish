@@ -4,6 +4,8 @@ function bb --description 'Launch BBEdit; dir arg opens and cds; file arg opens'
         return 0
     end
 
+    __require bb bbedit; or return 1
+
     if test (count $argv) -eq 0
         bbedit --launch
     else

@@ -15,10 +15,7 @@ function archgrep --description "Full-text search the OCR'd archival PDFs (ripgr
         return 1
     end
 
-    if not type -q rga
-        echo "archgrep: rga not found — brew install ripgrep-all" >&2
-        return 1
-    end
+    __require archgrep rga; or return 1
 
     set -l archives $RESEARCH_ARCHIVES_DIR
     if not test -d $archives

@@ -1,4 +1,13 @@
 DOTFILES := $(HOME)/git/dotfiles
+
+# Every symlink this Makefile creates points into $(DOTFILES), which is
+# hardcoded above. Clone the repo anywhere else and `make install` happily
+# builds a working-looking set of links to a directory that isn't there — the
+# breakage shows up later, somewhere else, as missing config. Refuse instead.
+ifneq ($(realpath $(CURDIR)),$(realpath $(DOTFILES)))
+$(error This repo must live at $(DOTFILES), but make is running in $(CURDIR). Move the clone there, or edit DOTFILES at the top of this Makefile)
+endif
+
 LAUNCHD_UID := $(shell id -u)
 LAUNCH_AGENTS := $(HOME)/Library/LaunchAgents
 GHOSTTY_DIR := $(HOME)/Library/Application Support/com.mitchellh.ghostty
@@ -211,11 +220,17 @@ betterfox-update :
 services :
 	@echo "Symlinking macOS Services (Automator workflows)"
 	mkdir -p "$(SERVICES_DIR)"
+	@# A real (non-symlink) workflow of the same name is someone's own work, not
+	@# ours to replace: this used to `rm -rf` it, which inside `make install`'s
+	@# output nobody reads, and it was already gone. Skip and say so instead —
+	@# an unlinked service is a visible, fixable problem; a deleted one is not.
 	@for wf in $(DOTFILES)/macos/services/*.workflow; do \
 	    name=$$(basename "$$wf"); \
 	    target="$(SERVICES_DIR)/$$name"; \
 	    if [ -e "$$target" ] && [ ! -L "$$target" ]; then \
-	        echo "  removing existing non-symlink: $$name"; rm -rf "$$target"; \
+	        echo "  SKIPPED $$name — a real file/folder is already there, not a symlink."; \
+	        echo "          Move or delete '$$target' yourself, then re-run 'make services'."; \
+	        continue; \
 	    fi; \
 	    ln -sfn "$$wf" "$$target"; \
 	    echo "  $$name"; \

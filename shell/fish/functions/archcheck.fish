@@ -9,10 +9,7 @@ function archcheck --description 'List archival PDFs with no OCR text layer (inv
     end
 
     set -l archives $RESEARCH_ARCHIVES_DIR
-    if not type -q pdftotext
-        echo "archcheck: pdftotext not found — brew install poppler" >&2
-        return 1
-    end
+    __require archcheck pdftotext; or return 1
     if not test -d $archives
         echo "archcheck: archive folder not found: $archives" >&2
         return 1

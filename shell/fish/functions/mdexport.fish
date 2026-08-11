@@ -10,6 +10,8 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
         return 0
     end
 
+    __require mdexport pandoc; or return 1
+
     if test (count $argv) -lt 2
         echo "usage: mdexport <html|pdf|docx|...> <file.md> [more.md ...]" >&2
         return 1

@@ -17,6 +17,8 @@ function docx2md --description 'Convert a .docx (e.g. returned editor revisions)
         return 0
     end
 
+    __require docx2md pandoc; or return 1
+
     if test (count $argv) -eq 0
         echo "usage: docx2md <file.docx> [all|accept|reject]" >&2
         return 1

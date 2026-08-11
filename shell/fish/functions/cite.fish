@@ -9,6 +9,8 @@ function cite --description 'Fuzzy-pick a citation from the BibTeX library; copi
         return 0
     end
 
+    __require cite rg fzf; or return 1
+
     set -l bib $ZOTERO_LIBRARY_BIB
 
     if not test -f $bib

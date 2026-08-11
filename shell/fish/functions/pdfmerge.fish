@@ -5,6 +5,8 @@ function pdfmerge --description 'Merge PDFs into one (qpdf)'
         return 0
     end
 
+    __require pdfmerge qpdf; or return 1
+
     if test (count $argv) -lt 3
         echo "usage: pdfmerge <out.pdf> <in1.pdf> <in2.pdf> [...]" >&2
         return 1

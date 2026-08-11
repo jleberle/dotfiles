@@ -26,10 +26,7 @@ function depmerge --description 'Rebase and fast-forward merge a GitHub Dependab
         return 1
     end
 
-    if not command -q gh
-        echo "depmerge: gh is not installed" >&2
-        return 1
-    end
+    __require depmerge gh; or return 1
 
     set -l github_remote (git remote get-url origin 2>/dev/null)
     if test -z "$github_remote"

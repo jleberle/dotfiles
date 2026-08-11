@@ -110,8 +110,8 @@ picker.
 |------------------|----------------------------------------------------|
 | `cb`             | `pbcopy` (pipe into it: `echo hi \| cb`)           |
 | `cv`             | `pbpaste`                                          |
-| `pubkey-github`  | Copy `~/.ssh/id_github.pub` to the clipboard       |
-| `pubkey-codeberg`| Copy `~/.ssh/id_codeberg.pub` to the clipboard     |
+| `pubkey-github`  | Copy `~/.ssh/secretive_github.pub` to the clipboard   |
+| `pubkey-codeberg`| Copy `~/.ssh/secretive_codeberg.pub` to the clipboard |
 
 **System / network / housekeeping**
 
@@ -168,7 +168,7 @@ required.
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
 | `csvsort [dir] [--header] [--force]` | Sort every unsorted CSV in a directory by the **last word of field 1** (surname order, case-insensitive) into `<name>-sorted.csv`; originals untouched |
-| `depmerge <pr-number>`  | Merge a Dependabot PR locally and push to both remotes — see [Git](git.md)            |
+| `depmerge <pr-number>`  | Merge a Dependabot PR locally and push to `origin` — see [Git](git.md)               |
 | `fuck`                  | Re-run the previous command under `sudo`                                              |
 | `gitup`                 | Run `gitup` over the tracked bookmarks file (`git/gitup-bookmarks`)                   |
 | `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |

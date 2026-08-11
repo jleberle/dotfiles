@@ -8,6 +8,8 @@ function pdfpages --description 'Extract a page range from a PDF (qpdf)'
         return 0
     end
 
+    __require pdfpages qpdf; or return 1
+
     if test (count $argv) -lt 2
         echo "usage: pdfpages <in.pdf> <range> [out.pdf]" >&2
         echo "       range examples: 7   10-25   1,5-9   z (last page)" >&2

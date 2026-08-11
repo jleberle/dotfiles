@@ -30,6 +30,11 @@ Configs symlinked by `make security`:
   `auto-key-locate local,wkd` omits keyservers so key lookups don't leak the
   queried key ID. Git commit and tag signing uses GPG (`gpg.format = openpgp`) —
   the same key works across GitHub and Codeberg without cross-registering SSH keys.
+  Note that `~/.gnupg/gpg-agent.conf` is **generated**, not symlinked: `make
+  security` (and therefore `make install`) rewrites it from
+  `security/gpg-agent.conf.tmpl` every time, substituting the Homebrew prefix.
+  Edits made to the file in `~/.gnupg` are discarded on the next run — change
+  the template instead. The generated file says so in its own header.
 - **GPG master key management**: `gpg-master-import` / `gpg-master-done` fish
   functions handle the import-edit-cleanup cycle for the offline master key.
   `gpg-master-done` detects the machine (Leia/Ahsoka), reimports only the correct
@@ -75,7 +80,7 @@ Not part of `make install` — each touches system state and most need `sudo`:
 - **`make touchid`** (sudo): enables Touch ID for `sudo` via `/etc/pam.d/sudo_local`
   (with `pam_reattach` ahead of `pam_tid` so it works inside tmux).
 - **FileVault**: not toggled here (enabling headless is unsafe), but
-  `make macos-check` / `make doctor` warn if full-disk encryption is off.
+  `make macos-check` warns if full-disk encryption is off (`make check` runs it).
 - **Backup integrity**: `archbackup check` runs `restic check` on the encrypted
   research-scan repo; `make resticcheck` schedules it weekly (see
   [Automation → Launchd](automation.md#launchd)).

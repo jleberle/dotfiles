@@ -14,10 +14,7 @@ function mdarchive --description 'Archive every URL cited in markdown files to t
         return 1
     end
 
-    if not type -q lychee
-        echo "mdarchive: lychee not found (run: make apps)" >&2
-        return 1
-    end
+    __require mdarchive lychee; or return 1
 
     for file in $argv
         if not test -f $file
