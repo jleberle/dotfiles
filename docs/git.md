@@ -76,25 +76,33 @@ GitHub Dependabot watches the SHA-pinned GitHub Actions workflow refs weekly
 and the Betterfox submodule monthly via
 [.github/dependabot.yml](../.github/dependabot.yml).
 
-**Dependabot merge workflow:** review the PR on GitHub, then merge it locally
-with the `depmerge <pr-number>` fish helper: switches to `main`,
-fast-forwards it from GitHub, asks GitHub to rebase the PR, waits for its
-checks, fetches the resulting PR head, fast-forwards locally, and pushes
-`main` back to GitHub. It refuses a dirty worktree.
+**Dependabot merge workflow:** review the PR on GitHub, then merge it with the
+`depmerge <pr-number>` fish helper: switches to `main`, fast-forwards it,
+waits for the PR's checks, then asks GitHub to rebase-merge it — entirely
+server-side — and fast-forwards `main` locally to match. It refuses a dirty
+worktree.
 
-NOTE: `depmerge` and required signed commits can collide. Dependabot's own
-commits are signed by GitHub, but when `gh pr update-branch --rebase` has to
-rebase a stale PR, GitHub rewrites the commit *as you* — it cannot sign as you,
-and the commit never touches local git, so nothing signs it. The final push is
-then rejected. It only bites when the PR needs rebasing; an already-current PR
-merges fine. Both cases exist in this repo's history (`e043bc1` signed,
-`dfbcaab` not). A rejected push is harmless — nothing is applied — so when it
-happens, the fix is to let GitHub do the merge server-side instead, which it
-does sign:
+The merge is deliberately server-side (`gh pr merge --rebase`), not a local
+rebase-then-push. An earlier version called `gh pr update-branch --rebase` to
+bring a stale PR up to date first: GitHub performs that rebase *as you*, so it
+cannot sign the result, and the commit that produced landed on `main` unsigned
+(`dfbcaab`) — harmless before signed commits were required on `main`, but a
+rejected push afterward. `gh pr merge --rebase` does the whole rebase-and-merge
+as one GitHub-authored operation instead, the same way Dependabot's own commits
+are signed (`e043bc1`), so there is no unsigned intermediate for a
+signature-required `main` to reject.
+
+NOTE: whether `gh pr merge --rebase` rebases a stale PR automatically as part
+of merging, or requires the PR to already be current, has not been exercised
+against a real out-of-date PR from this machine — GitHub's merge endpoint is
+documented to handle it, but confirm on the next Dependabot PR that needs
+rebasing. If it refuses instead of rebasing, updating the PR branch from
+GitHub's own "Update branch" button on the PR page before re-running `depmerge`
+is the fallback to try — that path has not been checked against signing
+either, so verify the result the same way:
 
 ```sh
-gh pr merge --rebase --repo <you>/dotfiles <pr>
-git pull --ff-only origin main
+gh api repos/<you>/dotfiles/commits/main --jq '.commit.verification'
 ```
 
 **Scheduled CI:** GitHub Actions still runs the full check suite monthly (catches

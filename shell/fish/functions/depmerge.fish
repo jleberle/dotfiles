@@ -52,12 +52,25 @@ function depmerge --description 'Rebase and fast-forward merge a GitHub Dependab
     git switch main; or return 1
     git pull --ff-only origin main; or return 1
 
-    gh pr update-branch --rebase --repo $github_repo $pr; or return 1
     gh pr checks --watch --fail-fast --repo $github_repo $pr; or return 1
 
-    git fetch origin refs/pull/$pr/head; or return 1
-    git merge --ff-only FETCH_HEAD; or return 1
-    git push origin main:main; or return 1
+    # Merge entirely server-side. This used to be `gh pr update-branch --rebase`
+    # (rewrite the PR branch), then a local `git fetch` + `git merge --ff-only` +
+    # `git push` of the result. That update-branch call rebases AS YOU -- GitHub
+    # can't sign a commit it's attributing to your account -- and the local merge
+    # then carried that unsigned commit straight onto main. Once `main` required
+    # signed commits (including for admins), that unsigned commit would have been
+    # rejected at push -- but the version of this script that HAD update-branch
+    # already put one in history before signing was enforced (see docs/git.md).
+    # `gh pr merge --rebase` performs the whole rebase-and-merge as a single
+    # GitHub-authored operation, so the commit that lands on main is signed by
+    # GitHub the same way Dependabot's own commits are -- there is no unsigned
+    # intermediate for a signature-required main to reject.
+    gh pr merge --rebase --repo $github_repo $pr; or return 1
+
+    # The merge just happened on GitHub, not in this checkout -- pull it down so
+    # local main matches what was pushed rather than sitting one commit behind.
+    git pull --ff-only origin main; or return 1
 
     echo "depmerge: merged PR #$pr into main and pushed to GitHub"
 end
