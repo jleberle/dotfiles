@@ -177,6 +177,7 @@ required.
 | `mkd <dir>`             | `mkdir -p` then `cd` into it                                                          |
 | `o [paths]`             | `open` the current dir (no args) or the given paths                                   |
 | `pman <cmd>`            | Open a man page rendered as a PDF in Preview                                          |
+| `pushrepos [dir]`       | Push every git repo under a directory that is ahead of its remote; refuses (and reports) any repo with uncommitted changes rather than pushing it |
 
 ---
 

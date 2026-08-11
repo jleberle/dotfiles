@@ -4,6 +4,17 @@ function wordfrequency --description 'Count and sort word frequency from stdin'
         return 0
     end
 
+    # Typed bare at a prompt this reads from the terminal, so it just sits
+    # there looking frozen until you work out that Ctrl-D is what it wants.
+    # The docs say "reads stdin", but the person who typed it bare is not
+    # reading the docs at that moment.
+    if isatty stdin
+        echo "wordfrequency: reads stdin — pipe something into it" >&2
+        echo "usage: <command> | wordfrequency" >&2
+        echo "   e.g. cat draft.md | wordfrequency | head -20" >&2
+        return 1
+    end
+
     awk '
        BEGIN { FS="[^a-zA-Z]+" } {
            for (i=1; i<=NF; i++) {

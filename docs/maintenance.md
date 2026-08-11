@@ -108,7 +108,7 @@ just prints a warning) so nothing destructive happens by accident.
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `resticcheck`      | Installs a launchd agent that runs `archbackup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
 | `decksync`         | Installs a `WatchPaths` launchd agent that syncs the Keynote lecture decks to the "Slides" flash drive whenever a volume mounts; no-op unless that drive appeared |
-| `brewauto`         | Installs `launchd` agents that update Homebrew weekly and rotate the log monthly                    |
+| `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly (`homebrewupdate.sh` caps its own log at 1 MB) |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |
 | `harden`           | **(sudo)** Enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |

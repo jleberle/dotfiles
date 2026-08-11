@@ -1,5 +1,6 @@
 function archbackup --description 'Snapshot the archival scans to a restic repo (versioned, encrypted backup)'
     # usage: archbackup            create a new snapshot
+    #        archbackup backup     the same thing, said explicitly
     #        archbackup snapshots  list existing snapshots
     #        archbackup check      verify repository integrity
     #
@@ -21,6 +22,7 @@ function archbackup --description 'Snapshot the archival scans to a restic repo 
     # stays the offline master (see the Archives README).
     if __help_requested $argv
         echo "usage: archbackup            create a new snapshot"
+        echo "       archbackup backup     the same thing, said explicitly"
         echo "       archbackup snapshots  list existing snapshots"
         echo "       archbackup check      verify repository integrity"
         return 0

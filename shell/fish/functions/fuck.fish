@@ -1,4 +1,9 @@
 function fuck --description 'Re-run the previous command under sudo (after confirmation)'
+    if __help_requested $argv
+        echo "usage: fuck   (no arguments — re-runs the previous command under sudo)"
+        return 0
+    end
+
     # $history[1] is the most recent command line in an interactive session.
     set -l cmd $history[1]
 
