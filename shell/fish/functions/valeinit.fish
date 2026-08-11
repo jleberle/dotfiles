@@ -12,7 +12,13 @@ function valeinit --description 'Scaffold a per-project .vale.ini from the dotfi
         return 1
     end
 
-    cp $DOTFILES_DIR/writing/vale/vale-project.ini .vale.ini
+    # The cp used to be unchecked, with the success message printed
+    # unconditionally after it — so an unset DOTFILES_DIR produced cp's usage
+    # text, "Wrote .vale.ini", exit 0, no file, and a stray .vale/styles.
+    set -l template "$DOTFILES_DIR/writing/vale/vale-project.ini"
+    __need_path valeinit file "vale project template" "$template"; or return 1
+
+    cp "$template" .vale.ini; or return 1
     mkdir -p .vale/styles
     echo "Wrote .vale.ini (StylesPath: .vale/styles)"
     echo "Edit BasedOnStyles to taste; run 'vale sync' if you add Packages."

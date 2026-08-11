@@ -12,6 +12,9 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
 
     __require mdexport pandoc; or return 1
 
+    set -l defaults "$DOTFILES_DIR/writing/pandoc/defaults.yaml"
+    __need_path mdexport file "pandoc defaults" "$defaults"; or return 1
+
     if test (count $argv) -lt 2
         echo "usage: mdexport <html|pdf|docx|...> <file.md> [more.md ...]" >&2
         return 1
@@ -36,12 +39,28 @@ function mdexport --description 'Pandoc-export markdown files (crossref + citepr
         end
 
         pushd (path dirname $file)
-        if pandoc -d $DOTFILES_DIR/writing/pandoc/defaults.yaml $name -o $out $meta_args
-            echo "Exported "(path dirname $file)/$out
+        # Pandoc exits 0 for an unresolvable citation: it warns on stderr and
+        # writes "smith2020?" into the document. Deciding on the exit status
+        # alone printed "Exported chapter.docx" directly beneath a warning that
+        # the citations are broken. stderr is captured so the warning can be
+        # restated after the filename, attached to the file it describes, and
+        # so the run exits non-zero.
+        set -l err (mktemp)
+        if pandoc -d $defaults $name -o $out $meta_args 2>$err
+            if test -s $err
+                echo "Exported "(path dirname $file)/$out" — WITH WARNINGS:" >&2
+                cat $err >&2
+                echo "        check it before sending it on; 'citecheck $name' finds bad citekeys" >&2
+                set failed 1
+            else
+                echo "Exported "(path dirname $file)/$out
+            end
         else
+            cat $err >&2
             echo "mdexport: pandoc failed for $file" >&2
             set failed 1
         end
+        rm -f $err
         popd
     end
 

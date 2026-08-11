@@ -1,0 +1,32 @@
+# GENERATED FROM A TEMPLATE — `newmeta` writes this file into your document's
+# folder, substituting the absolute paths below. Edit this copy freely; to change
+# what every future copy starts from, edit
+# writing/pandoc/metadata.yaml.tmpl in the dotfiles repo.
+#
+# Pandoc does NOT expand `~` in document metadata: a `csl: ~/…` line fails with
+# "not found in resource path" and exit 99. That is why this is a template
+# rendered by a command rather than a file you copy by hand.
+
+title: "Untitled"
+author: "__AUTHOR__"
+date: __TODAY__
+
+bibliography:
+  # CSL JSON (not .bib): preserves Zotero's archive / archive-location fields,
+  # which the BibTeX export drops. Better BibTeX keeps both auto-exported.
+  # The telescope-bibtex / cite.fish citekey pickers still read the .bib.
+  - __ZOTERO_LIBRARY_JSON__
+
+# CMOS 18th edition (current); swap to ...-17th-edition.csl for journals
+# still on 17e. Keep this default in sync with the newdoc fish function.
+csl: __DOTFILES__/writing/pandoc/chicago-notes-bibliography-18th-edition.csl
+
+link-citations: true
+
+reference-doc: __DOTFILES__/writing/pandoc/reference.docx
+
+geometry: margin=1in
+
+fontsize: 12pt
+
+linestretch: 1.5

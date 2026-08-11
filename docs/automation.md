@@ -20,7 +20,7 @@ validate args/env and invoke them.
 | `ipic -i\|-m\|-a\|-f\|-t\|-b TERM`  | Build an HTML gallery of iTunes/App Store artwork and open it. Flags: `-i` iOS app, `-m` Mac app, `-a` album, `-f` film, `-t` TV, `-b` book. |
 | `waybackup <URL>`                   | Save a URL to the Internet Archive Wayback Machine; prints the snapshot URL.                                         |
 | `homebrewupdate.sh`                 | `brew update` + `outdated` + `upgrade`, with timestamped log output; caps its own log at 1 MB.                        |
-| `mailsync.sh`                       | `mbsync -a` + `notmuch new` with timestamped log output; invoked by the mailsync launchd agent.                      |
+| `mailsync.sh`                       | `mbsync -a` + `notmuch new` with timestamped log output; invoked by the mailsync launchd agent. Tracks each step's exit status and sends a macOS notification when sync starts failing (and again when it recovers) — the log alone was never read. |
 | `citecheck.py` / `zotcheck.py` / `readnote.py` | Logic behind the `citecheck` / `zotcheck` / `readnote` fish functions; exercised by `make writing-check`. |
 
 ## Launchd

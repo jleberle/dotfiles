@@ -9,6 +9,35 @@ return {
 		end,
 	},
 
+	-- Press the leader key (`,`) and wait: a menu of what it can do appears,
+	-- rendered from the `desc` field already set on every mapping. The shell got
+	-- three answers to "what can this do?" — `make help`, bare `site`, and tab
+	-- completion — while nvim, where the actual writing happens, had none: the
+	-- export and citation mappings existed only in the source and the docs.
+	-- Nothing to maintain here; adding a mapping with a desc lists it.
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		opts = {
+			preset = "helix",
+			-- Names for the prefixes, so `,p` and `,f` are not bare letters.
+			spec = {
+				{ "<leader>p", group = "pandoc / preview" },
+				{ "<leader>f", group = "find / citations" },
+				{ "<leader>c", group = "code" },
+			},
+		},
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = true })
+				end,
+				desc = "All keymaps",
+			},
+		},
+	},
+
 	{
 		"nvim-lualine/lualine.nvim",
 		event = "VeryLazy",

@@ -49,7 +49,7 @@ function newdoc --description 'Create a new Markdown document pre-filled with Pa
 
     # CSL defaults to CMOS 18th edition (current since Sept 2024); swap the
     # frontmatter to ...-17th-edition.csl for journals still on 17e. Keep this
-    # default in sync with writing/pandoc/metadata.yaml — the CSL must live in
+    # default in sync with writing/pandoc/metadata.yaml.tmpl — the CSL must live in
     # document metadata, not defaults.yaml (defaults override frontmatter).
     printf '---\ntitle: "%s"\nauthor: "%s"\ndate: %s\n\nbibliography:\n  - %s\n\ncsl: %s/writing/pandoc/chicago-notes-bibliography-18th-edition.csl\n\nlink-citations: true\n\nreference-doc: %s/writing/pandoc/reference.docx\n\ngeometry: margin=1in\n\nfontsize: 12pt\n\nlinestretch: 1.5\n---\n\n' $title $author $today $ZOTERO_LIBRARY_JSON $DOTFILES_DIR $DOTFILES_DIR > $filename
 

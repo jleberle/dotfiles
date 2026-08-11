@@ -2,7 +2,7 @@ DOTFILES := $(HOME)/git/dotfiles
 
 # Every symlink this Makefile creates points into $(DOTFILES), hardcoded above —
 # and so do git/gitconfig (hooksPath), paths.env, the launchd plists, and
-# writing/pandoc/metadata.yaml. Clone the repo anywhere else and `make install`
+# writing/pandoc/metadata.yaml.tmpl. Clone the repo anywhere else and `make install`
 # happily builds a working-looking set of links to a directory that isn't there;
 # the breakage shows up later, somewhere else, as missing config.
 #
@@ -548,6 +548,12 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	    *) echo "WARNING: git core.hooksPath not set to dotfiles hooks (run: make git)" ;; \
 	esac
 	@command -v gitleaks >/dev/null 2>&1 || echo "WARNING: gitleaks not installed — pre-commit secret scan inactive (run: make apps)"
+	@# conf.d/paths.fish wraps its whole parse in `if test -f`, deliberately, since
+	@# a missing paths.env means a broken checkout with no worthwhile fallback.
+	@# But the else-branch is silence: every workflow function then fails one at a
+	@# time with "not configured", which is a true message about the wrong layer.
+	@test -f $(CURDIR)/paths.env || \
+	    echo "WARNING: paths.env missing — every workflow location is unset (broken checkout? re-clone or restore the file)"
 	@if [ -L "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf is a broken symlink (run: make security)"; elif [ ! -f "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf not written (run: make security)"; fi
 	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
 	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"

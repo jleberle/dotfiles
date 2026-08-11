@@ -85,6 +85,7 @@ names the problem and the fix.
 | Command                    | Purpose                                                       |
 |----------------------------|---------------------------------------------------------------|
 | `newdoc <file> [title]`    | New Markdown doc with Pandoc metadata, opened in Neovim       |
+| `newmeta`                  | Write a `metadata.yaml` for a folder of documents             |
 | `cite`                     | Fuzzy-pick a citation; copies `@citekey`                      |
 | `citecheck <md…>`          | Validate a draft's citekeys against the Zotero library        |
 | `readnote <key>`           | Scaffold a vault reading note from a Zotero citekey           |
@@ -149,7 +150,7 @@ dotfiles/
 └── writing/              # editor, Pandoc templates, Vale configs, and mail
     ├── nvim/             # Neovim config (see docs/writing.md); spell/ holds the tracked personal dictionary
     ├── neomutt/          # NeoMutt config (neomuttrc, gpg.rc, colors.rc, mailcap, mbsyncrc, notmuch-config, plist)
-    ├── pandoc/           # metadata.yaml, CSL, reference.docx
+    ├── pandoc/           # metadata template, CSL, reference.docx
     └── vale/             # global vale.ini + vale-project.ini template + vocab/ (Academic vocabulary)
 ```
 

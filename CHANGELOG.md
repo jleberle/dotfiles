@@ -7,6 +7,47 @@ everything since is one entry per real milestone.
 
 ---
 
+## 2026-08-11 — Second audit pass: Neovim, pandoc, mail, and the plists
+
+The first audit covered the fish functions, the Makefile and the docs. This
+covers what it never opened.
+
+- **Mail sync now tells you when it breaks.** `bin/mailsync.sh` ran `mbsync` and
+  `notmuch` inside a redirect and kept no exit status at all — the same defect
+  fixed in `homebrewupdate.sh` months ago, untouched in its sibling. This
+  machine's log held **seven silent failures**, most recently 2026-08-08, one of
+  them a wrong Maildir path that meant mail was not syncing at all. It is the
+  worst possible place for a silent failure: NeoMutt showing nothing new looks
+  exactly like nothing having arrived. Each step's status is now tracked, and a
+  macOS notification fires on the transition *into* failure and again on
+  recovery — not every five minutes in between.
+- **Exports no longer claim success when citations are broken.** Pandoc exits 0
+  for an unresolvable citekey: it warns on stderr and writes `smith2020?` into
+  the document. Both export paths judged only the exit code, so `<leader>pd`
+  reported a clean "Exported chapter.docx" for the file you send an editor.
+  Neovim now surfaces pandoc's warnings at WARN level on success, and `mdexport`
+  repeats them under the filename and exits non-zero.
+- **`metadata.yaml` is a template rendered by `newmeta`.** Pandoc does not
+  expand `~` in document metadata, so the file the docs told you to `cp` failed
+  with "not found in resource path" and exit 99 on both its `bibliography:` and
+  `csl:` lines. Its `date:` was hardcoded to 2026-05-28, which was silent —
+  every document built from it carried that date into the PDF. `newmeta` fills
+  in absolute paths and today's date, the way `newdoc` already did.
+- **The backup-integrity log is dated.** `restic_check_logs.txt` held seven
+  identical "skipping check" lines and no timestamps — on the one log whose
+  whole question is *when* the backup was last verified.
+- **Neovim can answer "what can this do?"** `which-key` renders the leader menu
+  from the `desc` fields already on the mappings; `<leader>?` lists everything.
+  The shell had three ways to ask this and the editor had none.
+- Smaller: `valeinit` no longer prints "Wrote .vale.ini" when the copy failed;
+  `$DOTFILES_DIR` is guarded in `valeinit`/`gitup`/`mdexport` the way `newdoc`
+  already guarded it; `make doctor` warns when `paths.env` is missing; `j`/`k`
+  keep working with a count (`10j` moved ten *display* lines); and a failed
+  `lazy.nvim` bootstrap says "you are probably offline" instead of throwing a
+  stack trace.
+
+---
+
 ## 2026-08-11 — umask 077 keeps its job, loses its side effects
 
 `umask 077` was doing two jobs badly instead of one job well. It stays, scoped

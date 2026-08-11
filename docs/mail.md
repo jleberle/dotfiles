@@ -64,6 +64,14 @@ if they don't already exist.
 After this, use `mailsync` in the terminal to sync on demand, or let launchd
 handle it automatically. Logs go to `~/.local/mail_sync_logs.txt`.
 
+**When sync breaks, you get told.** `mbsync` failing looks exactly like no new
+mail — there is no symptom in NeoMutt — so `mailsync.sh` checks each step's exit
+status and raises a macOS notification the first time a run fails, and one more
+when it recovers. It does not re-notify every five minutes in between. Proton
+Bridge simply not running is not treated as a failure (it is often closed on
+purpose), but the log records when sync pauses and resumes so a gap is
+explained rather than unexplained.
+
 ## Keybindings
 
 | Key              | Mode            | Action                                         |

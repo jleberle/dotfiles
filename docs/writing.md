@@ -31,12 +31,17 @@ symlinked into place by `make vale`, so additions sync across machines.
 
 ### Templates (`writing/pandoc/`)
 
-- `metadata.yaml` — the document metadata block (title, author,
-  `bibliography`, page geometry, font size, line spacing). Copy it next to a
-  document and edit:
-  ```sh
-  cp ~/git/dotfiles/writing/pandoc/metadata.yaml .
+- `metadata.yaml.tmpl` — the document metadata block (title, author,
+  `bibliography`, page geometry, font size, line spacing). Run `newmeta` in the
+  folder holding the document to render a copy:
+  ```fish
+  newmeta
   ```
+  Do **not** copy the template by hand. Pandoc does not expand `~` in document
+  metadata, so a hand-copied `csl: ~/…` line fails with "not found in resource
+  path" and exit 99. `newmeta` substitutes the absolute paths and today's date,
+  the same way `newdoc` does for frontmatter.
+
   Its `bibliography` points at the Better CSL JSON export (`Library.json`),
   not the `.bib` — CSL JSON preserves Zotero's archive / archive-location
   fields that BibTeX drops, so archival citations render with repository and
@@ -206,7 +211,8 @@ like commands. (General-purpose shell functions are listed under
 | Function                | Usage / behavior                                                                      |
 |-------------------------|---------------------------------------------------------------------------------------|
 | `newdoc <file> [title]` | Create a Markdown file pre-filled with Pandoc metadata and open in Neovim             |
-| `mdexport <fmt> <md…>`  | Batch Pandoc export (crossref + citeproc + sibling `metadata.yaml`); mirrors nvim `<leader>p` |
+| `mdexport <fmt> <md…>`  | Batch Pandoc export (crossref + citeproc + sibling `metadata.yaml`); mirrors nvim `<leader>p`. Exits non-zero and repeats the warning if pandoc reports one — an unresolved citekey exports "as if fine" otherwise |
+| `newmeta`               | Write a `metadata.yaml` into this folder with the paths and date filled in |
 | `words <md…>`           | Prose word count via `pandoc -t plain` (excludes frontmatter/syntax/URLs)             |
 | `cite`                  | fzf over the Zotero `.bib`; copies `@citekey` (warns if the export is >30 days stale) |
 | `linkcheck [md…]`       | Check links with `lychee` (no args: all `*.md` under the cwd)                         |

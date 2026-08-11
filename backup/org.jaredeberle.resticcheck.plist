@@ -3,7 +3,14 @@
 <!-- Template: __HOMEBREW_PREFIX__ and __HOME__ are replaced by `make resticcheck`.
      Runs `archbackup check` via fish so it inherits the ARCHIVE_RESTIC_REPO /
      RESTIC_PASSWORD_FILE universal variables (any fish process loads them); the
-     function itself exits quietly when the external drive isn't mounted. -->
+     function itself exits quietly when the external drive isn't mounted.
+
+     The `echo` prefix stamps each run. Without it this log was the only one of
+     the three that could not answer its own question: it held seven identical
+     "skipping check" lines and no dates, so there was no way to tell whether
+     the backup had last been verified a week ago or in March -- on the log
+     whose entire purpose is turning "I have backups" into "I have RESTORABLE
+     backups". mailsync.sh and homebrewupdate.sh both stamp every run. -->
 <plist version="1.0">
 <dict>
     <key>Label</key>
@@ -13,7 +20,7 @@
     <array>
         <string>__HOMEBREW_PREFIX__/bin/fish</string>
         <string>-c</string>
-        <string>archbackup check</string>
+        <string>echo &quot;=== &quot;(date &quot;+%Y-%m-%d %H:%M:%S&quot;)&quot; ===&quot;; archbackup check</string>
     </array>
 
     <!-- Weekly: Sunday 10:00; runs on next wake if the Mac was asleep. -->
