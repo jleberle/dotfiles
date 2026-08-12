@@ -29,7 +29,7 @@ function __site_registry --description 'Command table for `site` — one source 
     # inside %s arguments, which is why the separators can't live in the rows.
     printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
         doctor setup scripts/doctor.sh \
-        "[--quiet]" "Check this machine has what the site needs" - \
+        "[--quiet]" "Check this checkout is configured correctly (not tool installation — dots brew-check)" - \
         \
         new write scripts/newpost.sh \
         "<article|review|quote> [--cover] [title]" "Start a draft (created outside the repo)" - \
@@ -52,12 +52,6 @@ function __site_registry --description 'Command table for `site` — one source 
         finishsource reading scripts/finishsource.sh \
         "[--push] <slug>" "Mark a source read, then ship it" - \
         \
-        open reading scripts/open-source.sh \
-        "<citekey>" "Open a source's note in Obsidian" - \
-        \
-        window reading "python3 scripts/reading-window.py" \
-        "" "Show which reading events Micro.blog can still re-import" - \
-        \
         "check|preflight" check scripts/preflight.sh \
         "[--strict] [--full]" "Pre-push gate; --full runs exactly what CI runs" - \
         \
@@ -73,12 +67,6 @@ function __site_registry --description 'Command table for `site` — one source 
         archive maintain scripts/archive-links.sh \
         "[--dry-run] [--all|files...]" "Repoint dead links at Wayback snapshots" paths \
         \
-        csp maintain scripts/csp-hashes.sh \
-        "[--check|--write]" "Reconcile CSP hashes in static/_headers" - \
-        \
         security maintain scripts/sign-security-txt.sh \
-        "[--check [--days N]]" "Re-sign security.txt, or check its expiry" - \
-        \
-        hugo-version maintain scripts/sync-hugo-version.sh \
-        "" "Bump the Hugo version pinned in statichost.yml" -
+        "[--check [--days N]]" "Re-sign security.txt, or check its expiry" -
 end

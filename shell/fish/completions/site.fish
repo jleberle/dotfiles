@@ -35,6 +35,5 @@ complete -c site -n '__fish_seen_subcommand_from publish finishsource' -l push -
 complete -c site -n '__fish_seen_subcommand_from publish' -l cite -d 'Append a Works Cited section'
 complete -c site -n '__fish_seen_subcommand_from archive' -l dry-run -d 'Report what would change, change nothing'
 complete -c site -n '__fish_seen_subcommand_from archive' -l all -d 'Check every file, not just changed ones'
-complete -c site -n '__fish_seen_subcommand_from csp security' -l check -d 'Verify only, change nothing'
-complete -c site -n '__fish_seen_subcommand_from csp' -l write -d 'Rewrite static/_headers to match the build'
+complete -c site -n '__fish_seen_subcommand_from security' -l check -d 'Verify only, change nothing'
 complete -c site -n '__fish_seen_subcommand_from security' -l days -d 'Fail if expiry is closer than N days' -x
