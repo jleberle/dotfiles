@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Display equation with crossref label
+# key: eq
+# --
+\$\$${1:equation}\$\$ {#eq:${2:label}}

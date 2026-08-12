@@ -47,6 +47,8 @@ brew "neomutt" # terminal email client (config in writing/neomutt/)
 brew "notmuch" # mail indexer for fast search (used by NeoMutt virtual mailboxes)
 brew "pam-reattach" # lets pam_tid.so (Touch ID for sudo) work inside tmux; see `make touchid`
 brew "neovim" # text editor (config in nvim/)
+brew "emacs" # text editor (test config in writing/emacs/, mirrors nvim/; see docs/emacs.md)
+brew "aspell" # spell-check backend for Emacs flyspell (vim's spell is built-in and needs no such binary)
 brew "ocrmypdf" # OCR layer for scanned archival PDFs before Zotero/Obsidian full-text indexing (Archives workflow Step 1)
 brew "pandoc" # document converter (prose/Pandoc export workflow)
 brew "pandoc-crossref" # Pandoc filter for figure/table/equation cross-references

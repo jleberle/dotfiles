@@ -177,7 +177,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim emacs vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check emacs-check brew-check brew-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -421,6 +421,12 @@ touchid : require-location ## system | Touch ID for sudo, tmux-safe (sudo)
 nvim : require-location ## link | writing/nvim -> ~/.config/nvim
 	@echo "Symlinking nvim config"
 	$(call install_symlinks,nvim)
+emacs : require-location ## link | writing/emacs -> ~/.config/emacs (test config mirroring nvim; see docs/emacs.md — not part of `make install` or `make doctor`)
+	@echo "Symlinking Emacs config (test setup; run explicitly, not part of make install)"
+	@mkdir -p $(HOME)/.config
+	@target="$(HOME)/.config/emacs"; $(backup_if_real)
+	ln -sfn $(DOTFILES)/writing/emacs "$(HOME)/.config/emacs"
+	@echo "  writing/emacs -> $(HOME)/.config/emacs"
 vale : require-location ## link | Global ~/.vale.ini, then vale sync
 	@command -v vale >/dev/null 2>&1 || { echo "ERROR: vale not found — install it first (make apps)"; exit 1; }
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
@@ -493,6 +499,8 @@ update : ## maintain | Neovim plugins + vale sync (not Homebrew)
 	    else echo "  (vale not installed; run: make apps)"; fi
 	@echo ""
 	@echo "Not auto-run here (deliberately):"
+	@echo "  * Emacs (writing/emacs/) is a test config, not wired into make install/doctor/update —"
+	@echo "    update its packages inside Emacs: M-x straight-pull-all, see docs/emacs.md."
 	@echo "  * Homebrew updates weekly via launchd — run 'brewup' to update now."
 	@echo "  * Betterfox is review-gated — run 'make betterfox-update', review, then 'make firefox'."
 	@echo "  * CI's gitleaks is pinned by version AND checksum in"
@@ -552,6 +560,15 @@ nvim-check : ## check | Headless Neovim startup test
 	    cp -R "$(CURDIR)/writing/nvim" "$$tmp/config/nvim"; \
 	    XDG_CONFIG_HOME="$$tmp/config" XDG_DATA_HOME="$$tmp/data" XDG_STATE_HOME="$$tmp/state" XDG_CACHE_HOME="$$tmp/cache" \
 	        fish -c 'source $(CURDIR)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
+emacs-check : ## check | Headless Emacs config smoke test (paths only — no package install, unlike nvim-check's plugin-lazy nvim)
+	@echo "Running headless Emacs smoke test..."
+	@command -v emacs >/dev/null 2>&1 || { echo "ERROR: emacs not found — install it first (make apps)"; exit 1; }
+	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }
+	@fish -c 'source $(CURDIR)/shell/fish/conf.d/paths.fish; \
+	    emacs --batch --no-init-file \
+	        --eval "(setq user-emacs-directory \"$(CURDIR)/writing/emacs/\")" \
+	        --load "$(CURDIR)/writing/emacs/lisp/config/paths.el" \
+	        --eval "(unless (string-match-p \"Library.bib\" (dotfiles/zotero-library-bib)) (error \"zotero-library-bib did not resolve\"))"'
 brew-check : ## check | Verify every brewfile package is installed
 	@echo "Checking Brewfile packages..."
 	@# The WARNING: prefix is the shared contract with `make check`, which

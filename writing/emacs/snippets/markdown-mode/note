@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Inline footnote
+# key: note
+# --
+^[${1:Note text.}]

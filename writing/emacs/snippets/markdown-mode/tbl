@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Table caption with crossref label
+# key: tbl
+# --
+: ${1:caption} {#tbl:${2:label}}
