@@ -18,3 +18,18 @@ autocmd("FileType", {
 autocmd({ "FocusGained", "BufEnter", "TermClose", "TermLeave" }, {
 	command = "checktime",
 })
+
+-- `<leader>fa` (archival OCR search) populates the quickfix list with
+-- file:page hits from `arch grep`, and quickfix's default <CR> would load a
+-- PDF's raw bytes into a buffer. Open it in Preview instead and drop the
+-- buffer nvim already created for it, so :cnext/:cprev over the list still
+-- works normally.
+autocmd("BufReadCmd", {
+	pattern = "*.pdf",
+	callback = function(args)
+		vim.system({ "open", args.file })
+		vim.schedule(function()
+			vim.cmd.bwipeout({ bang = true })
+		end)
+	end,
+})

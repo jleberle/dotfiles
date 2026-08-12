@@ -15,6 +15,7 @@
   "telescope-bibtex.nvim": { "branch": "master", "commit": "289a6f86ebec06e8ae1590533b732b9981d84900" },
   "telescope.nvim": { "branch": "master", "commit": "9377230aa5305d9e9aca4ed8dadf1070fb4aa9fc" },
   "twilight.nvim": { "branch": "main", "commit": "664e752f4a219801265cc3fc18782b457b58c1e1" },
+  "vim-fugitive": { "branch": "master", "commit": "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0" },
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
   "zen-mode.nvim": { "branch": "main", "commit": "8564ce6d29ec7554eb9df578efa882d33b3c23a7" }
 }

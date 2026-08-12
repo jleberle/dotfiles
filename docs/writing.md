@@ -103,7 +103,7 @@ writing/nvim/
     │   └── lazy.lua         # bootstraps lazy.nvim
     └── plugins/
         ├── ui.lua           # nord theme + lualine
-        ├── editor.lua       # oil, telescope (+bibtex), treesitter, gitsigns
+        ├── editor.lua       # oil, telescope (+bibtex), treesitter, gitsigns, fugitive
         ├── completion.lua   # blink.cmp
         ├── lsp.lua          # lspconfig + conform (formatting)
         ├── linting.lua      # nvim-lint (vale)
@@ -114,8 +114,10 @@ writing/nvim/
 ### Key mappings
 
 The leader is `,`. **Press it and wait** — `which-key` shows what can follow,
-built from these same descriptions, so this table is a reference rather than
-something to memorize. `,?` lists every mapping including the plugins'.
+built from these same descriptions, so these tables are a reference rather
+than something to memorize. `,?` lists every mapping including the plugins'.
+
+**Navigation & editing**
 
 | Keys          | Mode   | Action                                              |
 |---------------|--------|-----------------------------------------------------|
@@ -126,23 +128,89 @@ something to memorize. `,?` lists every mapping including the plugins'.
 | `<leader>fb`  | Normal | Telescope **b**uffers                               |
 | `<leader>z`   | Normal | Toggle **Zen mode** (distraction-free writing)      |
 | `-`           | Normal | Open **Oil** file browser in the current dir        |
-| `<leader>fc`  | Normal | Telescope bibtex — insert `@citekey` **c**itation   |
 | `<leader>cf`  | Normal | **C**onform **f**ormat the buffer                   |
-| `<leader>ph`  | Normal | **P**andoc export → **H**TML (citeproc + crossref)  |
-| `<leader>pp`  | Normal | **P**andoc export → **P**DF (citeproc + crossref)   |
-| `<leader>pd`  | Normal | **P**andoc export → **d**ocx (uses `reference.docx`) |
-| `<leader>pv`  | Normal | Pre**v**iew in Marked 2 (live-updates on save)      |
 | `<CR>`        | Insert | Confirm the selected completion item                |
 | `,?`          | Normal | List every mapping                                  |
 
 `j` and `k` move by *display* line, so they follow wrapped prose — but only
 without a count. `10j` still moves ten real lines.
 
-Pandoc exports run **asynchronously** (`vim.system`), so the editor stays
-responsive during slow LaTeX builds, and the buffer is auto-written first. A
-notification reports the result — including pandoc's *warnings* on an otherwise
-successful export, since an unresolved citekey exports "successfully" with
-`smith2020?` in the text. `citecheck` catches those before you export.
+**Citations & bibliography**
+
+| Keys          | Mode   | Action                                              |
+|---------------|--------|-----------------------------------------------------|
+| `<leader>fc`  | Normal | Telescope bibtex — insert `@citekey` **c**itation   |
+| `<leader>fo`  | Normal | **O**pen the `@citekey` under the cursor in Zotero  |
+| `<leader>fr`  | Normal | Open/create the **r**eading note for the citekey under the cursor |
+| `<leader>pc`  | Normal | **C**heck `@citekey`s against the Zotero library    |
+
+`<leader>pc` shells out to `bin/citecheck.py` (the same tool behind the fish
+`citecheck` function) to validate every `@citekey`/`-@citekey` in the buffer
+against the Zotero library before you export — an unresolved citekey exports
+"successfully" with `smith2020?` in the text otherwise. `<leader>fr` closes
+the same loop `zotcheck` reports on: with the cursor on `@smith2020`, it opens
+that citekey's reading note if one exists, or scaffolds it with `readnote`
+(metadata pulled from the Zotero library) and opens the result — `readnote`'s
+own auto-open only fires when run interactively, so this opens it itself
+rather than racing a second nvim.
+
+**Archival research**
+
+| Keys          | Mode   | Action                                              |
+|---------------|--------|-----------------------------------------------------|
+| `<leader>fa`  | Normal | Search OCR'd **a**rchival scans (`arch grep`)       |
+
+Prompts for a query, searches the OCR text layer of every scan under
+`$RESEARCH_ARCHIVES_DIR` (`arch grep` → ripgrep-all), and loads the hits into
+the quickfix list as `file:page` entries. A PDF's raw bytes aren't something
+nvim can usefully display, so a `BufReadCmd` autocmd (`autocmds.lua`)
+intercepts `*.pdf` quickfix jumps and opens the scan in Preview instead of
+loading it as a buffer — `<CR>` on a hit opens the source PDF in Preview; the
+quickfix line still shows which page the match was on.
+
+**Pandoc export & preview**
+
+| Keys          | Mode   | Action                                              |
+|---------------|--------|-----------------------------------------------------|
+| `<leader>ph`  | Normal | Pandoc export → **H**TML (citeproc + crossref)      |
+| `<leader>pp`  | Normal | Pandoc export → **P**DF (citeproc + crossref)       |
+| `<leader>pd`  | Normal | Pandoc export → **d**ocx (uses `reference.docx`)    |
+| `<leader>pv`  | Normal | Pre**v**iew in Marked 2 (live-updates on save)      |
+| `<leader>pl`  | Normal | Check **l**inks in the buffer (`lychee`)            |
+| `<leader>pa`  | Normal | **A**rchive every cited URL to the Wayback Machine (`mdarchive`) |
+
+Exports run **asynchronously** (`vim.system`), so the editor stays responsive
+during slow LaTeX builds, and the buffer is auto-written first. A
+notification reports the result — including pandoc's own *warnings* on an
+otherwise successful export, for the same unresolved-citekey case `<leader>pc`
+catches ahead of time. `<leader>pl` and `<leader>pa` are the same pre-flight
+idea applied to links instead of citations — check before you export or
+publish, since link rot is silent until a reader hits it. `<leader>pa`
+confirms first: archiving is slow (~30s+ per URL on a link-heavy piece).
+
+**Blog publishing (site)**
+
+| Keys          | Mode   | Action                                              |
+|---------------|--------|-----------------------------------------------------|
+| `<leader>bp`  | Normal | **P**ublish the current draft (`site publish --cite`) |
+| `<leader>bc`  | Normal | Run the website pre**c**heck (`site check`)         |
+| `<leader>bs`  | Normal | **S**hip the website repo — commit + push (`site ship`) |
+
+These route to the `site` fish function (`~/git/website/scripts/`) rather
+than calling those scripts directly, so behavior matches the shell workflow
+exactly. Since `site` is a fish *function*, not something on `$PATH`, all
+three shell out through `fish -c` instead of `vim.system` exec-ing it
+directly. `<leader>bp` and `<leader>bs` confirm before running: publishing
+deletes the draft from the vault, and shipping reaches the remote.
+`<leader>bs` prompts for the commit message and passes `--yes`, since
+`ship.sh`'s own interactive prompts would read from a closed stdin under
+`vim.system` and abort as "Aborted".
+
+**Git**
+
+| Keys          | Mode   | Action                                              |
+|---------------|--------|-----------------------------------------------------|
+| `<leader>gs`  | Normal | Fugitive **g**it **s**tatus (stage/commit/diff)     |
 
 **From `mini.nvim` (defaults):**
 
@@ -173,7 +241,8 @@ successful export, since an unresolved citekey exports "successfully" with
 - **Theme/UI:** `gbprod/nord.nvim`, `lualine` (globalstatus), `which-key`
   (the leader menu — it reads the `desc` on each mapping, so adding a mapping
   with a description lists it automatically).
-- **Navigation:** `telescope` (lazy on `:Telescope`), `oil` (`-`), `gitsigns`.
+- **Navigation:** `telescope` (lazy on `:Telescope`), `oil` (`-`), `gitsigns`,
+  `vim-fugitive` (`<leader>gs` for `:Git` status; stage/commit/diff from there).
 - **Syntax:** `nvim-treesitter` (**`main` branch** — parsers install
   automatically on first launch; highlighting starts per-filetype).
 - **Writing:** `render-markdown`, `zen-mode`, `twilight`, `mini.nvim`

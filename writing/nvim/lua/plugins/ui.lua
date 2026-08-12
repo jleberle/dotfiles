@@ -25,6 +25,8 @@ return {
 				{ "<leader>p", group = "pandoc / preview" },
 				{ "<leader>f", group = "find / citations" },
 				{ "<leader>c", group = "code" },
+				{ "<leader>g", group = "git" },
+					{ "<leader>b", group = "blog (site)" },
 			},
 		},
 		keys = {
