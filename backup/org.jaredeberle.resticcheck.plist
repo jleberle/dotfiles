@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- Template: __HOMEBREW_PREFIX__ and __HOME__ are replaced by `make resticcheck`.
-     Runs `archbackup check` via fish so it inherits the ARCHIVE_RESTIC_REPO /
+     Runs `arch backup check` via fish so it inherits the ARCHIVE_RESTIC_REPO /
      RESTIC_PASSWORD_FILE universal variables (any fish process loads them); the
      function itself exits quietly when the external drive isn't mounted.
 
@@ -20,7 +20,7 @@
     <array>
         <string>__HOMEBREW_PREFIX__/bin/fish</string>
         <string>-c</string>
-        <string>echo &quot;=== &quot;(date &quot;+%Y-%m-%d %H:%M:%S&quot;)&quot; ===&quot;; archbackup check</string>
+        <string>echo &quot;=== &quot;(date &quot;+%Y-%m-%d %H:%M:%S&quot;)&quot; ===&quot;; arch backup check</string>
     </array>
 
     <!-- Weekly: Sunday 10:00; runs on next wake if the Mac was asleep. -->

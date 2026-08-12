@@ -17,7 +17,7 @@ function __help_requested --description 'internal: true when a function was call
     # Only the FIRST argument is inspected: `linkcheck --help` is a request for
     # help, but a filename literally named `--help` further along is not, and
     # neither is a flag being passed through to an underlying tool (e.g.
-    # `archgrep pattern --help`, where rg should answer).
+    # `arch grep pattern --help`, where rg should answer).
     test (count $argv) -gt 0; or return 1
     contains -- $argv[1] -h --help
 end

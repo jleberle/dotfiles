@@ -119,7 +119,7 @@ Not part of `make install` — each touches system state and most need `sudo`:
   (with `pam_reattach` ahead of `pam_tid` so it works inside tmux).
 - **FileVault**: not toggled here (enabling headless is unsafe), but
   `make macos-check` warns if full-disk encryption is off (`make check` runs it).
-- **Backup integrity**: `archbackup check` runs `restic check` on the encrypted
+- **Backup integrity**: `arch backup check` runs `restic check` on the encrypted
   research-scan repo; `make resticcheck` schedules it weekly (see
   [Automation → Launchd](automation.md#launchd)). A run that finds the drive
   unmounted exits 0 on purpose — the drive is normally unplugged, and a weekly

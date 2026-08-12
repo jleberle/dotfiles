@@ -221,7 +221,7 @@ install : require-location apps git shell security nvim vale neomutt services br
 	@echo "Run 'make firefox' after launching Firefox once."
 	@echo "If you use NeoMutt, finish setup with: make mailsync"
 	@echo "Optional system hardening (each needs sudo): make harden, make touchid"
-	@echo "Optional backup integrity check: make resticcheck (after archbackup is set up)"
+	@echo "Optional backup integrity check: make resticcheck (after arch backup is set up)"
 	@echo ""
 	@$(MAKE) doctor
 
@@ -468,8 +468,8 @@ resticcheck : require-location ## agents | launchd agent: weekly restic integrit
 	mkdir -p $(HOME)/.local
 	mkdir -p $(LAUNCH_AGENTS)
 	$(call install_agent,$(DOTFILES)/backup/org.jaredeberle.resticcheck.plist)
-	@echo "Runs 'archbackup check' every Sunday 10:00 (no-op when the drive is unmounted)."
-	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see archbackup)."
+	@echo "Runs 'arch backup check' every Sunday 10:00 (no-op when the drive is unmounted)."
+	@echo "Requires ARCHIVE_RESTIC_REPO + RESTIC_PASSWORD_FILE universal vars (see arch backup)."
 	@echo "Test now: launchctl kickstart -k gui/$(LAUNCHD_UID)/org.jaredeberle.resticcheck"
 decksync : require-location ## agents | launchd agent: sync Keynote decks on volume mount
 	@# The .app is a wrapper around keynote/sync_slides_drive.sh; if that ever
@@ -663,23 +663,23 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	    fi; \
 	done
 	@# The loop above proves the backup check RAN. This proves it PASSED — a
-	@# different question, and the only one that matters. `archbackup check`
+	@# different question, and the only one that matters. `arch backup check`
 	@# exits 0 when the drive is unmounted (deliberately: a weekly failure for a
 	@# normally-unplugged drive would train you to ignore the job), so a loaded
 	@# agent and a green `make check` read identically whether the backup was
 	@# verified last Sunday or has never been verified at all. This machine's
 	@# log held seven consecutive skips and zero passes when that was written.
-	@# archbackup stamps ~/.local/.restic_verified on a success; this reads
+	@# arch backup stamps ~/.local/.restic_verified on a success; this reads
 	@# its age. Gated on the plist because `make resticcheck` is opt-in — a
 	@# machine that never set up backups should not be nagged about them.
 	@STAMP=$(HOME)/.local/.restic_verified; \
 	if [ -f "$(LAUNCH_AGENTS)/org.jaredeberle.resticcheck.plist" ]; then \
 	    if [ ! -f "$$STAMP" ]; then \
-	        echo "WARNING: restic backup has never passed an integrity check (run: archbackup check with the drive mounted)"; \
+	        echo "WARNING: restic backup has never passed an integrity check (run: arch backup check with the drive mounted)"; \
 	    else \
 	        D=$$(( ($$(date +%s) - $$(stat -f %m "$$STAMP")) / 86400 )); \
 	        [ "$$D" -le $(RESTIC_VERIFY_MAX_AGE_DAYS) ] || \
-	            echo "WARNING: restic backup last verified $$D days ago (run: archbackup check with the drive mounted)"; \
+	            echo "WARNING: restic backup last verified $$D days ago (run: arch backup check with the drive mounted)"; \
 	    fi; \
 	fi
 	@echo "Done."

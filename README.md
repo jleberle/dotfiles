@@ -81,7 +81,7 @@ Everything below works from any directory.
 | `make help`      | Every `make` target, grouped, with one line each                            |
 | `site`           | Every website command (run with no arguments)                               |
 | `,` in Neovim    | Hold the leader key for a menu of what it can do; `,?` lists everything     |
-| `<Tab>`          | Completions for `dots`, `site`, `archbackup`, `archverify`, `docx2md`, `mdexport` |
+| `<Tab>`          | Completions for `dots`, `site`, `arch`, `docx2md`, `mdexport` |
 
 Any command also takes `--help`.
 

@@ -147,7 +147,7 @@ targets' own `## group | description` tags, so it cannot drift.
 | `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs, scaffolds `~/.mbsyncrc` and `~/.notmuch-config` from templates if missing |
 | `services`         | Symlinks the Automator workflows in `macos/services/` into `~/Library/Services` (run by `make install`; see [Automation → macOS Services](automation.md#macos-services)) |
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
-| `resticcheck`      | Installs a launchd agent that runs `archbackup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
+| `resticcheck`      | Installs a launchd agent that runs `arch backup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
 | `decksync`         | Installs a `WatchPaths` launchd agent that syncs the Keynote lecture decks to the "Slides" flash drive whenever a volume mounts; no-op unless that drive appeared |
 | `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly (`homebrewupdate.sh` caps its own log at 1 MB) |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
@@ -166,4 +166,4 @@ targets' own `## group | description` tags, so it cannot drift.
 
 `harden` and `touchid` are **not** part of `make install` — they touch system
 files under `sudo`, so run them deliberately. `resticcheck` is optional and only
-useful once `archbackup` is configured (see [Security](security.md)).
+useful once `arch backup` is configured (see [Security](security.md)).

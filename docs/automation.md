@@ -34,7 +34,7 @@ install time):
 |-----------------------------------|------------------|-----------------------------------------------------------------------|
 | `org.jaredeberle.brewupdate`      | Mondays 09:00    | `bin/homebrewupdate.sh`                                               |
 | `org.jaredeberle.mailsync`        | Every 5 minutes  | `bin/mailsync.sh`                                                     |
-| `org.jaredeberle.resticcheck`     | Sundays 10:00    | `archbackup check` (restic integrity; no-op if the drive is unmounted) |
+| `org.jaredeberle.resticcheck`     | Sundays 10:00    | `arch backup check` (restic integrity; no-op if the drive is unmounted) |
 | `org.jaredeberle.decksync`        | On volume mount  | `keynote/sync_slides_drive.sh` (via `DeckSync.app`) — pushes `.pptx` + PDF exports of the Keynote lecture decks to the "R2-D2" flash drive (`WatchPaths` on `/Volumes`; no-op unless that drive appeared) |
 
 Logs: `~/.local/brew_update_logs.txt` (newest run first),

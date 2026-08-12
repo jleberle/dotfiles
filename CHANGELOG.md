@@ -12,28 +12,26 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-08-12 — Merge the archival-scan functions into one dispatcher
+
+- **Action required.** `archgrep`, `archocr`, `archverify`, and `archbackup`
+  are now subcommands of a single `arch` function: `arch grep`, `arch ocr`,
+  `arch verify [update]`, `arch backup [snapshots|check]`.
+- `archcheck`, the stub pointing at `archocr`, is deleted with it.
+
+---
+
 ## 2026-08-11 — Third audit pass: CI history, backups, the last of the Ruby
 
-- CI's secret scan now sees history. It ran against a one-commit checkout, so a
-  secret committed and later deleted passed clean; only GitHub's own push
-  protection had been covering that, and it covers provider tokens only.
-- The Keynote deck sync passes paths to AppleScript as arguments. Built by
-  string interpolation, a deck with a quote in its name — `The "New" Deal.key` —
-  failed to export and said so only in a log.
-- `archbackup check` records when the backup last *passed*, and `make doctor`
-  warns when that is missing or over 35 days old. A check that skips because the
-  drive is unmounted exits 0, so nothing distinguished "verified last Sunday"
-  from "never verified at all".
-  **Action required:** on this machine that turned out to be the latter — the
-  restic password file was empty and the weekly job could not open the repo.
-  Confirm yours works unattended: `fish -c 'archbackup check'`.
-- The two `md - Links - * Tabs` services are gone, replaced by `mdlinks safari`
-  / `mdlinks firefox`. Each held ~90 lines of Ruby inside a `.workflow` plist
-  where no linter could reach it, and two latent crashes had been sitting there
-  for years. Output goes to stdout now, so it reaches a draft open in Neovim.
-- `make doctor` notices broken symlinks. `test -L` is true for a link that
-  resolves to nothing, so links still aimed at an old checkout path reported a
-  healthy machine.
+- CI's secret scan now sees full history, not a one-commit checkout.
+- The Keynote deck sync passes paths to AppleScript as arguments instead of
+  string interpolation.
+- `archbackup check` records when the backup last *passed*; `make doctor` warns
+  when that is missing or over 35 days old.
+  **Action required:** confirm yours works unattended: `fish -c 'archbackup check'`.
+- The two `md - Links - * Tabs` Automator services are gone, replaced by
+  `mdlinks safari` / `mdlinks firefox`.
+- `make doctor` notices broken symlinks.
   **Action required:** expect doctor to name links you did not know were dead.
 
 ## 2026-08-11 — Second audit pass: Neovim, pandoc, mail
@@ -53,14 +51,12 @@ Anything needing action on a machine that is already set up is marked
 
 ## 2026-08-11 — `umask 077` scoped to what it's good at
 
-- `make harden` sets `~` to `0700`. That, not a umask, is what keeps other
-  local accounts out, and you can see it with `ls -ld ~`.
-- Homebrew installs at `umask 022` again. It had inherited `077` from the shell
-  and was installing world-readable software owner-only.
+- `make harden` sets `~` to `0700`.
+- Homebrew installs at `umask 022` again.
   **Action required:** existing drift isn't repaired automatically.
   `make brew-check` reports it and prints the fix.
-- The umask stays for what it does well: files that leave the machine carrying
-  their permissions (GPG key on USB, restic snapshots, synced decks).
+- The umask stays for files that leave the machine carrying their permissions
+  (GPG key on USB, restic snapshots, synced decks).
 
 ## 2026-08-11 — Naming conventions, written down
 
