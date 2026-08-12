@@ -2,6 +2,19 @@
 # Enforce jaredeberle.org's local preflight gate before it can leave this
 # machine. Runs scripts/preflight.sh only inside that repo; every other repo
 # on this machine is a no-op. Bypass deliberately with `git push --no-verify`.
+#
+# scripts/ship.sh already runs preflight itself and refuses to commit or push
+# if it fails, so a push that came from ship.sh would otherwise run the whole
+# gate twice — once explicitly, once here. ship.sh exports
+# WEBSITE_PREFLIGHT_VERIFIED=1 (inherited by this hook, since it runs as a
+# child of the same `git push`) once its own run has passed, so this skips
+# cleanly for that path while still gating any push that bypasses ship.sh
+# (a bare `git push`, or a push from a tool that doesn't set the variable).
+
+if [ "$WEBSITE_PREFLIGHT_VERIFIED" = "1" ]; then
+    echo "pre-push: preflight already verified by scripts/ship.sh; skipping re-run"
+    exit 0
+fi
 
 if [ -f "scripts/preflight.sh" ] && [ -f "hugo.yaml" ]; then
     scripts/preflight.sh || exit 1
