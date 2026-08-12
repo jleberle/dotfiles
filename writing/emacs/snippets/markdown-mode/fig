@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Figure with crossref label
-# key: fig
-# --
-![${1:caption}](${2:path}){#fig:${3:label}}

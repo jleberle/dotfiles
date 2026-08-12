@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Section heading with crossref label
-# key: sec
-# --
-${1:Heading} {#sec:${2:label}}
