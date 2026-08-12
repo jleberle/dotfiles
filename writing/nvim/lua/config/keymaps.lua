@@ -46,6 +46,13 @@ map({ "n", "x" }, "k", function()
 	return vim.v.count == 0 and "gk" or "k"
 end, { expr = true, desc = "Up (by display line)" })
 
+-- Clipboard (clipboard=unnamedplus in options.lua aliases the unnamed
+-- register to the system clipboard, so plain y/p already are "copy/paste".
+-- Two gaps that leaves: deletes clobber the clipboard too, and visual-mode
+-- paste overwrites the paste buffer with the text it just replaced.
+map({ "n", "x" }, "<leader>d", '"_d', { desc = "Delete without clobbering clipboard" })
+map("x", "p", '"_dP', { desc = "Paste over selection (keep register)" })
+
 -- Save/Quit
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write file" })
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit window" })
