@@ -33,6 +33,12 @@ end
 -- Diagnostics
 map("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostic" })
 
+-- Nvim 0.11+ auto-binds grn/gra/grr/gri/grt/gO and K (hover) on LSP attach,
+-- but not goto-definition — the one marksman mapping that matters most here,
+-- since it's how a [[wikilink]] or markdown link under the cursor jumps to
+-- the note it points to (title- or filename-matched per .marksman.toml).
+map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition (follow link)" })
+
 -- Navigate by display line (respects word-wrap) — but only without a count.
 -- Bare `gj` moves one wrapped row, which is what prose wants; `10j` with the
 -- unconditional remap became `10gj`, ten *display* rows, which in a wrapped
