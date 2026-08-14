@@ -177,7 +177,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check brew-check brew-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -552,6 +552,42 @@ nvim-check : ## check | Headless Neovim startup test
 	    cp -R "$(CURDIR)/writing/nvim" "$$tmp/config/nvim"; \
 	    XDG_CONFIG_HOME="$$tmp/config" XDG_DATA_HOME="$$tmp/data" XDG_STATE_HOME="$$tmp/state" XDG_CACHE_HOME="$$tmp/cache" \
 	        fish -c 'source $(CURDIR)/shell/fish/conf.d/paths.fish; nvim --headless -c "lua assert(require([[config.paths]]).zotero_library_bib():find([[Library.bib]], 1, true))" -c qa'
+nvim-drift : ## check | Compare installed nvim plugins against lazy-lock.json
+	@echo "Checking Neovim plugins against lazy-lock.json..."
+	@# Lazy applies the lockfile when it *installs* a plugin it doesn't have, but
+	@# never re-checks one it already does. Pull a lockfile whose pins moved on
+	@# another machine and nothing happens — no warning, no error, you just keep
+	@# running the old commits. On a multi-machine setup that silence is the whole
+	@# problem, so this is the thing that breaks it.
+	@#
+	@# Locked-but-not-installed is skipped, not flagged: lazy installs those at the
+	@# pinned commit by itself on the next start. Installed-but-not-locked is left
+	@# to :Lazy clean — a leftover directory is inert, since nothing loads it.
+	@command -v jq >/dev/null 2>&1 || { echo "ERROR: jq not found"; exit 1; }
+	@lazy="$${XDG_DATA_HOME:-$$HOME/.local/share}/nvim/lazy"; \
+	tmp=$$(mktemp); \
+	trap 'rm -f "$$tmp"' EXIT; \
+	jq -r 'to_entries[] | "\(.key) \(.value.commit)"' $(CURDIR)/writing/nvim/lazy-lock.json | \
+	while read -r name want; do \
+	    [ -d "$$lazy/$$name" ] || continue; \
+	    have=$$(git -C "$$lazy/$$name" rev-parse HEAD 2>/dev/null) || continue; \
+	    [ "$$have" = "$$want" ] || \
+	        printf '  %-24s installed %.7s, locked %.7s\n' "$$name" "$$have" "$$want"; \
+	done > "$$tmp"; \
+	cat "$$tmp"; \
+	n=$$(wc -l < "$$tmp" | tr -d ' '); \
+	[ "$$n" = 0 ] && echo "  all pinned plugins match the lockfile." || \
+	    echo "WARNING: $$n nvim plugin(s) drifted from lazy-lock.json (run: make nvim-restore)"
+
+nvim-restore : ## maintain | Check out the nvim plugin commits pinned in lazy-lock.json
+	@# The counterpart to `make update`: update moves the pins forward and rewrites
+	@# the lockfile, restore moves this machine onto the pins someone else already
+	@# committed. After pulling a lockfile change, this is the one to run.
+	@echo "Restoring Neovim plugins to the commits in lazy-lock.json..."
+	@command -v nvim >/dev/null 2>&1 || { echo "ERROR: nvim not found — install it first (make apps)"; exit 1; }
+	@nvim --headless "+Lazy! restore" +qa
+	@$(MAKE) --no-print-directory nvim-drift
+
 brew-check : ## check | Verify every brewfile package is installed
 	@echo "Checking Brewfile packages..."
 	@# The WARNING: prefix is the shared contract with `make check`, which
@@ -666,7 +702,7 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	    fi; \
 	fi
 	@echo "Done."
-check : ## check | Everything read-only: doctor + macos-check + brew-check
+check : ## check | Everything read-only: doctor + macos-check + brew-check + nvim-drift
 	@# Runs the three read-only check targets, then summarizes. The summary is
 	@# the point: doctor + macos-check + brew-check emit ~30 lines of "Checking
 	@# ..." headers, and a WARNING scrolls past in the middle of them. This used
@@ -682,7 +718,7 @@ check : ## check | Everything read-only: doctor + macos-check + brew-check
 	@# check itself broke" rather than "your machine needs three fixes".
 	@tmp=$$(mktemp); \
 	trap 'rm -f "$$tmp"' EXIT; \
-	$(MAKE) --no-print-directory doctor macos-check brew-check 2>&1 | tee "$$tmp"; \
+	$(MAKE) --no-print-directory doctor macos-check brew-check nvim-drift 2>&1 | tee "$$tmp"; \
 	n=$$(grep -c '^WARNING:' "$$tmp" 2>/dev/null || true); \
 	n=$${n:-0}; \
 	echo ""; \
