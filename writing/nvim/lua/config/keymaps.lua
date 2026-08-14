@@ -30,6 +30,20 @@ local function citekey_under_cursor()
 	return key
 end
 
+-- Run `cmd` asynchronously and report its combined output through vim.notify.
+-- `fail_level` is the level for a non-zero exit: WARN for checks that routinely
+-- report findings (a dead link is news, not a malfunction), ERROR for
+-- operations that were supposed to succeed.
+local function run_notify(cmd, title, fail_level)
+	vim.system(cmd, { text = true }, function(result)
+		vim.schedule(function()
+			local output = strip_ansi(vim.trim((result.stdout or "") .. "\n" .. (result.stderr or "")))
+			local level = result.code == 0 and vim.log.levels.INFO or fail_level
+			vim.notify(output, level, { title = title })
+		end)
+	end)
+end
+
 -- Diagnostics
 map("n", "<leader>e", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostic" })
 
@@ -227,16 +241,8 @@ end, { desc = "Check citations against Zotero library" })
 -- is a real binary on $PATH, so this runs directly, no fish -c needed.
 map("n", "<leader>pl", function()
 	vim.cmd.update()
-	local file = vim.fn.expand("%:p")
-
 	vim.notify("Checking links …")
-	vim.system({ "lychee", "--no-progress", file }, { text = true }, function(result)
-		vim.schedule(function()
-			local output = strip_ansi(vim.trim((result.stdout or "") .. "\n" .. (result.stderr or "")))
-			local level = result.code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
-			vim.notify(output, level, { title = "linkcheck" })
-		end)
-	end)
+	run_notify({ "lychee", "--no-progress", vim.fn.expand("%:p") }, "linkcheck", vim.log.levels.WARN)
 end, { desc = "Check links in buffer (lychee)" })
 
 -- Snapshot every URL cited in the buffer to the Wayback Machine (`mdarchive`)
@@ -252,13 +258,7 @@ map("n", "<leader>pa", function()
 	end
 
 	vim.notify("Archiving cited URLs …")
-	vim.system(fish_cmd({ "mdarchive", file }), { text = true }, function(result)
-		vim.schedule(function()
-			local output = strip_ansi(vim.trim((result.stdout or "") .. "\n" .. (result.stderr or "")))
-			local level = result.code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
-			vim.notify(output, level, { title = "mdarchive" })
-		end)
-	end)
+	run_notify(fish_cmd({ "mdarchive", file }), "mdarchive", vim.log.levels.WARN)
 end, { desc = "Archive cited URLs to the Wayback Machine" })
 
 -- Publish the current buffer as a finished draft (site publish --cite),
@@ -306,13 +306,7 @@ end, { desc = "Publish current draft to content/" })
 -- advisories. Async since a full run builds the site with Hugo.
 map("n", "<leader>bc", function()
 	vim.notify("Running site check …")
-	vim.system(fish_cmd({ "site", "check" }), { text = true }, function(result)
-		vim.schedule(function()
-			local output = strip_ansi(vim.trim((result.stdout or "") .. "\n" .. (result.stderr or "")))
-			local level = result.code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
-			vim.notify(output, level, { title = "site check" })
-		end)
-	end)
+	run_notify(fish_cmd({ "site", "check" }), "site check", vim.log.levels.ERROR)
 end, { desc = "Run site preflight checks" })
 
 -- Ship (site ship / scripts/ship.sh): stages EVERY pending change in the
@@ -335,26 +329,18 @@ map("n", "<leader>bs", function()
 	end
 
 	vim.notify("Shipping …")
-	vim.system(fish_cmd({ "site", "ship", "--yes", msg }), { text = true }, function(result)
-		vim.schedule(function()
-			local output = strip_ansi(vim.trim((result.stdout or "") .. "\n" .. (result.stderr or "")))
-			local level = result.code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
-			vim.notify(output, level, { title = "site ship" })
-		end)
-	end)
+	run_notify(fish_cmd({ "site", "ship", "--yes", msg }), "site ship", vim.log.levels.ERROR)
 end, { desc = "Commit and push the website repo" })
 
-map("n", "<leader>ph", function()
-	pandoc_export("html")
-end, { desc = "Pandoc → HTML" })
-
-map("n", "<leader>pp", function()
-	pandoc_export("pdf")
-end, { desc = "Pandoc → PDF" })
-
-map("n", "<leader>pd", function()
-	pandoc_export("docx")
-end, { desc = "Pandoc → Word" })
+for _, e in ipairs({
+	{ "ph", "html", "Pandoc → HTML" },
+	{ "pp", "pdf", "Pandoc → PDF" },
+	{ "pd", "docx", "Pandoc → Word" },
+}) do
+	map("n", "<leader>" .. e[1], function()
+		pandoc_export(e[2])
+	end, { desc = e[3] })
+end
 
 -- Live preview in Marked 2 (re-renders on every save)
 map("n", "<leader>pv", function()

@@ -5,53 +5,21 @@ local M = {}
 -- that file exported — real values whenever nvim is launched from a fish shell,
 -- which is the normal case. Each getter carries a fallback for the rare launch
 -- with no such environment (e.g. straight from a GUI launcher).
+local defaults = {
+	zotero_library_bib = { "ZOTERO_LIBRARY_BIB", "~/Documents/Library/Library.bib" },
+	zotero_library_json = { "ZOTERO_LIBRARY_JSON", "~/Documents/Library/Library.json" },
+	website_repo = { "WEBSITE_REPO", "~/git/website" },
+	website_drafts_dir = { "WEBSITE_DRAFTS_DIR", "~/Notes/07 Blog/Drafts" },
+	research_archives_dir = { "RESEARCH_ARCHIVES_DIR", "~/Notes/03 Research/Archives" },
+	reading_notes_dir = { "READING_NOTES_DIR", "~/Notes/02 Notes/01 Reading Notes" },
+}
 
-function M.zotero_library_bib()
-	local value = vim.env.ZOTERO_LIBRARY_BIB
-	if value and value ~= "" then
-		return vim.fn.expand(value)
+for name, spec in pairs(defaults) do
+	local var, fallback = spec[1], spec[2]
+	M[name] = function()
+		local value = vim.env[var]
+		return vim.fn.expand(value ~= nil and value ~= "" and value or fallback)
 	end
-	return vim.fn.expand("~/Documents/Library/Library.bib")
-end
-
-function M.zotero_library_json()
-	local value = vim.env.ZOTERO_LIBRARY_JSON
-	if value and value ~= "" then
-		return vim.fn.expand(value)
-	end
-	return vim.fn.expand("~/Documents/Library/Library.json")
-end
-
-function M.website_repo()
-	local value = vim.env.WEBSITE_REPO
-	if value and value ~= "" then
-		return vim.fn.expand(value)
-	end
-	return vim.fn.expand("~/git/website")
-end
-
-function M.website_drafts_dir()
-	local value = vim.env.WEBSITE_DRAFTS_DIR
-	if value and value ~= "" then
-		return vim.fn.expand(value)
-	end
-	return vim.fn.expand("~/Notes/07 Blog/Drafts")
-end
-
-function M.research_archives_dir()
-	local value = vim.env.RESEARCH_ARCHIVES_DIR
-	if value and value ~= "" then
-		return vim.fn.expand(value)
-	end
-	return vim.fn.expand("~/Notes/03 Research/Archives")
-end
-
-function M.reading_notes_dir()
-	local value = vim.env.READING_NOTES_DIR
-	if value and value ~= "" then
-		return vim.fn.expand(value)
-	end
-	return vim.fn.expand("~/Notes/02 Notes/01 Reading Notes")
 end
 
 -- DOTFILES_DIR falls back to nvim's own config location: `make nvim` symlinks
