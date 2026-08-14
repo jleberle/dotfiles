@@ -5,42 +5,8 @@ return {
 		opts = {},
 	},
 
-	{
-		"nvim-telescope/telescope.nvim",
-		cmd = "Telescope",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-		config = function()
-			local paths = require("config.paths")
-			require("telescope").setup({
-				defaults = {
-					layout_strategy = "horizontal",
-				},
-				extensions = {
-					-- Zotero library, kept current by Better BibTeX auto-export.
-					-- Enter inserts @citekey (pandoc style, detected from the
-					-- markdown filetype).
-					-- Stays on .bib (not the .json pandoc renders from):
-					-- telescope-bibtex parses BibTeX syntax and can't read CSL JSON.
-					bibtex = {
-						global_files = { paths.zotero_library_bib() },
-					},
-				},
-			})
-		end,
-	},
-
-	{
-		"nvim-telescope/telescope-bibtex.nvim",
-		dependencies = { "nvim-telescope/telescope.nvim" },
-		keys = {
-			{ "<leader>fc", "<cmd>Telescope bibtex<cr>", desc = "Insert citation" },
-		},
-		config = function()
-			require("telescope").load_extension("bibtex")
-		end,
-	},
+	-- Pickers live in mini.pick (see plugins/writing.lua); the <leader>f* maps,
+	-- including the citation picker, are in config/keymaps.lua.
 
 	{
 		"nvim-treesitter/nvim-treesitter",

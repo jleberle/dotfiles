@@ -77,10 +77,11 @@ map("x", "p", '"_dP', { desc = "Paste over selection (keep register)" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write file" })
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit window" })
 
--- Telescope
-map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Find files" })
-map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "Search in files" })
-map("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Open buffers" })
+-- Pickers (mini.pick)
+map("n", "<leader>ff", "<cmd>Pick files<cr>", { desc = "Find files" })
+map("n", "<leader>fg", "<cmd>Pick grep_live<cr>", { desc = "Search in files" })
+map("n", "<leader>fb", "<cmd>Pick buffers<cr>", { desc = "Open buffers" })
+map("n", "<leader>fc", "<cmd>Pick citations<cr>", { desc = "Insert citation" })
 
 -- Jump from the @citekey under the cursor to its item in Zotero (PDF and
 -- notes are one keystroke away there). Better BibTeX registers the
