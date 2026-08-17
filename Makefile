@@ -108,6 +108,10 @@ neomutt|writing/neomutt/neomuttrc|$(HOME)/.config/neomutt/neomuttrc
 neomutt|writing/neomutt/gpg.rc|$(HOME)/.config/neomutt/gpg.rc
 neomutt|writing/neomutt/colors.rc|$(HOME)/.config/neomutt/colors.rc
 neomutt|writing/neomutt/mailcap|$(HOME)/.config/neomutt/mailcap
+fonts|fonts/source-serif-4/SourceSerif4-Regular.ttf|$(HOME)/Library/Fonts/SourceSerif4-Regular.ttf
+fonts|fonts/source-serif-4/SourceSerif4-Bold.ttf|$(HOME)/Library/Fonts/SourceSerif4-Bold.ttf
+fonts|fonts/source-serif-4/SourceSerif4-Italic.ttf|$(HOME)/Library/Fonts/SourceSerif4-Italic.ttf
+fonts|fonts/source-serif-4/SourceSerif4-BoldItalic.ttf|$(HOME)/Library/Fonts/SourceSerif4-BoldItalic.ttf
 endef
 SYMLINK_ROWS := $(strip $(SYMLINKS))
 
@@ -216,7 +220,7 @@ help : ## Print this list
 	@echo "lint-python, lint-luacheck, lint-secrets."
 	@echo "Docs: docs/maintenance.md (targets), README.md (setup)."
 
-install : require-location apps git shell security nvim vale neomutt services brewauto ## setup | Full setup: apps, symlinks, agents, then doctor
+install : require-location apps git shell security nvim fonts vale neomutt services brewauto ## setup | Full setup: apps, symlinks, agents, then doctor
 	@echo ""
 	@echo "Run 'make firefox' after launching Firefox once."
 	@echo "If you use NeoMutt, finish setup with: make mailsync"
@@ -421,6 +425,9 @@ touchid : require-location ## system | Touch ID for sudo, tmux-safe (sudo)
 nvim : require-location ## link | writing/nvim -> ~/.config/nvim
 	@echo "Symlinking nvim config"
 	$(call install_symlinks,nvim)
+fonts : require-location ## link | Static Source Serif 4 -> ~/Library/Fonts (see fonts/source-serif-4/README.md)
+	@echo "Symlinking Source Serif 4 (static instances)"
+	$(call install_symlinks,fonts)
 vale : require-location ## link | Global ~/.vale.ini, then vale sync
 	@command -v vale >/dev/null 2>&1 || { echo "ERROR: vale not found — install it first (make apps)"; exit 1; }
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
