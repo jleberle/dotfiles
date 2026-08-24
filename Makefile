@@ -108,12 +108,19 @@ neomutt|writing/neomutt/neomuttrc|$(HOME)/.config/neomutt/neomuttrc
 neomutt|writing/neomutt/gpg.rc|$(HOME)/.config/neomutt/gpg.rc
 neomutt|writing/neomutt/colors.rc|$(HOME)/.config/neomutt/colors.rc
 neomutt|writing/neomutt/mailcap|$(HOME)/.config/neomutt/mailcap
-fonts|fonts/source-serif-4/SourceSerif4-Regular.ttf|$(HOME)/Library/Fonts/SourceSerif4-Regular.ttf
-fonts|fonts/source-serif-4/SourceSerif4-Bold.ttf|$(HOME)/Library/Fonts/SourceSerif4-Bold.ttf
-fonts|fonts/source-serif-4/SourceSerif4-Italic.ttf|$(HOME)/Library/Fonts/SourceSerif4-Italic.ttf
-fonts|fonts/source-serif-4/SourceSerif4-BoldItalic.ttf|$(HOME)/Library/Fonts/SourceSerif4-BoldItalic.ttf
 endef
 SYMLINK_ROWS := $(strip $(SYMLINKS))
+
+# Source Serif 4 static instances are COPIED into ~/Library/Fonts, not
+# symlinked like everything above. macOS's font service (fontd) silently
+# does not register symlinked files dropped into a Fonts folder — the file
+# is present and readable, `ls`/Finder show it fine, but it never appears in
+# `system_profiler SPFontsDataType`, so apps like Keynote report the
+# PostScript name as simply not found. No amount of logout/reboot fixes
+# that, because it was never a cache problem. Real copies are the only
+# reliable way to install a font per-user without admin rights. See
+# fonts/source-serif-4/README.md for why these are static instances at all.
+FONT_FILES := SourceSerif4-Regular.ttf SourceSerif4-Bold.ttf SourceSerif4-Italic.ttf SourceSerif4-BoldItalic.ttf
 
 # Canned recipe: $(call install_symlinks,<group>) — creates every SYMLINKS row
 # tagged with <group>. mkdir -p covers a parent dir that doesn't exist yet
@@ -425,9 +432,15 @@ touchid : require-location ## system | Touch ID for sudo, tmux-safe (sudo)
 nvim : require-location ## link | writing/nvim -> ~/.config/nvim
 	@echo "Symlinking nvim config"
 	$(call install_symlinks,nvim)
-fonts : require-location ## link | Static Source Serif 4 -> ~/Library/Fonts (see fonts/source-serif-4/README.md)
-	@echo "Symlinking Source Serif 4 (static instances)"
-	$(call install_symlinks,fonts)
+fonts : require-location ## copy | Static Source Serif 4 -> ~/Library/Fonts (see fonts/source-serif-4/README.md)
+	@echo "Installing Source Serif 4 (static instances)"
+	@mkdir -p "$(HOME)/Library/Fonts"
+	@for f in $(FONT_FILES); do \
+	    target="$(HOME)/Library/Fonts/$$f"; \
+	    rm -f "$$target"; \
+	    cp "$(DOTFILES)/fonts/source-serif-4/$$f" "$$target"; \
+	    echo "  fonts/source-serif-4/$$f -> $$target"; \
+	done
 vale : require-location ## link | Global ~/.vale.ini, then vale sync
 	@command -v vale >/dev/null 2>&1 || { echo "ERROR: vale not found — install it first (make apps)"; exit 1; }
 	@echo "Installing global Vale config (used by nvim-lint for prose)"
@@ -637,6 +650,11 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	@test -f $(CURDIR)/paths.env || \
 	    echo "WARNING: paths.env missing — every workflow location is unset (broken checkout? re-clone or restore the file)"
 	@if [ -L "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf is a broken symlink (run: make security)"; elif [ ! -f "$(HOME)/.gnupg/gpg-agent.conf" ]; then echo "WARNING: gpg-agent.conf not written (run: make security)"; fi
+	@for f in $(FONT_FILES); do \
+	    target="$(HOME)/Library/Fonts/$$f"; \
+	    if [ -L "$$target" ]; then echo "WARNING: $$target is a symlink — macOS won't register a symlinked font (run: make fonts)"; \
+	    elif [ ! -f "$$target" ]; then echo "WARNING: $$target not installed (run: make fonts)"; fi; \
+	done
 	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
 	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
