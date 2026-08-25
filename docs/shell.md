@@ -200,6 +200,7 @@ failures, a missing tool and a missing path.
 | `csvsort [dir] [--header] [--force]` | Sort every unsorted CSV in a directory by the **last word of field 1** (surname order, case-insensitive) into `<name>-sorted.csv`; originals untouched |
 | `depmerge <pr-number>`  | Merge a Dependabot PR locally and push to `origin` — see [Git](git.md)               |
 | `fuck`                  | Re-run the previous command under `sudo`                                              |
+| `gitstatus [dir]`       | Show which git repos under a directory (default `~/git`) have uncommitted changes or unpushed commits |
 | `gitup`                 | Run `gitup` over the tracked bookmarks file (`git/gitup-bookmarks`)                   |
 | `gpg-master-import`     | Import the offline GPG master key from USB for editing                                |
 | `gpg-master-done`       | Remove master key and reimport machine-specific subkeys only                          |
