@@ -23,6 +23,12 @@ end
 # to universal variables, so nothing leaks into the repo's fish_variables.
 fish_add_path --global --prepend $HOME/git/dotfiles/bin $HOME/.local/bin
 
+# curl is keg-only (macOS ships its own LibreSSL-based curl in /usr/bin) so
+# Homebrew doesn't symlink it into $HOMEBREW_PREFIX/bin automatically. Prepend
+# its keg bin/ directly rather than `brew link --force`, which would also
+# expose its include/lib to other formulae's builds.
+fish_add_path --global --prepend $HOMEBREW_PREFIX/opt/curl/bin
+
 # --- GPG ----------------------------------------------------------------------
 # Required for pinentry to open a passphrase prompt in the current terminal.
 # Guarded: in non-interactive shells `tty` returns the literal "not a tty",
