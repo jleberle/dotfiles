@@ -188,7 +188,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -467,7 +467,7 @@ neomutt : require-location ## link | NeoMutt config, cache dirs, mbsync/notmuch 
 	    { cp $(DOTFILES)/writing/neomutt/mbsyncrc $(HOME)/.mbsyncrc; \
 	      echo "REMINDER: edit ~/.mbsyncrc and set User to your Proton Bridge email"; }
 	@[ -f "$(HOME)/.notmuch-config" ] || \
-	    { sed 's|__HOME__|$(HOME)|g' $(DOTFILES)/writing/neomutt/notmuch-config > $(HOME)/.notmuch-config; \
+	    { sed '/^path=/s|__HOME__|$(HOME)|' $(DOTFILES)/writing/neomutt/notmuch-config > $(HOME)/.notmuch-config; \
 	      echo "REMINDER: edit ~/.notmuch-config with your name and email, then run: notmuch new"; }
 	@echo "NeoMutt configured."
 mailsync : require-location ## agents | launchd agent: mbsync + notmuch every 5 minutes
@@ -629,6 +629,68 @@ brew-drift : ## check | List installed packages missing from the brewfile
 	@echo ""
 	@echo "Nothing listed above = no drift. To add a package, edit the Brewfile;"
 	@echo "to uninstall the drift instead, run: brew bundle cleanup --force --file=$(CURDIR)/homebrew/brewfile"
+# The three files `make neomutt` seeds — see the neomutt target, where each copy
+# is guarded by `[ -f ]`. Rows are <live file>|<template in this repo>.
+define SEEDED_MAIL
+$(HOME)/.mbsyncrc|writing/neomutt/mbsyncrc
+$(HOME)/.notmuch-config|writing/neomutt/notmuch-config
+$(HOME)/.config/neomutt/accounts/local.rc|writing/neomutt/accounts/example.rc
+endef
+SEEDED_MAIL_ROWS := $(strip $(SEEDED_MAIL))
+
+# Shell fragment: read a seeded mail file (or its template) on stdin and write a
+# comparable form on stdout. Strips the values that are legitimately yours so
+# they are never reported as drift, and nothing else:
+#   __HOME__ / path=      the template placeholder, resolved the way make neomutt does
+#   %40                   the percent-encoded @ inside an smtp_url, so it normalizes too
+#   /Users/<name>         to /Users/@USER@
+#   any email address     to @EMAIL@
+#   realname / name=      dropped outright (a display name, not a setting)
+# Hosts, ports, TLS mode, Maildir paths, channel names and the comments that
+# document them are compared verbatim: those come from the template unchanged,
+# so a difference there means the template moved and this machine did not.
+mail_normalize = sed \
+    -e '/^path=/s|__HOME__|$(HOME)|' \
+    -e 's|%40|@|g' \
+    -e 's|/Users/[^/"]*|/Users/@USER@|g' \
+    -e 's|[A-Za-z0-9._%+-][A-Za-z0-9._%+-]*@[A-Za-z0-9.-][A-Za-z0-9.-]*\.[A-Za-z][A-Za-z]*|@EMAIL@|g' \
+    -e '/^set realname/d' \
+    -e '/^name=/d'
+
+mail-drift : ## check | Compare the seeded mail configs against their templates
+	@echo "Checking seeded mail config against writing/neomutt templates..."
+	@# `make neomutt` copies these three once and then never touches them again —
+	@# the `[ -f ]` guard is deliberate, since each one holds an address or a name
+	@# that does not belong in the repo. The cost is that a template which moves on
+	@# (a new provider, a new sync pattern) silently never reaches a machine that
+	@# already ran the copy. Nothing errors. mbsync just keeps talking to the old
+	@# server, and `doctor` — which only tests that the files EXIST — stays green.
+	@# This is the check that says otherwise. It compares; it never overwrites,
+	@# because the merge needs a human who knows which side is current.
+	@a=$$(mktemp); b=$$(mktemp); \
+	trap 'rm -f "$$a" "$$b"' EXIT; \
+	n=0; \
+	for row in $(foreach r,$(SEEDED_MAIL_ROWS),'$(r)'); do \
+	    IFS='|'; set -- $$row; unset IFS; \
+	    live="$$1"; tmpl="$(CURDIR)/$$2"; \
+	    if [ ! -f "$$live" ]; then \
+	        echo "  $$live — missing (run: make neomutt)"; \
+	        n=$$((n+1)); continue; \
+	    fi; \
+	    $(mail_normalize) "$$tmpl" > "$$a"; \
+	    $(mail_normalize) "$$live" > "$$b"; \
+	    if ! diff -q "$$a" "$$b" >/dev/null; then \
+	        echo ""; \
+	        echo "  $$live differs from $$2:"; \
+	        diff -u --label "$$2 (template)" --label "$$live (yours)" "$$a" "$$b" \
+	            | sed -e '1,2d' -e 's/^/    /'; \
+	        n=$$((n+1)); \
+	    fi; \
+	done; \
+	echo ""; \
+	[ "$$n" = 0 ] && echo "  all three match their templates." || \
+	    echo "WARNING: $$n seeded mail file(s) drifted from writing/neomutt (review the diff above, then copy the template across by hand and re-enter your address)"
+
 doctor : ## check | Symlinks, keys, permissions, shell, agents
 	@echo "Checking symlinks..."
 	@for row in $(foreach r,$(SYMLINK_ROWS),'$(r)'); do \
@@ -657,6 +719,15 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	done
 	@test -f $(HOME)/.mbsyncrc        || echo "WARNING: ~/.mbsyncrc not found (run: make neomutt)"
 	@test -f $(HOME)/.notmuch-config  || echo "WARNING: ~/.notmuch-config not found (run: make neomutt)"
+	@# `mail-drift` cannot see this one: it normalizes every address to @EMAIL@ so
+	@# that YOUR address is not reported as drift, which means the template's
+	@# placeholder normalizes to exactly the same thing. A file still carrying
+	@# `you@proton.me` is therefore a perfect match on that check while mbsync
+	@# authenticates as nobody. Named literally here, on purpose.
+	@P=$$(grep -l 'you@proton\.me\|you%40proton\.me\|you@yourdomain\.com\|Your Name' \
+	    $(HOME)/.mbsyncrc $(HOME)/.notmuch-config \
+	    $(HOME)/.config/neomutt/accounts/local.rc 2>/dev/null | tr '\n' ' '); \
+	[ -z "$$P" ] || echo "WARNING: template placeholder left unfilled in: $$P(edit each and put your real address in)"
 	@test -f $(HOME)/.vale.ini                || echo "WARNING: .vale.ini not generated (run: make vale)"
 	@test -d $(HOME)/.local/share/vale/styles && \
 	    ls $(HOME)/.local/share/vale/styles | grep -q . || \
@@ -727,7 +798,7 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	    fi; \
 	fi
 	@echo "Done."
-check : ## check | Everything read-only: doctor + macos-check + brew-check + nvim-drift
+check : ## check | Everything read-only: doctor + macos-check + brew-check + nvim-drift + mail-drift
 	@# Runs the three read-only check targets, then summarizes. The summary is
 	@# the point: doctor + macos-check + brew-check emit ~30 lines of "Checking
 	@# ..." headers, and a WARNING scrolls past in the middle of them. This used
@@ -743,7 +814,7 @@ check : ## check | Everything read-only: doctor + macos-check + brew-check + nvi
 	@# check itself broke" rather than "your machine needs three fixes".
 	@tmp=$$(mktemp); \
 	trap 'rm -f "$$tmp"' EXIT; \
-	$(MAKE) --no-print-directory doctor macos-check brew-check nvim-drift 2>&1 | tee "$$tmp"; \
+	$(MAKE) --no-print-directory doctor macos-check brew-check nvim-drift mail-drift 2>&1 | tee "$$tmp"; \
 	n=$$(grep -c '^WARNING:' "$$tmp" 2>/dev/null || true); \
 	n=$${n:-0}; \
 	echo ""; \
