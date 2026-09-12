@@ -77,7 +77,12 @@ step() {
         fi
 
         step "Upgrading outdated casks..."     "$BREW" upgrade --cask
-        step "Cleaning up..."                  "$BREW" cleanup
+        # --prune=all removes old Cellar versions and download cache immediately
+        # rather than waiting brew's default 120 days. That trades away a
+        # quick `brew switch` downgrade window if an upgrade goes bad, which is
+        # acceptable here since restic already backs this machine up weekly
+        # (see backup/org.jaredeberle.resticcheck.plist).
+        step "Cleaning up..."                  "$BREW" cleanup --prune=all
     fi
 
     if [[ $failed -eq 0 ]]; then
