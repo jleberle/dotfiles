@@ -188,7 +188,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -690,6 +690,13 @@ mail-drift : ## check | Compare the seeded mail configs against their templates
 	echo ""; \
 	[ "$$n" = 0 ] && echo "  all three match their templates." || \
 	    echo "WARNING: $$n seeded mail file(s) drifted from writing/neomutt (review the diff above, then copy the template across by hand and re-enter your address)"
+
+# Cross-repo view of every project under ~/git. Distinct from the `gitstatus`
+# fish function, which stays the fast offline git-only check: this one also
+# reports CI (network, via gh) and whether a repo that generates files into
+# another repo is ahead of what it generated. See bin/projectstatus.py.
+status : ## check | Git, CI, and generated-output state for every repo under ~/git
+	@$(DOTFILES)/bin/projectstatus.py $(ARGS)
 
 doctor : ## check | Symlinks, keys, permissions, shell, agents
 	@echo "Checking symlinks..."
