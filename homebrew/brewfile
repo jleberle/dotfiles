@@ -88,13 +88,12 @@ cask "zoom" # video conferencing
 cask "zotero" # reference / citation manager
 mas "acorn", id:6737921844 # image editor
 mas "broadcasts", id:1469995354 # Internet Radio
-mas "changetheheaders", id:6743129567 # rewrite link-tracking headers in Safari
 mas "dropover", id:1355679052 # drag-and-drop shelf
-mas "focus for youtube", id:1514703160
 mas "folder quick look", id:6753110395 # Quick Look folder previews
 mas "hazeover", id:430798174 # blur background
 mas "kagi for safari", id:1622835804 # Kagi Search
 mas "keynote", id:361285480 # Presentation software
+mas "litterbox", id:6805719216 # Tweet viewer
 mas "mela", id:1568924476 # Recipes
 mas "numbers", id:361304891 # Spreadsheets
 mas "obsidian web clipper", id:6720708363 # Obsidian Web Clipper
