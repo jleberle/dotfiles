@@ -31,6 +31,19 @@
         <key>Minute</key><integer>0</integer>
     </dict>
 
+    <!-- Background: this is a heavy, unattended job that competes with whatever
+         you are actually doing at the moment it fires. ProcessType Background
+         puts it in launchd's throttled band -- low CPU priority AND throttled
+         disk I/O -- which is what separates "runs weekly" from "makes the
+         machine feel broken for ten minutes every Monday morning". No `Nice`
+         key alongside it: ProcessType already sets scheduling priority, and the
+         two disagreeing is how you get a job that is nice-19 but still saturates
+         the disk. Deliberately NOT set on mailsync (it must finish inside its
+         five-minute interval) or decksync (you are standing at the machine
+         waiting for the export when it fires). -->
+    <key>ProcessType</key>
+    <string>Background</string>
+
     <key>StandardOutPath</key>
     <string>__HOME__/.local/restic_check_logs.txt</string>
     <key>StandardErrorPath</key>

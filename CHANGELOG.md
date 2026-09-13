@@ -12,6 +12,30 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-09-12 — Resource pass: a dead backup check, and the prompt
+
+- **Action required.** `make brewauto` and, if you use it, `make resticcheck`,
+  to pick up the changed plists. `make install` covers `brewauto`; the other
+  agents stay opt-in and must be re-run by hand. `make agent-drift` says which.
+- The weekly restic integrity check had been dead since the 2026-08-12 rename
+  below: the installed plist still invoked `archbackup check`. Reinstalled, and
+  it passes again.
+- New `make agent-drift`: compares the installed LaunchAgents against this
+  repo's plists, which is the check whose absence hid the above. Part of
+  `make check`.
+- `brewupdate` and `resticcheck` now run as `ProcessType: Background`, so the
+  unattended jobs no longer compete at full priority with foreground work.
+- The fish prompt makes one `git` call per prompt instead of five: 46ms → 10ms.
+- `mailsync.sh` no longer logs runs where nothing arrived; it counts them and
+  writes the streak as one line. The 1 MB log cap had been discarding failure
+  history to make room for "No new mail."
+- New `brew` fish function: runs Homebrew under `umask 022`, so packages
+  installed by hand stop landing in the Cellar as `drwx------`. `make apps` and
+  `homebrewupdate.sh` already did this; the interactive path was the gap, and
+  the source of all 32 drifted directories `make brew-check` was reporting.
+
+---
+
 ## 2026-08-12 — Merge the archival-scan functions into one dispatcher
 
 - **Action required.** `archgrep`, `archocr`, `archverify`, and `archbackup`

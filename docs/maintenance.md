@@ -156,13 +156,14 @@ targets' own `## group | description` tags, so it cannot drift.
 | `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
 | `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
+| `agent-drift`      | Compares the installed LaunchAgents against this repo's plists and names the target that reinstalls each stale one. Compares normalized JSON (`plutil` + sorted keys), so rewritten comments are not reported — only differences launchd would act on |
 | `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, `py_compile` for the Python helpers, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-python`/`lint-luacheck`/`lint-secrets` |
 | `lint-plists`      | macOS-only: `plutil -lint` over tracked LaunchAgents and Automator workflow files                    |
 | `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`, `mdlinks`) |
 | `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync) and `vale sync`; Homebrew/Betterfox stay on their own paths. Also prints the CI-pinned vs. local gitleaks version, since that pin is bumped by hand |
 | `doctor`           | Checks symlinks, SSH keys, key/secret-dir permissions, login shell, vale styles, GPG key, git hooksPath/gitleaks, that launchd agents are loaded, and how long since the backup last passed an integrity check (FileVault is checked by `macos-check`) |
-| `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` |
+| `check`            | Runs all read-only health checks at once: `doctor` + `macos-check` + `brew-check` + `nvim-drift` + `mail-drift` + `agent-drift` |
 
 `harden` and `touchid` are **not** part of `make install` — they touch system
 files under `sudo`, so run them deliberately. `resticcheck` is optional and only

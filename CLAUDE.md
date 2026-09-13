@@ -80,5 +80,16 @@ something faster.
 `make lint` fans out to `lint-shellcheck`, `lint-fish`, `lint-python`,
 `lint-luacheck`, `lint-secrets`, `lint-plists`. There are also drift checks
 that compare this repo against machine state: `nvim-drift`, `brew-drift`,
-`mail-drift`. Drift is expected and informational — it is not a failure the
-way lint is.
+`mail-drift`, `agent-drift`. Drift is expected and informational — it is not a
+failure the way lint is.
+
+`agent-drift` is the exception: a drifted LaunchAgent is not a difference of
+opinion, it is the machine running code this repo no longer contains. Installing
+an agent is a one-time copy, so editing a plist here reaches nothing until
+`make <agent>` runs again — resticcheck spent a month invoking `archbackup
+check` after that function became `arch backup`, waking the Mac every Sunday to
+write a fish parse error into the backup-verification log while `doctor` stayed
+green. Both it and `doctor`'s loaded-agent loop read the `AGENT_PLISTS` table,
+so a fifth agent is one row, not two lists. It compares normalized JSON rather
+than bytes, because two of the four plists differ from their installed copies in
+comments alone.

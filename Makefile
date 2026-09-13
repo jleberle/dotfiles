@@ -188,7 +188,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift agent-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -614,10 +614,17 @@ brew-check : ## check | Verify every brewfile package is installed
 	@# counts and re-lists those lines in its summary — see the note there.
 	@brew bundle check --file=$(CURDIR)/homebrew/brewfile --no-upgrade || \
 	    echo "WARNING: some Brewfile packages are missing (run: make apps)"
-	@# Packages installed from a fish shell before `make apps` set umask 022 landed
-	@# in the Cellar as drwx------ instead of drwxr-xr-x. Nothing breaks while brew
-	@# runs as you, which is exactly why it needs saying out loud — otherwise the
-	@# drift is only discoverable by a second account failing to run something.
+	@# Packages installed from a fish shell landed in the Cellar as drwx------
+	@# instead of drwxr-xr-x, because conf.d/env.fish sets umask 077 session-wide
+	@# and brew creates directories with its caller's umask. Nothing breaks while
+	@# brew runs as you, which is exactly why it needs saying out loud — otherwise
+	@# the drift is only discoverable by a second account failing to run something.
+	@#
+	@# All three paths that run brew now set umask 022 themselves: this target's
+	@# `apps`, bin/homebrewupdate.sh, and — the one that was missing, and the one
+	@# the drift actually came from — the `brew` fish function. This check stays
+	@# because the wrapper only prevents NEW drift; it cannot fix what a machine
+	@# already has, and it does not exist in a non-fish shell.
 	@# go+rX, capital X: adds execute to directories only, never to data files.
 	@N=$$(find $(HOMEBREW_PREFIX)/Cellar -maxdepth 2 -type d ! -perm -005 2>/dev/null | wc -l | tr -d ' '); \
 	[ "$$N" = 0 ] || \
@@ -690,6 +697,65 @@ mail-drift : ## check | Compare the seeded mail configs against their templates
 	echo ""; \
 	[ "$$n" = 0 ] && echo "  all three match their templates." || \
 	    echo "WARNING: $$n seeded mail file(s) drifted from writing/neomutt (review the diff above, then copy the template across by hand and re-enter your address)"
+
+# The four launchd agents this repo installs. Rows are <source plist in this
+# repo>|<make target that installs it>, so a drift report can name its own fix.
+# Both `doctor` (is it loaded?) and `agent-drift` (is it the CURRENT one?) read
+# this table, which is the point: the two questions were previously asked from
+# two hardcoded lists, and adding a fifth agent meant remembering both.
+define AGENT_PLISTS
+writing/neomutt/org.jaredeberle.mailsync.plist|mailsync
+homebrew/org.jaredeberle.brewupdate.plist|brewauto
+backup/org.jaredeberle.resticcheck.plist|resticcheck
+keynote/org.jaredeberle.decksync.plist|decksync
+endef
+AGENT_PLIST_ROWS := $(strip $(AGENT_PLISTS))
+
+agent-drift : ## check | Compare installed launchd agents against this repo's plists
+	@echo "Checking installed launchd agents against this repo's plists..."
+	@# The gap this closes: `make <agent>` templates a plist into
+	@# ~/Library/LaunchAgents and loads it ONCE. Edit the plist here afterwards
+	@# and nothing re-runs -- the machine keeps executing the old copy, and
+	@# `doctor` stays green because it only asks whether the label is loaded.
+	@# That is not hypothetical. resticcheck sat for weeks invoking `archbackup
+	@# check`, a function that had been renamed to `arch backup`, so the weekly
+	@# job woke the machine to print a fish parse error into a log nobody reads
+	@# -- on the agent whose entire job is proving the backups are restorable.
+	@# nvim-drift, brew-drift and mail-drift all existed; the agents had nothing.
+	@#
+	@# Compares NORMALIZED JSON, not bytes. plutil drops the comments and
+	@# python sorts the keys, so the only differences reported are ones launchd
+	@# would actually act on. Byte-diffing was tried first and immediately cried
+	@# wolf on decksync, whose installed copy differed from the repo's in a
+	@# rewritten explanatory comment and nothing else.
+	@t=$$(mktemp); a=$$(mktemp); b=$$(mktemp); \
+	trap 'rm -f "$$t" "$$a" "$$b"' EXIT; \
+	norm() { \
+	    sed -e 's|__HOMEBREW_PREFIX__|$(HOMEBREW_PREFIX)|g' -e 's|__HOME__|$(HOME)|g' "$$1" > "$$t" && \
+	    plutil -convert json -o - "$$t" | \
+	    python3 -c 'import json,sys; json.dump(json.load(sys.stdin), sys.stdout, sort_keys=True, indent=2); print()'; \
+	}; \
+	n=0; skipped=0; \
+	for row in $(foreach r,$(AGENT_PLIST_ROWS),'$(r)'); do \
+	    IFS='|'; set -- $$row; unset IFS; \
+	    src="$(CURDIR)/$$1"; target="$$2"; \
+	    label=$$(basename "$$1" .plist); \
+	    live="$(LAUNCH_AGENTS)/$$label.plist"; \
+	    if [ ! -f "$$live" ]; then skipped=$$((skipped+1)); continue; fi; \
+	    norm "$$src" > "$$a"; norm "$$live" > "$$b"; \
+	    if ! diff -q "$$a" "$$b" >/dev/null; then \
+	        echo ""; \
+	        echo "  $$label differs from $$1:"; \
+	        diff -u --label "$$1 (repo)" --label "$$live (installed)" "$$a" "$$b" \
+	            | sed -e '1,2d' -e 's/^/    /'; \
+	        echo ""; \
+	        echo "WARNING: $$label is running an outdated plist (run: make $$target)"; \
+	        n=$$((n+1)); \
+	    fi; \
+	done; \
+	if [ "$$n" = 0 ]; then \
+	    echo "  all installed agents match this repo ($$skipped not installed)."; \
+	fi
 
 # Cross-repo view of every project under ~/git. Distinct from the `gitstatus`
 # fish function, which stays the fast offline git-only check: this one also
@@ -778,7 +844,12 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	@gpg --list-secret-keys 2>/dev/null | grep -q "sec" || \
 	    echo "WARNING: no GPG secret key found — import your key"
 	@echo "Checking background agents..."
-	@for agent in org.jaredeberle.mailsync org.jaredeberle.brewupdate org.jaredeberle.resticcheck org.jaredeberle.decksync; do \
+	@# Driven by the AGENT_PLISTS table so this list and agent-drift's cannot
+	@# disagree. This asks only whether the label is LOADED; whether what is
+	@# loaded is still current is agent-drift's question.
+	@for row in $(foreach r,$(AGENT_PLIST_ROWS),'$(r)'); do \
+	    IFS='|'; set -- $$row; unset IFS; \
+	    agent=$$(basename "$$1" .plist); \
 	    if [ -f "$(LAUNCH_AGENTS)/$$agent.plist" ]; then \
 	        launchctl print gui/$(LAUNCHD_UID)/$$agent >/dev/null 2>&1 || \
 	            echo "WARNING: $$agent plist installed but not loaded (run: launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$$agent.plist)"; \
@@ -805,7 +876,7 @@ doctor : ## check | Symlinks, keys, permissions, shell, agents
 	    fi; \
 	fi
 	@echo "Done."
-check : ## check | Everything read-only: doctor + macos-check + brew-check + nvim-drift + mail-drift
+check : ## check | Everything read-only: doctor + macos-check + brew-check + nvim-drift + mail-drift + agent-drift
 	@# Runs the three read-only check targets, then summarizes. The summary is
 	@# the point: doctor + macos-check + brew-check emit ~30 lines of "Checking
 	@# ..." headers, and a WARNING scrolls past in the middle of them. This used
@@ -821,7 +892,7 @@ check : ## check | Everything read-only: doctor + macos-check + brew-check + nvi
 	@# check itself broke" rather than "your machine needs three fixes".
 	@tmp=$$(mktemp); \
 	trap 'rm -f "$$tmp"' EXIT; \
-	$(MAKE) --no-print-directory doctor macos-check brew-check nvim-drift mail-drift 2>&1 | tee "$$tmp"; \
+	$(MAKE) --no-print-directory doctor macos-check brew-check nvim-drift mail-drift agent-drift 2>&1 | tee "$$tmp"; \
 	n=$$(grep -c '^WARNING:' "$$tmp" 2>/dev/null || true); \
 	n=$${n:-0}; \
 	echo ""; \

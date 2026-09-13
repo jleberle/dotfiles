@@ -20,7 +20,7 @@ validate args/env and invoke them.
 | `ipic -i\|-m\|-a\|-f\|-t\|-b TERM`  | Build an HTML gallery of iTunes/App Store artwork and open it. Flags: `-i` iOS app, `-m` Mac app, `-a` album, `-f` film, `-t` TV, `-b` book. |
 | `waybackup <URL>`                   | Save a URL to the Internet Archive Wayback Machine; prints the snapshot URL.                                         |
 | `homebrewupdate.sh`                 | `brew update` + `outdated` + `upgrade`, with timestamped log output; caps its own log at 1 MB.                        |
-| `mailsync.sh`                       | `mbsync -a` + `notmuch new` with timestamped log output; invoked by the mailsync launchd agent. Tracks each step's exit status and sends a macOS notification when sync starts failing (and again when it recovers) — the log alone was never read. |
+| `mailsync.sh`                       | `mbsync -a` + `notmuch new` with timestamped log output; invoked by the mailsync launchd agent. Tracks each step's exit status and sends a macOS notification when sync starts failing (and again when it recovers) — the log alone was never read. Logs only runs that did something: quiet runs are counted and flushed as a single summary line. |
 | `citecheck.py` / `zotcheck.py` / `readnote.py` | Logic behind the `citecheck` / `zotcheck` / `readnote` fish functions; exercised by `make writing-check`. |
 | `mdlinks.py`                        | Logic behind the `mdlinks` fish function: turns a list of browser tabs into Markdown reference definitions. Reads URLs on stdin (Safari), or decodes Firefox's `recovery.jsonlz4` session store with `--firefox` — Firefox exposes no AppleScript tab list, so the session store is the only way to read its tabs without simulating keystrokes. Exercised by `make writing-check`. |
 
@@ -37,8 +37,24 @@ install time):
 | `org.jaredeberle.resticcheck`     | Sundays 10:00    | `arch backup check` (restic integrity; no-op if the drive is unmounted) |
 | `org.jaredeberle.decksync`        | On volume mount  | `keynote/sync_slides_drive.sh` (via `DeckSync.app`) — pushes `.pptx` + PDF exports of the Keynote lecture decks to the "R2-D2" flash drive (`WatchPaths` on `/Volumes`; no-op unless that drive appeared) |
 
+`brewupdate` and `resticcheck` are marked `ProcessType: Background`, which puts
+them in launchd's throttled band (low CPU priority and throttled disk I/O) —
+they are unattended jobs that would otherwise compete at full priority with
+whatever you are doing when they fire. `mailsync` and `decksync` are
+deliberately left at the default: the first has to finish inside its five-minute
+interval, and you are usually standing at the machine waiting for the second.
+
+Installing an agent is a one-time copy into `~/Library/LaunchAgents`, so editing
+a plist here does **not** reach a machine that already ran `make <agent>`. `make
+agent-drift` compares the two and names the target that reinstalls; it is part
+of `make check`. See [Maintenance](maintenance.md).
+
 Logs: `~/.local/brew_update_logs.txt` (newest run first),
-`~/.local/mail_sync_logs.txt`, `~/.local/restic_check_logs.txt`. Trigger a run
+`~/.local/mail_sync_logs.txt`, `~/.local/restic_check_logs.txt`. `mailsync.sh`
+does not log runs where nothing arrived — it counts them and writes the streak
+as one `--- N quiet run(s) ---` line when something finally happens, or after 24
+hours. Logging every routine run filled the 1 MB cap with three months of "No
+new mail." and pushed out the failures the log exists to keep. Trigger a run
 on demand:
 
 ```sh

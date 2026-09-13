@@ -158,7 +158,9 @@ documented in [Writing](writing.md#writing-functions-and-aliases-fish).)
 Every one of them takes `--help` (or `-h`) and prints its usage without doing
 anything else, so you never have to remember which argument came first. Typing
 a function's name with no arguments does the same wherever arguments are
-required.
+required. The exceptions are the thin pass-throughs — `brew` and `gitup` — which
+forward every argument to the real tool, `--help` included, on the grounds that
+the tool's own help knows more than a wrapper's would.
 
 #### Conventions
 
@@ -196,6 +198,7 @@ failures, a missing tool and a missing path.
 | `site <cmd> [args]`     | Website (jaredeberle.org) tasks from anywhere — pure dispatch to `~/git/website/scripts/`. Run `site` with no arguments for the full, always-current command list (it and the completions are generated from the same table, so neither can advertise a command that no longer exists). See [Writing → Reading workflow](writing.md#reading-workflow-vault--website) |
 | `acp <message>`         | **a**dd, signed **c**ommit, **p**ush in one step (quotes optional)                    |
 | `bb [path]`             | Launch BBEdit; with a dir, open **and** `cd` into it                                  |
+| `brew [args…]`          | Homebrew, run under `umask 022` so the Cellar stays world-readable. Transparent otherwise — every argument, the exit status, and the tty pass straight through. Without it, `conf.d/env.fish`'s session-wide `umask 077` makes anything you `brew install` by hand land as `drwx------`, which nothing notices until a second account cannot run it. `make brew-check` reports the drift; this prevents it |
 | `cdf`                   | `cd` to the directory open in the front Finder window                                 |
 | `csvsort [dir] [--header] [--force]` | Sort every unsorted CSV in a directory by the **last word of field 1** (surname order, case-insensitive) into `<name>-sorted.csv`; originals untouched |
 | `depmerge <pr-number>`  | Merge a Dependabot PR locally and push to `origin` — see [Git](git.md)               |
