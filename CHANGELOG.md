@@ -12,6 +12,17 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-09-13 — `mail-drift` stops punishing a second email address
+
+- `mail_normalize` collapses a `;`/`,`-separated run of addresses to one, so
+  listing your own second address in `other_email` is no longer permanent
+  drift. It was, and the obvious way to silence it — deleting the line from
+  the template — quietly removes the slot from every future machine.
+- `~/.notmuch-config` now lists both non-primary addresses, so `notmuch reply`
+  answers from the address the mail was actually sent to.
+
+---
+
 ## 2026-09-12 — Resource pass: a dead backup check, and the prompt
 
 - **Action required.** `make brewauto` and, if you use it, `make resticcheck`,

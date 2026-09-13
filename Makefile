@@ -652,15 +652,27 @@ SEEDED_MAIL_ROWS := $(strip $(SEEDED_MAIL))
 #   %40                   the percent-encoded @ inside an smtp_url, so it normalizes too
 #   /Users/<name>         to /Users/@USER@
 #   any email address     to @EMAIL@
+#   a ;/,-separated run   collapsed to one @EMAIL@ — see below
 #   realname / name=      dropped outright (a display name, not a setting)
 # Hosts, ports, TLS mode, Maildir paths, channel names and the comments that
 # document them are compared verbatim: those come from the template unchanged,
 # so a difference there means the template moved and this machine did not.
+#
+# The collapse matters because HOW MANY addresses you have is also yours. The
+# address rule alone rewrote the template's `other_email=you@proton.me;` to
+# `@EMAIL@;` and a real two-address line to `@EMAIL@;@EMAIL@;`, so listing a
+# second address of your own was reported as drift forever — and the obvious
+# way to silence that is to delete the line from the template, which quietly
+# removes the slot from every future machine. One `;`/`,`-separated run of
+# addresses is one address as far as this comparison is concerned. Only those
+# two separators: they are what notmuch's other_email and mbsync take. A
+# neomutt `alternates` regex (`|`-separated) would need another.
 mail_normalize = sed \
     -e '/^path=/s|__HOME__|$(HOME)|' \
     -e 's|%40|@|g' \
     -e 's|/Users/[^/"]*|/Users/@USER@|g' \
     -e 's|[A-Za-z0-9._%+-][A-Za-z0-9._%+-]*@[A-Za-z0-9.-][A-Za-z0-9.-]*\.[A-Za-z][A-Za-z]*|@EMAIL@|g' \
+    -e 's|@EMAIL@\([;,] *@EMAIL@\)*|@EMAIL@|g' \
     -e '/^set realname/d' \
     -e '/^name=/d'
 

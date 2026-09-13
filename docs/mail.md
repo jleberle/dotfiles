@@ -31,8 +31,24 @@ if they don't already exist.
 
 3. **Edit `~/.mbsyncrc`** — set `User` to your Proton Bridge email address.
 
-4. **Edit `~/.notmuch-config`** — set `name` and `primary_email`
-   (`path` is filled in automatically by `make neomutt`).
+4. **Edit `~/.notmuch-config`** — set `name` and `primary_email`, and put every
+   other address that reaches this mailbox in `other_email` as a `;`-separated
+   list (`path` is filled in automatically by `make neomutt`). A Proton account
+   usually has at least two: the `@protonmail.com` login and the custom-domain
+   address you actually send from. `other_email` is how notmuch knows those are
+   also you — without it, `notmuch reply` answers from your primary address even
+   on mail sent to one of the others.
+
+   Edit the file in `$HOME`, not the copy in this repo. The repo's
+   `writing/neomutt/notmuch-config` is the scaffold every future machine starts
+   from, so its `you@proton.me` placeholder is meant to stay; change it only
+   when you want the change on every machine. The two checks read differently
+   because they ask different questions: `make doctor` greps your **live** files
+   for unfilled placeholders (it names the file it means), while `make
+   mail-drift` compares live against template with addresses normalized away, so
+   filling one in is invisible to it but *deleting a line* is real drift. How
+   many addresses you list is normalized away too — a `;`-separated run counts
+   as one — so a second address of your own never reads as drift.
 
 5. **Store the Bridge password in Keychain** under a custom service name
    (avoids conflicts with Apple Mail's tokens stored under server hostnames):
