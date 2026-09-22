@@ -33,6 +33,12 @@ Anything needing action on a machine that is already set up is marked
   casks brew manages here are fonts. Only `app`/`pkg`/plugin casks are deferred
   to you. The allowlist is pinned by `make cask-check`, in CI on both
   platforms.
+- The Brewfile's 20 `mas` entries are checked too — nothing updated them
+  before. macOS's own "Automatically update apps" was switched on and still
+  had Litterbox four releases behind. Reported, not upgraded: `mas update`
+  needs root, the same wall as an app cask.
+- Everything needing a hand, from any source, now produces one notification
+  with a total instead of one per subsystem.
 - The job now runs `brew bundle check` weekly, which is what catches a purged
   cask record — `brew outdated` structurally cannot, since a package brew has
   forgotten is never "outdated". It notifies separately and no longer lets

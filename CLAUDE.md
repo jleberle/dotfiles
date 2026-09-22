@@ -78,6 +78,19 @@ Most casks never reach any of this: brew skips `auto_updates true` and
 `version :latest` casks, which keep themselves current. Of 30 installed, 22
 were skipped, 5 fonts were `auto`, 3 apps were `manual`.
 
+The Brewfile's 20 `mas` entries are the third update path, and the easiest to
+forget: `brew upgrade` does not touch them, and macOS's own "Automatically
+update apps" does not reliably either — it was **on**
+(`com.apple.commerce AutoUpdate = 1`) while Litterbox sat four releases behind.
+So the job reports them too. Not upgrades: `mas update` documents *"Requires
+root privileges to update apps"*, which is the same wall as an app cask, so
+attempting it unattended would just manufacture another half-applied upgrade.
+`mas outdated` is read-only and works fine as you.
+
+Everything that needs you — app casks and App Store apps alike — accumulates
+into one `needs_hand` list and produces **one** notification with a total.
+Adding a fourth source means appending to that list, not adding a notification.
+
 The job also runs `brew bundle check` against `homebrew/brewfile` weekly. That
 is the check that catches the *other* failure mode, the one `brew outdated`
 structurally cannot see: a cask whose Caskroom record was purged by a failed

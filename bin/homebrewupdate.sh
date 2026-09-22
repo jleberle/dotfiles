@@ -30,6 +30,12 @@ failed=0
 # `make check` documents having made with its own success line.
 issues=0
 
+# Things this job found that only you can finish, from any source — app casks
+# and App Store apps both land here. Collected rather than announced inline so
+# one run produces ONE notification with a total, not a notification per
+# subsystem. Each line is already indented for the log.
+needs_hand=""
+
 # Run one labelled step; on failure, say so in the log and count it.
 step() {
     local label="$1"
@@ -156,12 +162,9 @@ step() {
             fi
 
             if [[ -n "$MANUAL" ]]; then
-                N=$(grep -c . <<<"$MANUAL")
-                echo "Casks needing a terminal (sudo + App Management both need you):"
-                while IFS= read -r c; do echo "  $c"; done <<<"$MANUAL"
-                echo "  → run: brew upgrade --cask"
-                osascript -e "display notification \"$N app cask(s) need upgrading by hand. Run: brew upgrade --cask\" with title \"Homebrew Update\" sound name \"Glass\"" >/dev/null 2>&1 || true
-                echo ""
+                while IFS= read -r c; do
+                    needs_hand+="  cask      $c"$'\n'
+                done <<<"$MANUAL"
             fi
         fi
 
@@ -170,6 +173,38 @@ step() {
         # quick `brew switch` downgrade window if an upgrade goes bad, which is
         # acceptable here since restic already backs this machine up weekly
         # (see backup/org.jaredeberle.resticcheck.plist).
+        # Mac App Store apps. The Brewfile carries 20 `mas` entries and until
+        # now nothing here touched them: `brew upgrade` does not, and macOS's
+        # own "Automatically update apps" is unreliable — it was switched ON
+        # (com.apple.commerce AutoUpdate = 1) on the machine where this was
+        # written and Litterbox was still four releases behind.
+        #
+        # Reported, not upgraded, for the same reason app casks are: `mas
+        # update` documents "Requires root privileges to update apps", and this
+        # agent has no terminal to authenticate a sudo at. Attempting it anyway
+        # is how a half-applied upgrade happens, which is strictly worse than a
+        # skipped one. `mas outdated` is read-only and works fine as you.
+        MAS="$(dirname "$BREW")/mas"
+        echo "Checking for outdated App Store apps..."
+        if [[ ! -x "$MAS" ]]; then
+            echo "  skipped: mas not installed (it is in the Brewfile; run: make apps)"
+        else
+            MAS_OUT=$("$MAS" outdated 2>/dev/null || true)
+            if [[ -z "$MAS_OUT" ]]; then
+                echo "  none."
+            else
+                while IFS= read -r a; do
+                    # `mas outdated` right-aligns the app id, so strip the
+                    # leading padding before it goes in the shared list.
+                    a="${a#"${a%%[![:space:]]*}"}"
+                    [[ -n "$a" ]] || continue
+                    needs_hand+="  app store $a"$'\n'
+                done <<<"$MAS_OUT"
+                echo "  $(grep -c . <<<"$MAS_OUT") outdated — listed below."
+            fi
+        fi
+        echo ""
+
         step "Cleaning up..."                  "$BREW" cleanup --prune=all
 
         # Does the machine still have everything the Brewfile claims? This is
@@ -203,6 +238,17 @@ step() {
             issues=$((issues + 1))
         fi
         echo ""
+
+        # One report, one notification, however many subsystems contributed.
+        if [[ -n "$needs_hand" ]]; then
+            N=$(grep -c . <<<"$needs_hand")
+            echo "Needs you — these installs are privileged and cannot run unattended:"
+            printf '%s' "$needs_hand"
+            echo "  → casks:     brew upgrade --cask"
+            echo "  → App Store: sudo mas upgrade   (or App Store.app → Updates)"
+            osascript -e "display notification \"$N update(s) need you: see ~/.local/brew_update_logs.txt\" with title \"Homebrew Update\" sound name \"Glass\"" >/dev/null 2>&1 || true
+            echo ""
+        fi
     fi
 
     if [[ $failed -eq 0 && $issues -eq 0 ]]; then
