@@ -38,6 +38,30 @@ config existed.
 they need sudo and change system state beyond this repo. Same for `make macos`
 and `make chsh`.
 
+## The weekly brew job upgrades formulae only, deliberately
+
+`bin/homebrewupdate.sh` runs `brew upgrade --formula`. The `--formula` is
+load-bearing: a bare `brew upgrade` takes `installed_formula|installed_cask`,
+so it also rewrites apps in `/Applications`, and a launchd agent cannot do
+that. Two independent walls, both hit on 2026-09-21:
+
+- **sudo.** A cask install ends in `sudo -E -- chgrp -hR admin <app>`, and
+  there is no terminal under launchd to read a password from. The bitwarden
+  upgrade failed *after* moving the new app into place and its rollback failed
+  too, leaving `Bitwarden.app` group `staff` where every other app is `admin`.
+- **App Management (TCC).** Modifying another app's bundle needs that grant,
+  and the process asking is Homebrew's vendored ruby — so it surfaces as a
+  `"ruby" was prevented from modifying apps on your Mac` notification with
+  nothing actionable behind it.
+
+Neither is worth defeating. The grant would be tied to the portable-ruby
+binary, which `brew update` replaces on its own schedule (it did so in that
+same run), revoking it again; and an askpass helper or NOPASSWD sudoers rule
+would hand every background process on the Mac the ability to rewrite
+`/Applications`. So casks are **reported** by the job and upgraded by hand.
+Most never appear: brew skips `auto_updates true` casks, which update
+themselves.
+
 ## fish functions are the user-facing surface
 
 `shell/fish/functions/` is where the day-to-day commands live — `dots`, `site`

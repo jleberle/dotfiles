@@ -12,6 +12,23 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-09-22 — The weekly brew job stops trying to upgrade apps
+
+- `bin/homebrewupdate.sh` runs `brew upgrade --formula`. A bare `brew upgrade`
+  also upgrades casks, which a launchd agent cannot do: cask installs end in a
+  `sudo chgrp` with no terminal to authenticate at, and modifying
+  `/Applications` needs an App Management grant that Homebrew's vendored ruby
+  does not have — the source of the `"ruby" was prevented from modifying apps
+  on your Mac` notification.
+- Casks are now listed in the log and notified about instead, to upgrade by
+  hand. The old `brew upgrade --cask` step was already a no-op; the bare
+  upgrade above it had claimed them first.
+- **Action required (one-off).** The 2026-09-21 run left `Bitwarden.app` group
+  `staff` instead of `admin` when its upgrade failed mid-move. Harmless on a
+  single-user Mac, and the next interactive `brew upgrade --cask` fixes it.
+
+---
+
 ## 2026-09-13 — `mail-drift` stops punishing a second email address
 
 - `mail_normalize` collapses a `;`/`,`-separated run of addresses to one, so

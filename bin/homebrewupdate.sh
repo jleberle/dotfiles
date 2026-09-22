@@ -63,7 +63,33 @@ step() {
         HUGO="$(dirname "$BREW")/hugo"
         HUGO_BEFORE=$("$HUGO" version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
 
-        step "Upgrading outdated packages..."  "$BREW" upgrade
+        # --formula, NOT a bare `brew upgrade`. A bare upgrade takes
+        # "installed_formula|installed_cask", so it upgrades apps in
+        # /Applications too — and a launchd agent cannot do that. Two separate
+        # walls, both hit on 2026-09-21 upgrading bitwarden:
+        #
+        #   1. sudo. Cask install ends in `sudo -E -- chgrp -hR admin <app>`,
+        #      and under launchd there is no terminal to read a password from:
+        #      "sudo: a terminal is required to read the password". The upgrade
+        #      failed AFTER moving the new app into place, then the rollback
+        #      failed too ("there is already an App at /Applications/..."),
+        #      leaving Bitwarden.app owned by :staff while every other app is
+        #      :admin. A half-applied upgrade is worse than no upgrade.
+        #
+        #   2. macOS App Management (TCC). Modifying another app's bundle needs
+        #      that grant, and the process asking is Homebrew's own vendored
+        #      ruby — so the denial surfaces as a "\"ruby\" was prevented from
+        #      modifying apps on your Mac" notification with nothing actionable
+        #      behind it. Granting it is not a fix either: the grant is tied to
+        #      that binary, and `brew update` replaces portable-ruby on its own
+        #      schedule (4.0.7 landed in this very run), which revokes it again.
+        #
+        # Neither is worth defeating. An askpass helper or a NOPASSWD sudoers
+        # rule would hand every background process on this Mac the ability to
+        # rewrite /Applications, to save a click on an upgrade you want to see
+        # anyway. So formulae — which live in the Cellar, need no sudo and
+        # touch no app bundle — are automated, and casks are reported below.
+        step "Upgrading outdated packages..."  "$BREW" upgrade --formula
 
         # Notify if Hugo was upgraded. Both follow-ups are `site` subcommands
         # now, so they run from anywhere — no `cd` into the website repo.
@@ -76,7 +102,27 @@ step() {
             echo ""
         fi
 
-        step "Upgrading outdated casks..."     "$BREW" upgrade --cask
+        # Casks are REPORTED, not upgraded — see the note above. This step
+        # used to be `brew upgrade --cask`, which was already doing nothing:
+        # the bare `brew upgrade` above had upgraded (or failed to upgrade)
+        # every cask before it ran, so its output in the log was empty even on
+        # the week it broke. Reporting is the honest version of that no-op.
+        #
+        # Most casks never appear here: brew skips `auto_updates true` ones,
+        # which update themselves. What is left is the handful that genuinely
+        # need you, so a weekly notification is a reminder, not noise.
+        echo "Checking for outdated casks..."
+        CASKS=$("$BREW" outdated --cask --quiet 2>/dev/null || true)
+        if [[ -n "$CASKS" ]]; then
+            N=$(grep -c . <<<"$CASKS")
+            while IFS= read -r c; do echo "  $c"; done <<<"$CASKS"
+            echo "  → upgrade these from a terminal (sudo + App Management both need you): brew upgrade --cask"
+            osascript -e "display notification \"$N cask(s) need upgrading by hand. Run: brew upgrade --cask\" with title \"Homebrew Update\" sound name \"Glass\"" >/dev/null 2>&1 || true
+        else
+            echo "  none."
+        fi
+        echo ""
+
         # --prune=all removes old Cellar versions and download cache immediately
         # rather than waiting brew's default 120 days. That trades away a
         # quick `brew switch` downgrade window if an upgrade goes bad, which is

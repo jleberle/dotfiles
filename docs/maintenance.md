@@ -149,7 +149,7 @@ targets' own `## group | description` tags, so it cannot drift.
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `resticcheck`      | Installs a launchd agent that runs `arch backup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
 | `decksync`         | Installs a `WatchPaths` launchd agent that syncs the Keynote lecture decks to the "Slides" flash drive whenever a volume mounts; no-op unless that drive appeared |
-| `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly (`homebrewupdate.sh` caps its own log at 1 MB) |
+| `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly — formulae only; casks are reported for you to upgrade by hand (`homebrewupdate.sh` caps its own log at 1 MB) |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |
 | `harden`           | **(sudo)** Sets `~` to `0700`, enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |
