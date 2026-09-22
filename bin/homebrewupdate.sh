@@ -23,6 +23,13 @@ trap 'rm -f "$TMPFILE"' EXIT
 # after one is deliberate: a broken cask should not stop `brew cleanup`.
 failed=0
 
+# Problems that are real but are NOT update failures: the update did everything
+# it was asked to, and something else about the machine is wrong. Tracked apart
+# from `failed` so the summary can say which, rather than signing off with
+# "Brew update complete!" over an unresolved finding — the same mistake
+# `make check` documents having made with its own success line.
+issues=0
+
 # Run one labelled step; on failure, say so in the log and count it.
 step() {
     local label="$1"
@@ -111,17 +118,52 @@ step() {
         # Most casks never appear here: brew skips `auto_updates true` ones,
         # which update themselves. What is left is the handful that genuinely
         # need you, so a weekly notification is a reminder, not noise.
+        # Casks split two ways, by ARTIFACT rather than by name — see
+        # bin/caskclassify.py for the allowlist and why it is an allowlist.
+        # A cask that only drops fonts in ~/Library/Fonts or a symlink in
+        # $HOMEBREW_PREFIX/bin needs no sudo and writes no app bundle, so it
+        # upgrades here like a formula. Anything that installs an app (or
+        # anything unrecognised) is reported for you to run by hand.
+        #
+        # Of the 30 casks installed when this was written, five fonts were
+        # `auto` and three apps were `manual`; the other 22 never reach here
+        # at all, because brew skips `auto_updates true` and `version :latest`
+        # casks, which keep themselves current.
         echo "Checking for outdated casks..."
         CASKS=$("$BREW" outdated --cask --quiet 2>/dev/null || true)
-        if [[ -n "$CASKS" ]]; then
-            N=$(grep -c . <<<"$CASKS")
-            while IFS= read -r c; do echo "  $c"; done <<<"$CASKS"
-            echo "  → upgrade these from a terminal (sudo + App Management both need you): brew upgrade --cask"
-            osascript -e "display notification \"$N cask(s) need upgrading by hand. Run: brew upgrade --cask\" with title \"Homebrew Update\" sound name \"Glass\"" >/dev/null 2>&1 || true
-        else
+        if [[ -z "$CASKS" ]]; then
             echo "  none."
+            echo ""
+        else
+            CLASSIFY="$(dirname "$0")/caskclassify.py"
+            if [[ -x "$CLASSIFY" ]]; then
+                # shellcheck disable=SC2086
+                # Word splitting is the point: $CASKS is a newline-separated
+                # list of cask tokens, which never contain whitespace.
+                CLASS=$("$CLASSIFY" $CASKS 2>/dev/null || true)
+            else
+                echo "*** caskclassify.py missing — treating every cask as manual"
+                CLASS=$(while IFS= read -r c; do printf 'manual\t%s\tunclassified\n' "$c"; done <<<"$CASKS")
+                failed=$((failed + 1))
+            fi
+
+            AUTO=$(awk -F'\t' '$1=="auto"   {print $2}' <<<"$CLASS")
+            MANUAL=$(awk -F'\t' '$1=="manual" {printf "%s (%s)\n", $2, $3}' <<<"$CLASS")
+
+            if [[ -n "$AUTO" ]]; then
+                # shellcheck disable=SC2086
+                step "Upgrading font/CLI casks..." "$BREW" upgrade --cask $AUTO
+            fi
+
+            if [[ -n "$MANUAL" ]]; then
+                N=$(grep -c . <<<"$MANUAL")
+                echo "Casks needing a terminal (sudo + App Management both need you):"
+                while IFS= read -r c; do echo "  $c"; done <<<"$MANUAL"
+                echo "  → run: brew upgrade --cask"
+                osascript -e "display notification \"$N app cask(s) need upgrading by hand. Run: brew upgrade --cask\" with title \"Homebrew Update\" sound name \"Glass\"" >/dev/null 2>&1 || true
+                echo ""
+            fi
         fi
-        echo ""
 
         # --prune=all removes old Cellar versions and download cache immediately
         # rather than waiting brew's default 120 days. That trades away a
@@ -129,10 +171,44 @@ step() {
         # acceptable here since restic already backs this machine up weekly
         # (see backup/org.jaredeberle.resticcheck.plist).
         step "Cleaning up..."                  "$BREW" cleanup --prune=all
+
+        # Does the machine still have everything the Brewfile claims? This is
+        # the check that would have caught 2026-09-21 on its own. That failed
+        # cask upgrade left Bitwarden.app on disk, current and working, while
+        # brew's Caskroom version directory was purged — so `brew info` said
+        # "Not installed", nothing would ever upgrade it again, and the only
+        # symptom was a notification about ruby. `brew outdated` cannot see a
+        # package brew no longer believes in; `brew bundle check` can.
+        #
+        # It reuses the Brewfile rather than inventing a second inventory,
+        # because this repo is the single authority on tool presence (CLAUDE.md)
+        # and `make brew-check` already asks exactly this question — this just
+        # asks it weekly and unattended instead of when you remember to.
+        #
+        # Deliberately does NOT increment `failed`: nothing about the update
+        # went wrong, and folding it in would fire the "update failed" notice
+        # with a message about the wrong thing. It gets its own.
+        BREWFILE="$(dirname "$0")/../homebrew/brewfile"
+        echo "Verifying Brewfile packages are still installed..."
+        if [[ ! -f "$BREWFILE" ]]; then
+            echo "  skipped: no Brewfile at $BREWFILE"
+        elif BUNDLE_OUT=$("$BREW" bundle check --file="$BREWFILE" --no-upgrade --verbose 2>&1); then
+            echo "  all present."
+        else
+            while IFS= read -r line; do echo "  $line"; done <<<"$BUNDLE_OUT"
+            echo "  → a package went missing, or a cask upgrade failed halfway and"
+            echo "    purged brew's record of it. Re-adopt an app that is still on"
+            echo "    disk with: brew install --cask --adopt <token>"
+            osascript -e "display notification \"A Brewfile package is missing or its brew record is broken. See the log.\" with title \"Homebrew Update\" sound name \"Basso\"" >/dev/null 2>&1 || true
+            issues=$((issues + 1))
+        fi
+        echo ""
     fi
 
-    if [[ $failed -eq 0 ]]; then
+    if [[ $failed -eq 0 && $issues -eq 0 ]]; then
         echo "Brew update complete!"
+    elif [[ $failed -eq 0 ]]; then
+        echo "Brew update complete, but $issues package integrity issue(s) found — see above."
     else
         echo "*** homebrewupdate.sh: $failed step(s) FAILED — see the *** lines above."
         echo "*** Re-run by hand to watch it live: ~/git/dotfiles/bin/homebrewupdate.sh"

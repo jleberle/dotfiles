@@ -188,7 +188,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift agent-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check cask-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift agent-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -557,6 +557,9 @@ lint-plists : ## check | plutil -lint over tracked plists and workflows
 	@echo "Linting macOS plist/workflow files..."
 	@command -v plutil >/dev/null 2>&1 || { echo "ERROR: plutil not found — macOS only"; exit 1; }
 	@find backup homebrew keynote writing macos/services -type f \( -name '*.plist' -o -name '*.wflow' \) -print0 | xargs -0 -n1 plutil -lint
+cask-check : ## check | Fixture test for bin/caskclassify.py (offline, no Homebrew needed)
+	@./tests/cask-check.sh
+
 writing-check : ## check | Smoke tests for citecheck/zotcheck/readnote/mdlinks
 	@echo "Running writing workflow checks..."
 	@command -v fish >/dev/null 2>&1 || { echo "ERROR: fish not found — install it first (make apps)"; exit 1; }

@@ -149,7 +149,7 @@ targets' own `## group | description` tags, so it cannot drift.
 | `mailsync`         | Installs a launchd agent that runs `mbsync -a && notmuch new` every 5 minutes                      |
 | `resticcheck`      | Installs a launchd agent that runs `arch backup check` (restic integrity) weekly; no-op when the backup drive is unmounted |
 | `decksync`         | Installs a `WatchPaths` launchd agent that syncs the Keynote lecture decks to the "Slides" flash drive whenever a volume mounts; no-op unless that drive appeared |
-| `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly — formulae only; casks are reported for you to upgrade by hand (`homebrewupdate.sh` caps its own log at 1 MB) |
+| `brewauto`         | Installs a `launchd` agent that updates Homebrew weekly — formulae plus font/CLI casks; casks that install an app are reported for you to upgrade by hand, and a `brew bundle check` runs after (`homebrewupdate.sh` caps its own log at 1 MB) |
 | `macos`            | Writes sensible macOS system defaults (keyboard repeat, Finder, Dock, screenshots, system)          |
 | `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |
 | `harden`           | **(sudo)** Sets `~` to `0700`, enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |
@@ -159,6 +159,7 @@ targets' own `## group | description` tags, so it cannot drift.
 | `agent-drift`      | Compares the installed LaunchAgents against this repo's plists and names the target that reinstalls each stale one. Compares normalized JSON (`plutil` + sorted keys), so rewritten comments are not reported — only differences launchd would act on |
 | `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, `py_compile` for the Python helpers, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-python`/`lint-luacheck`/`lint-secrets` |
 | `lint-plists`      | macOS-only: `plutil -lint` over tracked LaunchAgents and Automator workflow files                    |
+| `cask-check`       | Fixture test for `bin/caskclassify.py` — asserts app/pkg/unknown-artifact casks never classify as safe to upgrade unattended. Offline; no Homebrew needed |
 | `writing-check`    | Runs fixture-backed smoke tests for the academic-writing helpers (`citecheck`, `zotcheck`, `readnote`, `mdlinks`) |
 | `nvim-check`       | Runs a headless Neovim startup smoke test in a temporary XDG tree                                    |
 | `update`           | Updates the non-brew toolchain — Neovim plugins (Lazy sync) and `vale sync`; Homebrew/Betterfox stay on their own paths. Also prints the CI-pinned vs. local gitleaks version, since that pin is bumped by hand |

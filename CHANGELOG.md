@@ -23,9 +23,20 @@ Anything needing action on a machine that is already set up is marked
 - Casks are now listed in the log and notified about instead, to upgrade by
   hand. The old `brew upgrade --cask` step was already a no-op; the bare
   upgrade above it had claimed them first.
-- **Action required (one-off).** The 2026-09-21 run left `Bitwarden.app` group
-  `staff` instead of `admin` when its upgrade failed mid-move. Harmless on a
-  single-user Mac, and the next interactive `brew upgrade --cask` fixes it.
+- **Action required (one-off).** That failed upgrade also purged brew's
+  Caskroom record for bitwarden, so the app on disk is current and working
+  while `brew info` says "Not installed" — nothing will ever update it again.
+  Repair with `brew install --cask --adopt bitwarden`, which also re-runs the
+  `chgrp` that left it group `staff` instead of `admin`.
+- New `bin/caskclassify.py` splits outdated casks by artifact, so the ones that
+  only drop fonts or a CLI symlink still upgrade unattended — five of the eight
+  casks brew manages here are fonts. Only `app`/`pkg`/plugin casks are deferred
+  to you. The allowlist is pinned by `make cask-check`, in CI on both
+  platforms.
+- The job now runs `brew bundle check` weekly, which is what catches a purged
+  cask record — `brew outdated` structurally cannot, since a package brew has
+  forgotten is never "outdated". It notifies separately and no longer lets
+  "Brew update complete!" stand over an unresolved finding.
 
 ---
 

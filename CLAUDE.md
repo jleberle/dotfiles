@@ -58,9 +58,32 @@ Neither is worth defeating. The grant would be tied to the portable-ruby
 binary, which `brew update` replaces on its own schedule (it did so in that
 same run), revoking it again; and an askpass helper or NOPASSWD sudoers rule
 would hand every background process on the Mac the ability to rewrite
-`/Applications`. So casks are **reported** by the job and upgraded by hand.
-Most never appear: brew skips `auto_updates true` casks, which update
-themselves.
+`/Applications`.
+
+But "cask" is not "app". `bin/caskclassify.py` splits the outdated ones by
+**artifact**, not by name: a cask whose artifacts are all in a small allowlist
+(`font`, `binary`, `manpage`, `*_completion`) writes nothing into
+`/Applications` and needs no sudo, so the job upgrades it like a formula.
+Anything with an `app`/`pkg`/plugin artifact — or any artifact kind not on the
+list — is reported for you. `font-*` would have worked as a name rule today,
+but it is a convention; the artifact list is the thing that actually decides.
+
+SAFE is an allowlist **so an unrecognised artifact kind fails to `manual`**.
+`tests/cask-check.sh` (`make cask-check`, and CI on both platforms) pins that:
+it asserts a made-up artifact kind classifies `manual`, so turning the
+allowlist into a denylist breaks the build rather than shipping the next new
+artifact type unattended.
+
+Most casks never reach any of this: brew skips `auto_updates true` and
+`version :latest` casks, which keep themselves current. Of 30 installed, 22
+were skipped, 5 fonts were `auto`, 3 apps were `manual`.
+
+The job also runs `brew bundle check` against `homebrew/brewfile` weekly. That
+is the check that catches the *other* failure mode, the one `brew outdated`
+structurally cannot see: a cask whose Caskroom record was purged by a failed
+upgrade is not outdated, it is invisible — the app sits on disk working and
+current while brew reports "Not installed" and never updates it again. Recover
+one with `brew install --cask --adopt <token>`.
 
 ## fish functions are the user-facing surface
 
