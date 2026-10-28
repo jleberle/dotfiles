@@ -1,0 +1,7 @@
+# Python packages the brewfile cannot carry: Homebrew has no formula for them.
+# Installed into Homebrew python3's per-user site by `make pydeps` (part of
+# `make apps`), checked by `make brew-check`, and reinstalled by the weekly
+# brew job — see the pydeps target for why that last part matters.
+#
+# One distribution name per line, with what needs it.
+pyyaml # ~/git/website scripts/writing-log.py reads writing-log.yaml

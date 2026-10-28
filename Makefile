@@ -188,7 +188,7 @@ plutil -lint $(LAUNCH_AGENTS)/$(notdir $(1))
 launchctl bootstrap gui/$(LAUNCHD_UID) $(LAUNCH_AGENTS)/$(notdir $(1))
 endef
 
-.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check cask-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift agent-drift
+.PHONY: default help require-location install git shell chsh security firefox betterfox-update apps pydeps brewauto nvim vale neomutt mailsync resticcheck decksync services macos macos-check harden touchid update doctor status check lint lint-shellcheck lint-fish lint-python lint-luacheck lint-secrets lint-plists writing-check cask-check nvim-check nvim-drift nvim-restore brew-check brew-drift mail-drift agent-drift
 
 # `make` alone still does nothing — running `install` by accident is the thing
 # worth preventing — but refusing in silence taught the user nothing about what
@@ -348,6 +348,21 @@ apps : require-location ## setup | brew bundle against homebrew/brewfile
 	@# drwxr-xr-x. Harmless while brew runs as you, invisible, and impossible to
 	@# trace back later. The umask stays 077 for everything you create yourself.
 	umask 022 && $(HOMEBREW_PREFIX)/bin/brew bundle install --file=$(CURDIR)/homebrew/brewfile
+	@$(MAKE) --no-print-directory pydeps
+
+pydeps : ## setup | pip install homebrew/requirements.txt for Homebrew python3
+	@# Python packages with no Homebrew formula (PyYAML, for the website's writing
+	@# log). A --user install lands in ~/Library/Python/3.X/, one directory per
+	@# MINOR version — so when a routine brew upgrade moves python3 from 3.14 to
+	@# 3.15 the packages are still on disk and the new interpreter cannot see
+	@# them. That is how writing-log.py broke on 2026-10-26 with nothing changed
+	@# in either repo. bin/homebrewupdate.sh runs this after every upgrade so the
+	@# weekly job heals it; brew-check reports it if python3 moved by hand.
+	@#
+	@# --break-system-packages is required, not reckless: Homebrew's python is
+	@# marked externally-managed (PEP 668), which refuses even --user installs.
+	@# --user keeps them out of the Cellar, so brew never sees or clobbers them.
+	$(HOMEBREW_PREFIX)/bin/python3 -m pip install --user --break-system-packages --quiet -r $(CURDIR)/homebrew/requirements.txt
 brewauto : require-location ## agents | launchd agent: update Homebrew weekly
 	@echo "Installing Homebrew auto-update LaunchAgents"
 	mkdir -p $(HOME)/.local
@@ -617,6 +632,13 @@ brew-check : ## check | Verify every brewfile package is installed
 	@# counts and re-lists those lines in its summary — see the note there.
 	@brew bundle check --file=$(CURDIR)/homebrew/brewfile --no-upgrade || \
 	    echo "WARNING: some Brewfile packages are missing (run: make apps)"
+	@# The pip half of the inventory (see pydeps). Distribution names, not import
+	@# names — pyyaml imports as `yaml` — so ask importlib.metadata, which takes
+	@# the same name requirements.txt does.
+	@MISSING=$$(sed 's/#.*//' $(CURDIR)/homebrew/requirements.txt | xargs $(HOMEBREW_PREFIX)/bin/python3 -c \
+	    'import sys, importlib.metadata as m; have = {d.metadata["Name"].lower() for d in m.distributions()}; print(*[n for n in sys.argv[1:] if n.lower() not in have])' 2>&1); \
+	[ -z "$$MISSING" ] || \
+	    echo "WARNING: python3 ($$($(HOMEBREW_PREFIX)/bin/python3 -V 2>&1)) is missing: $$MISSING (run: make pydeps)"
 	@# Packages installed from a fish shell landed in the Cellar as drwx------
 	@# instead of drwxr-xr-x, because conf.d/env.fish sets umask 077 session-wide
 	@# and brew creates directories with its caller's umask. Nothing breaks while

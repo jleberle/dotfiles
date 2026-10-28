@@ -12,6 +12,18 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-10-27 — Python packages without a formula are tracked
+
+- `homebrew/requirements.txt` lists pip packages the brewfile cannot carry
+  (PyYAML, for `~/git/website`'s writing log). `make pydeps` installs them and
+  `make apps` now runs it; `make brew-check` warns when `python3` cannot see
+  one.
+- `bin/homebrewupdate.sh` reinstalls them after its formula upgrade, because a
+  `--user` install is per minor Python version — the 3.14 → 3.15 upgrade on
+  2026-10-26 hid PyYAML from the new `python3`.
+- **Action required (each machine).** `make pydeps` once. The weekly job runs
+  the script from this checkout, so it picks up the new step on its own.
+
 ## 2026-09-22 — The weekly brew job stops trying to upgrade apps
 
 - `bin/homebrewupdate.sh` runs `brew upgrade --formula`. A bare `brew upgrade`

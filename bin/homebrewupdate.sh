@@ -104,6 +104,19 @@ step() {
         # touch no app bundle — are automated, and casks are reported below.
         step "Upgrading outdated packages..."  "$BREW" upgrade --formula
 
+        # Right after the upgrade, because the upgrade is what breaks them: a
+        # --user pip install is tied to python3's MINOR version, so a formula
+        # upgrade that moves python3 to 3.N+1 strands every package in
+        # homebrew/requirements.txt in the old ~/Library/Python/3.N/. That is
+        # how the website's writing log lost PyYAML on 2026-10-26. pip skips
+        # whatever is already satisfied, so on an ordinary week this is a no-op.
+        # Same command as `make pydeps`; see the note there for the flags.
+        REQS="$(dirname "$0")/../homebrew/requirements.txt"
+        if [[ -f "$REQS" ]]; then
+            step "Installing Python packages for python3..." \
+                "$(dirname "$BREW")/python3" -m pip install --user --break-system-packages --quiet -r "$REQS"
+        fi
+
         # Notify if Hugo was upgraded. Both follow-ups are `site` subcommands
         # now, so they run from anywhere — no `cd` into the website repo.
         HUGO_AFTER=$("$HUGO" version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")

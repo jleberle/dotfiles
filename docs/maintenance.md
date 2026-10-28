@@ -65,6 +65,12 @@ the CLI tools the rest of the setup depends on — delta, vale, pandoc, tectonic
 lazygit, the LSP servers, and the formatters are all Brewfile entries, so the
 Brewfile stays the single list to keep current.
 
+The one exception is Python packages Homebrew has no formula for, which live
+in `homebrew/requirements.txt` beside it and are checked here too. They are
+installed per *minor* Python version, so a `brew upgrade` that moves `python3`
+(3.14 → 3.15) hides them from the new interpreter. If this warns about them,
+run `make pydeps`.
+
 ### Brewfile drift (reverse direction)
 
 ```sh
@@ -141,7 +147,8 @@ targets' own `## group | description` tags, so it cannot drift.
 | `security`         | Symlinks SSH config + pinned `known_hosts` + GPG configs; creates `~/.ssh/control` and `~/.gnupg` with safe perms |
 | `firefox`          | Detects the default Firefox profile via `installs.ini` and writes `user.js` (Betterfox + overrides) |
 | `betterfox-update` | Pulls latest Betterfox upstream into the submodule; re-run `make firefox` afterwards               |
-| `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps)                 |
+| `apps`             | `brew bundle` against `homebrew/brewfile` (CLIs, casks, fonts, Mac App Store apps), then `pydeps`  |
+| `pydeps`           | `pip install --user` of `homebrew/requirements.txt` into Homebrew `python3` — packages with no formula (PyYAML). Re-run after `python3` changes minor version; the weekly brew job does it for you |
 | `nvim`             | Symlinks the whole `writing/nvim/` dir → `~/.config/nvim`                                           |
 | `vale`             | Writes a global `~/.vale.ini` with an absolute `StylesPath`, creates the styles dir, runs `vale sync` |
 | `neomutt`          | Symlinks NeoMutt config files into `~/.config/neomutt/`, creates cache dirs, scaffolds `~/.mbsyncrc` and `~/.notmuch-config` from templates if missing |
@@ -154,7 +161,7 @@ targets' own `## group | description` tags, so it cannot drift.
 | `macos-check`      | Reads every key set by `make macos` plus the security checks (FileVault, firewall, auto-updates, Touch ID) and warns on any missing/wrong |
 | `harden`           | **(sudo)** Sets `~` to `0700`, enables the application firewall + stealth mode, automatic macOS security updates, and opts out of Apple diagnostics submission |
 | `touchid`          | **(sudo)** Writes `/etc/pam.d/sudo_local` to enable Touch ID for `sudo` (with `pam_reattach` so it works inside tmux) |
-| `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed                              |
+| `brew-check`       | Runs `brew bundle check` to verify every Brewfile package is installed, and that `python3` can see every package in `homebrew/requirements.txt` |
 | `brew-drift`       | Lists formulae/casks installed but **not** in the Brewfile (reverse of `brew-check`; dry run)       |
 | `agent-drift`      | Compares the installed LaunchAgents against this repo's plists and names the target that reinstalls each stale one. Compares normalized JSON (`plutil` + sorted keys), so rewritten comments are not reported — only differences launchd would act on |
 | `lint`             | Runs repo static checks: shellcheck for scripts/hooks, fish syntax checks, `py_compile` for the Python helpers, luacheck for nvim Lua, and a full-history gitleaks scan. Each also runs standalone as `lint-shellcheck`/`lint-fish`/`lint-python`/`lint-luacheck`/`lint-secrets` |
