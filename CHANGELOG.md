@@ -12,6 +12,17 @@ Anything needing action on a machine that is already set up is marked
 
 ---
 
+## 2026-11-05 — pip packages are no longer tracked
+
+- Removed `make pydeps`, `homebrew/requirements.txt`, the pip check in
+  `make brew-check`, and the weekly job's pip reinstall. Their only package was
+  PyYAML, for `~/git/website`'s writing log, which is now standard-library
+  only. Nothing else under `~/git` imports it.
+- The weekly job's "Hugo updated" notice now says to run `site doctor`. It used
+  to name `site hugo-version` and `site csp`, neither of which exists any more.
+- Optional, each machine: `python3 -m pip uninstall --break-system-packages pyyaml`
+  removes the now-unused copy. Leaving it does no harm.
+
 ## 2026-10-27 — Python packages without a formula are tracked
 
 - `homebrew/requirements.txt` lists pip packages the brewfile cannot carry

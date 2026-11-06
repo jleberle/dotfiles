@@ -104,27 +104,16 @@ step() {
         # touch no app bundle — are automated, and casks are reported below.
         step "Upgrading outdated packages..."  "$BREW" upgrade --formula
 
-        # Right after the upgrade, because the upgrade is what breaks them: a
-        # --user pip install is tied to python3's MINOR version, so a formula
-        # upgrade that moves python3 to 3.N+1 strands every package in
-        # homebrew/requirements.txt in the old ~/Library/Python/3.N/. That is
-        # how the website's writing log lost PyYAML on 2026-10-26. pip skips
-        # whatever is already satisfied, so on an ordinary week this is a no-op.
-        # Same command as `make pydeps`; see the note there for the flags.
-        REQS="$(dirname "$0")/../homebrew/requirements.txt"
-        if [[ -f "$REQS" ]]; then
-            step "Installing Python packages for python3..." \
-                "$(dirname "$BREW")/python3" -m pip install --user --break-system-packages --quiet -r "$REQS"
-        fi
-
-        # Notify if Hugo was upgraded. Both follow-ups are `site` subcommands
-        # now, so they run from anywhere — no `cd` into the website repo.
+        # Notify if Hugo was upgraded: local Hugo now differs from the version
+        # the website deploys with (~/git/website/.hugo-version, mirrored in
+        # Cloudflare's HUGO_VERSION). `site doctor` and `site check` both flag
+        # the mismatch; ~/git/website/docs/maintenance.md has the upgrade steps.
         HUGO_AFTER=$("$HUGO" version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
         if [[ -n "$HUGO_BEFORE" && -n "$HUGO_AFTER" && "$HUGO_BEFORE" != "$HUGO_AFTER" ]]; then
-            FOLLOWUP="site hugo-version && site csp --write"
+            FOLLOWUP="site doctor, then ~/git/website/docs/maintenance.md (After Upgrading Hugo)"
             echo "Hugo updated: $HUGO_BEFORE → $HUGO_AFTER"
             echo "  → run: $FOLLOWUP"
-            osascript -e "display notification \"Hugo $HUGO_BEFORE → $HUGO_AFTER. Run: site hugo-version && site csp --write\" with title \"Homebrew Update\" sound name \"Glass\""
+            osascript -e "display notification \"Hugo $HUGO_BEFORE → $HUGO_AFTER. Run: site doctor\" with title \"Homebrew Update\" sound name \"Glass\""
             echo ""
         fi
 
