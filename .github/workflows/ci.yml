@@ -41,10 +41,16 @@ jobs:
       - name: Install Linux dependencies
         run: |
           sudo apt-get update -o Acquire::Retries=3
+          # shellcheck and fish are version-pinned to Ubuntu 24.04's current
+          # archive versions, the same discipline luacheck/gitleaks already
+          # get below — otherwise an archive bump changes what the lint
+          # steps accept between two identical pushes, with no diff to show
+          # why. Bump these deliberately (`apt-cache policy shellcheck fish`
+          # on a noble runner) rather than letting them float.
           sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y \
             make \
-            shellcheck \
-            fish \
+            shellcheck=0.9.0-1 \
+            fish=3.7.0-1 \
             python3 \
             curl \
             lua5.4 \

@@ -2,8 +2,10 @@
 
 Static Regular/Bold/Italic/Bold Italic instances (wght 400/700, opsz 20 — the
 family's own "text" optical size), generated from Adobe's Source Serif 4
-variable font via `fonttools varLib.instancer`. SIL Open Font License 1.1
-(see Adobe's upstream repo: https://github.com/adobe-fonts/source-serif).
+variable font via `fonttools varLib.instancer`. SIL Open Font License 1.1 —
+full text in [LICENSE.md](LICENSE.md), copied verbatim from Adobe's upstream
+repo (https://github.com/adobe-fonts/source-serif), required alongside any
+copy of the font, modified or not.
 
 ## Why static, not the Homebrew cask
 
